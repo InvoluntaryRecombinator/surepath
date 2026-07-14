@@ -402,17 +402,84 @@ the user hand-writes it (see D3).
 | ENF006 | `Are you currently on probation?` | **`/Yes`** · **`/No`** |
 | ENF003 | `Type of Request` | New = **`/Choice1`** · Renewal = `/Choice2` |
 | ENF003 | `#16` (renewals) | No = **`/Choice1`** · Yes = `/Choice2` |
-| ENF003 | `#17` (parole) | No = **`/Choice1`** · Yes = **`/Choice3`** ⚠️ |
-| ENF003 | `#18` (probation) | No = **`/Choice1`** · Yes = `/Choice2` |
+| ENF003 | `#17` (parole) | No = **`/Choice3`** · Yes = **`/Choice1`** ⚠️ |
+| ENF003 | `#18` (probation) | No = **`/Choice2`** · Yes = **`/Choice1`** ⚠️ |
 
-⚠️ **`#17` (parole) uses `/Choice3` for Yes, not `/Choice2`.** There is no `/Choice2`
-on that field. This is not guessable.
+🚨 **CORRECTION — the two parole/probation rows above were INVERTED in every earlier
+revision of this file, and the packet lied to TDLR because of it.**
 
-**If you assume `/Yes`/`/No` on ENF003 (the obvious guess), every checkbox silently
-stays `/Off`.** No error. No test failure. The packet arrives at TDLR with blank
-required fields — on a form that says *"Do not leave blank fields."* Rejected.
+The old table said parole *Yes* = `/Choice3`. **It is the opposite: `/Choice3` is NO.**
+Verified by reading each widget's on-value **and its rectangle** off the real blank — on the
+printed form **"No" is the LEFT box, "Yes" is the RIGHT box**:
+
+```
+#17 (parole)     left  x=192 → /Choice3 = NO      right x=226 → /Choice1 = YES
+#18 (probation)  left  x=191 → /Choice2 = NO      right x=225 → /Choice1 = YES
+#16 (renewals)   left  x=481 → /Choice1 = NO      right x=529 → /Choice2 = YES
+```
+
+**What that bug actually did:** for a man who is **not on parole** and **is on probation**, the
+generated packet ticked *"Yes, I am on parole"* and *"No, I am not on probation."* Both
+backwards. On a form he signs **under penalty of administrative sanction**, affirming it is
+his full and accurate account.
+
+**And every single check was green.** The field map said so. pdf-lib validated the export
+value and read it back. The PDF was well-formed. `A13` confirmed the packet held exactly the
+values we intended to write — *we intended to write the wrong ones.* No test can catch this,
+because the error was in the ground truth the tests were written from.
+
+**ONLY PRINTING THE PAGE AND LOOKING AT IT CAUGHT THIS.** That is why `BUILD_SEQUENCE`
+Phase 1 says *"Then print it. On paper. Look at it."* It is not a nicety. It is the only
+control that can detect a lie the whole system agrees on.
+
+⚠️ **`/Choice1` means YES on `#17` and `#18`, and NO on `#16`.** The number carries no
+meaning whatsoever. **Never reason from the number. Read the map, and if the map is the thing
+you are checking, read the geometry.**
+
+**Correction (Phase 0, verified against the real blanks).** An earlier revision of this
+file said that assuming `/Yes`/`/No` on ENF003 leaves the box *silently* `/Off`. **That was
+wrong, and the truth is better:** pdf-lib **throws loudly** on an export value the field
+does not have — *"`option` must be one of 'Choice3' or 'Choice1'"*. You cannot ship a
+silently-unticked box by guessing the wrong **syntax**.
+
+**The distinction that survives, and it is the entire reason the probe exists:** pdf-lib
+validates **syntax** — that the value exists on the field. It cannot validate **semantics** —
+that `/Choice3` is the one meaning *yes, I am on parole*. Nothing in the PDF says so. **Only
+the labeled render told us that.** A wrong-but-valid value (`/Choice1` where you meant
+`/Choice3`) ticks cleanly, throws nothing, and tells TDLR **the opposite of the truth about
+a man's parole status.** **Read the map. Never reason from the number.**
 
 Full map: `data/tdlr_field_map.json`. Labeled renders: `probe/*_labeled.png`.
+
+### F11 — `/Off` is NOT an option. It is the ABSENCE of one. `select('Off')` throws.
+
+`/Off` is not among a radio group's on-values — it is what the group holds when nothing is
+selected. This bit the field map, which listed `"none": "/Off"` for ENF006's **`Type of
+Ownership`**. That field's only real options are:
+
+```
+/General Partnership · /Sole Proprietor · /LLC · /LLP · /Corporation
+```
+
+There is **no export value meaning "not a business owner"** — which is the **default** case
+and the **common** one (A9: the business branch is hidden unless the user is a controlling
+person of a company).
+
+**Therefore two distinct primitives, never one:**
+
+| Primitive | Use |
+|---|---|
+| `tickButton(field, exportValue)` | Select a value. Verifies it exists on the field first. Fails closed. |
+| `clearButton(field)` | Leave the group unticked. **The only correct way to say "none."** |
+
+*Reason: `select('/Off')` throws — and an agent "fixing" that throw reaches for the nearest
+value that works. On this field, the nearest value is **`/General Partnership`**. That ships
+TDLR a signed statement that a man with no business is a general partnership. It is the D7
+failure exactly, arrived at from a different direction.*
+
+**Slash convention:** the map stores the **true PDF value, with the slash** (`/Choice3`).
+pdf-lib's `select()` wants it **bare** (`Choice3`) and throws on the slash. `tickButton()`
+strips it. **The map stays true; the adapter absorbs the quirk. Do not "fix" the map.**
 
 ### F9 — ENF006 splits county and state. ENF003 combines them. Same packet.
 

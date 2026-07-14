@@ -2,10 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import SmokePage from './SmokePage.tsx'
+import PacketDevPage from './PacketDevPage.tsx'
 
-// PHASE 0. The app renders the smoke test and nothing else. The shell lands next.
+// PHASES 0–1. Two dev harnesses, no product UI yet. The shell lands next.
+//   /          → generate the Marcus Rivera packet  (Phase 1)
+//   /#smoke    → the eleven-check smoke test        (Phase 0)
+const smoke = window.location.hash === '#smoke'
+
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <SmokePage />
-  </StrictMode>,
+  <StrictMode>{smoke ? <SmokePage /> : <PacketDevPage />}</StrictMode>,
 )

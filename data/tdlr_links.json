@@ -1,0 +1,141 @@
+{
+  "_meta": {
+    "purpose": "SINGLE SOURCE OF TRUTH for every external link and citation in the app. Components import from here. NEVER hardcode a URL in a component -- when a state changes a URL, this is the only file that changes.",
+    "verified": "2026-07-14",
+    "review_before_demo": "Re-check every URL marked verify:false before presenting."
+  },
+
+  "tdlr": {
+    "chel_page": {
+      "label": "TDLR — Criminal History Evaluation Letter",
+      "url": "https://www.tdlr.texas.gov/crimHistoryEval.htm",
+      "verify": true,
+      "use_on": ["Stage 1 (Texas overview)", "Stage 1.5 (disclosure)"]
+    },
+    "criminal_conviction_guidelines": {
+      "label": "TDLR — Guidelines for License Applicants with Criminal Convictions",
+      "url": "https://www.tdlr.texas.gov/crimconvict.htm",
+      "verify": true,
+      "use_on": ["Stage 5 (license selection — the guidelines lookup)"],
+      "note": "This is the source document for data/tdlr_guidelines.json. Cite it on every lookup."
+    },
+    "applicants_with_criminal_history": {
+      "label": "TDLR — Information for Applicants with Criminal History",
+      "url": "https://www.tdlr.texas.gov/criminal-history/",
+      "verify": true,
+      "use_on": ["Stage 1.5"]
+    },
+    "enforcement_email": "enforcement@tdlr.texas.gov",
+    "enforcement_phone": "(512) 539-5600",
+    "customer_service_phone": "(800) 803-9202 / (512) 463-6599",
+    "_phone_note": "Enforcement handles the CHEL. Customer Service reps CANNOT answer questions about ENF006/ENF003. Point users at Enforcement.",
+    "mailing_address": {
+      "line1": "Texas Department of Licensing and Regulation",
+      "line2": "P.O. Box 12157",
+      "line3": "Austin, TX 78711-2157"
+    },
+    "fee_usd": 10.0,
+    "fee_note": "Per LICENSE TYPE, not per crime. Cashier's check or money order payable to TDLR. NOT cash.",
+    "turnaround_days": 90
+  },
+
+  "get_your_record": {
+    "_CRITICAL": "There are TWO paths and the cheap one CAN LOSE YOU THE CASE. Steer users to the FINGERPRINT review. A name-based search can silently miss a conviction -- which is the exact omission that voids the evaluation letter.",
+
+    "RECOMMENDED_fingerprint_personal_review": {
+      "label": "Texas DPS — Personal Review of your complete criminal history (fingerprint-based)",
+      "url": "https://uenroll.identogo.com/servicecode/11FT12",
+      "verify": true,
+      "service_code": "11FT12",
+      "cost_usd": 25.0,
+      "cost_breakdown": "$10 fingerprint capture at IdentoGO + $15 for the criminal history record",
+      "turnaround": "typically days (mail results can take ~10 business days)",
+      "phone": "1-888-467-2080",
+      "why": "This is your COMPLETE Texas record, including arrests that did not lead to conviction. Fingerprints positively identify you. Nothing gets missed because of a name spelling.",
+      "use_on": ["Stage 2 (Get your record)"]
+    },
+
+    "NOT_RECOMMENDED_name_search": {
+      "label": "DPS public name-based conviction search",
+      "cost_usd": 3.0,
+      "why_not": "DPS itself warns: 'The only way to positively link someone to a criminal record is through fingerprint identification.' A name search uses Soundex matching -- it CAN MISS your records and CAN return someone else's. It also only shows convictions and deferred adjudications (Gov't Code §411.135). A missed conviction voids the TDLR letter.",
+      "surepath_position": "Mention it exists, and say plainly why it is the wrong tool for this. Do not link it as the primary path."
+    },
+
+    "out_of_state_and_federal": {
+      "label": "FBI — Identity History Summary Check",
+      "url": "https://www.fbi.gov/how-we-can-help-you/more-fbi-services-and-information/identity-history-summary-checks",
+      "verify": false,
+      "verify_note": "VERIFY THE URL AND THE CURRENT FEE BEFORE THE DEMO.",
+      "why": "The Texas DPS record shows TEXAS. TDLR requires you report in-state, out-of-state, AND federal offenses. This is the only way to see the rest.",
+      "use_on": ["Stage 2 (Get your record)"]
+    },
+
+    "cant_remember_the_court": {
+      "label": "Texas county and district clerks",
+      "url": "https://www.county.org/about-texas-counties/county-websites",
+      "verify": false,
+      "guidance": "TDLR's own FAQ says: call the COUNTY clerk for misdemeanors, the DISTRICT clerk for felonies, in the county where it happened.",
+      "use_on": ["Stage 2", "Stage 3 (record intake) — contextual help"]
+    },
+
+    "dps_status_check": {
+      "phone": "(512) 424-2365, option 6",
+      "email": "fingerprint.service@dps.texas.gov"
+    }
+  },
+
+  "expungement_and_nondisclosure": {
+    "_INVARIANT": "CLAUDE.md L8 — SurePath NEVER advises whether an expunged or sealed record must be disclosed. We present the information. The USER decides, with TDLR or a lawyer.",
+    "what_the_sources_say": [
+      "EXPUNCTION destroys the record. The person may generally deny it occurred.",
+      "An ORDER OF NONDISCLOSURE seals the record from the PUBLIC, but it REMAINS AVAILABLE to certain government and licensing agencies.",
+      "Nondisclosure is most commonly granted after DEFERRED ADJUDICATION — which TDLR explicitly REQUIRES be reported.",
+      "TDLR's published FAQ addresses NEITHER expunction nor nondisclosure."
+    ],
+    "surepath_copy": "We can't tell you whether an expunged or sealed record has to be disclosed. Expunction and an order of nondisclosure are different things, and the answer is different for each. This is a question for TDLR or a lawyer — ask before you decide.",
+    "status": "OPEN — see OPEN_QUESTIONS.md Q8. Pending written answer from TDLR Enforcement."
+  },
+
+  "statutes": {
+    "chel_authority": {
+      "cite": "Tex. Occ. Code §51.4012 and ch. 53, subch. D",
+      "what": "Authorizes the pre-application criminal history evaluation letter."
+    },
+    "factors_considered": {
+      "cite": "Tex. Occ. Code §53.025(a)",
+      "what": "The factors TDLR weighs: extent and nature of past criminal activity; age when the crime was committed; time elapsed since; conduct and work activity before and after; evidence of rehabilitation; other evidence of fitness including letters of recommendation.",
+      "use_on": ["Stage 4 (Your story) — the STATIC coaching copy. Quote it. Cite it. CLAUDE.md L5."]
+    },
+    "public_criminal_history": {
+      "cite": "Tex. Gov't Code §411.135",
+      "what": "Defines what the DPS public name search shows — convictions and deferred adjudications only."
+    }
+  },
+
+  "tdlr_faq_panel": {
+    "_purpose": "TDLR published 16 FAQs. They are the STATE'S OWN WORDS on the state's own site — scrivener-safe, quotable, citable. Surface them as expandable panels RIGHT WHERE THE QUESTION ARISES, not buried on a help page.",
+    "source_url": "https://www.tdlr.texas.gov/crimHistoryEval.htm",
+    "place_near_record_intake": [
+      "What crimes do I have to report?",
+      "I got a deferred adjudication and was technically not convicted. Do I still report it?",
+      "How many years back do I go? Do I report convictions older than ten years?",
+      "What if I can't remember all my crimes?",
+      "What if I can't remember the date, or which court?",
+      "Do I have to report a DWI? Isn't that a traffic violation?"
+    ],
+    "place_near_license_selection": [
+      "What crimes will prevent me from getting my license?",
+      "What does 'crimes which relate to the occupation' mean?"
+    ],
+    "place_near_review": [
+      "When will I get a response?",
+      "You said yes — does that mean I'll get a license?",
+      "You said no — can I apply anyway?"
+    ],
+    "rules": [
+      "Paraphrase TDLR's answers. Attribute them to TDLR. Link to the source.",
+      "The expungement/nondisclosure entry is OURS, not TDLR's, and must be marked as an open question (L8)."
+    ]
+  }
+}

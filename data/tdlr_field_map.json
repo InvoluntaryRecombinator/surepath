@@ -1,0 +1,341 @@
+{
+  "_meta": {
+    "verified": "2026-07-14 \u2014 field-probe render + human read; re-verified against FRESH blanks from tdlr.texas.gov",
+    "source_forms": {
+      "ENF006": "Request for Criminal History Evaluation Letter, rev May 2025 (pp 3-4 of the CHEL PDF)",
+      "ENF003": "Criminal History Questionnaire, rev Aug 2024 (p 3 of the CHQ PDF)"
+    },
+    "WARNING_templates": "USE THE FRESH BLANKS from tdlr.texas.gov (assets/). The PDFs originally supplied to this project had been opened in an editor and were mangled three ways: (1) residual test values, including /General Partnership and Renewal pre-ticked; (2) the /Sig signature fields STRIPPED; (3) the /DR font resource STRIPPED. Never source a template from an edited copy. Regardless: the fill routine MUST zero every field before writing (CLAUDE.md D7).",
+    "packet_math": "N convictions => 1 x ENF006 (carries conviction #1) + (N-1) x ENF003",
+    "flatten": "Flatten on output. Text is burned into the page -> identical on every printer.",
+    "signature_fields": "BOTH forms carry a /Sig (cryptographic digital signature) field, and the AcroForm sets /SigFlags 1. NEVER POPULATE THEM. Invariant L6: the user signs in wet ink; liability transfers at physical execution. form.flatten() has been smoke-tested with /Sig present and works."
+  },
+  "ENF006": {
+    "_note": "Carries the applicant data AND CONVICTION #1. 33 fields (32 fillable + 1 /Sig).",
+    "applicant": {
+      "program": {
+        "field": "List Program",
+        "item": 1
+      },
+      "specific_license": {
+        "field": "Specific License Type",
+        "item": 2
+      },
+      "last_name": {
+        "field": "Last Name",
+        "item": 3
+      },
+      "first_name": {
+        "field": "First Name",
+        "item": 3
+      },
+      "middle_name": {
+        "field": "Middle Name",
+        "item": 3
+      },
+      "suffix": {
+        "field": "Suffix Jr Sr III",
+        "item": 3
+      },
+      "all_known_names": {
+        "field": "List All Names",
+        "item": 4
+      },
+      "dob": {
+        "field": "Date of Birth",
+        "item": 5
+      },
+      "gender": {
+        "field": "Gender",
+        "item": 6,
+        "type": "button",
+        "values": {
+          "male": "/Male",
+          "female": "/Female"
+        }
+      },
+      "SSN": {
+        "field": "Social Security Number",
+        "item": 7,
+        "NEVER_FILL": true,
+        "reason": "Invariant D3. Left empty; user hand-writes in pen."
+      },
+      "mailing_address": {
+        "field": "Mailing Address",
+        "item": 8
+      },
+      "phone": {
+        "field": "Phone Number",
+        "item": 9
+      },
+      "email": {
+        "field": "Email Address",
+        "item": 10
+      }
+    },
+    "business_branch": {
+      "_note": "Hidden in UI unless the user is a controlling person of a company. When hidden, write 'N/A' to the text fields (no blanks allowed, F6) and leave Type of Ownership at /Off.",
+      "company_name": {
+        "field": "Name of Company",
+        "item": 11
+      },
+      "dba": {
+        "field": "DBA: (Doing Business As)",
+        "item": 12
+      },
+      "federal_tax_id": {
+        "field": "Federal Tax ID",
+        "item": 13
+      },
+      "ownership_type": {
+        "field": "Type of Ownership",
+        "item": 14,
+        "type": "button",
+        "values": {
+          "general_partnership": "/General Partnership",
+          "sole_proprietor": "/Sole Proprietor",
+          "corporation": "/Corporation",
+          "llc": "/LLC",
+          "llp": "/LLP",
+          "none": "/Off"
+        }
+      }
+    },
+    "conviction_1": {
+      "_TRAP": "The field NAMED 'County and State of conviction or deferred adjudication' holds the COUNTY ONLY. The state goes in the separate field 'State (ex: Texas)'. Writing 'Harris, Texas' into the first field is WRONG and leaves the second blank.",
+      "county": {
+        "field": "County and State of conviction or deferred adjudication",
+        "item": 15,
+        "value": "COUNTY ONLY, e.g. 'Harris'"
+      },
+      "state": {
+        "field": "State (ex: Texas)",
+        "item": 15,
+        "value": "e.g. 'Texas'"
+      },
+      "court": {
+        "field": "Court",
+        "item": 16
+      },
+      "date_crime": {
+        "field": "Date Crime Committed",
+        "item": 17
+      },
+      "date_conviction": {
+        "field": "Date of conviction or deferred adjudication",
+        "item": 18
+      },
+      "exact_offense": {
+        "field": "Exact crime you were convicted of or received a deferred adjudication",
+        "item": 19
+      },
+      "sentence": {
+        "field": "Sentence or action imposed by the court ex six months in Travis County Jail",
+        "item": 20
+      },
+      "narrative": {
+        "field": "What exactly did you do (crime) and why",
+        "item": 21,
+        "value": "SEE ATTACHED CONTINUATION SHEET - INCIDENT n OF m"
+      }
+    },
+    "supervision": {
+      "on_parole": {
+        "field": "Are you currently on parole?",
+        "item": 22,
+        "type": "button",
+        "values": {
+          "yes": "/Yes",
+          "no": "/No"
+        }
+      },
+      "parole_officer": {
+        "field": "Parole Officer's Name",
+        "item": 22
+      },
+      "parole_phone": {
+        "field": "(Area Code) Phone Number for Parole Officer",
+        "item": 22
+      },
+      "on_probation": {
+        "field": "Are you currently on probation?",
+        "item": 23,
+        "type": "button",
+        "values": {
+          "yes": "/Yes",
+          "no": "/No"
+        }
+      },
+      "probation_officer": {
+        "field": "Probation Officer's Name",
+        "item": 23
+      },
+      "probation_phone": {
+        "field": "(Area Code) Phone Number for Probation Officer",
+        "item": 23
+      }
+    },
+    "signature": {
+      "date_signed": {
+        "field": "Date Signed",
+        "item": 24,
+        "value": "LEAVE EMPTY - user hand-dates"
+      },
+      "signature": {
+        "field": "Signature of person who is subject of this evaluation",
+        "item": 24,
+        "type": "/Sig",
+        "NEVER_FILL": true,
+        "reason": "Invariant L6. Digital signature field. User signs by hand, in ink."
+      }
+    }
+  },
+  "ENF003": {
+    "_note": "One per ADDITIONAL conviction (2..N). 24 fields (23 fillable + 1 /Sig). NOTE: ENF003 uses /Choice1|/Choice2|/Choice3 for buttons -- NOT /Yes|/No like ENF006. The two forms in the same packet use DIFFERENT conventions. Assuming /Yes|/No here silently leaves every box /Off -> blank fields -> packet rejected.",
+    "request_type": {
+      "type_of_request": {
+        "field": "Type of Request",
+        "item": 1,
+        "type": "button",
+        "values": {
+          "new": "/Choice1",
+          "renewal": "/Choice2"
+        },
+        "surepath_always": "/Choice1"
+      },
+      "license_type": {
+        "field": "ex Barber Cosmetologist Electrician Towing etc",
+        "item": 2
+      }
+    },
+    "applicant": {
+      "full_name": {
+        "field": "Last First Middle Name Suffix Jr Sr III",
+        "item": 3,
+        "value": "single field: 'LAST, FIRST, MIDDLE, SUFFIX'"
+      },
+      "SSN": {
+        "field": "See instruction sheet for disclosure information",
+        "item": 4,
+        "NEVER_FILL": true,
+        "reason": "Invariant D3. NOTE the near-identical field name for EMAIL: 'ex johndoeaolcom See instruction sheet for disclosure information'. The BARE name is the SSN. Do not confuse them."
+      },
+      "address": {
+        "field": "Number Street Name Suite NumberApartment Number",
+        "item": 5,
+        "value": "single field: street, city, state, zip"
+      },
+      "phone": {
+        "field": "Area Code Phone Number",
+        "item": 6,
+        "note": "APPLICANT's phone"
+      },
+      "dob": {
+        "field": "DOB",
+        "item": 7
+      },
+      "email": {
+        "field": "ex johndoeaolcom See instruction sheet for disclosure information",
+        "item": 8
+      }
+    },
+    "conviction": {
+      "_TRAP": "ENF003 combines county+state into ONE field ('Harris, TX'). ENF006 SPLITS them into two. Same data, different shape, same packet.",
+      "county_and_state": {
+        "field": "ex Travis TX",
+        "item": 9,
+        "value": "e.g. 'Harris, TX'"
+      },
+      "court": {
+        "field": "ex 300th Dist Ct or Fed Ct",
+        "item": 10
+      },
+      "date_crime": {
+        "field": "MonthDayYear_2",
+        "item": 11,
+        "VERIFIED": "item 11 = DATE CRIME COMMITTED"
+      },
+      "date_conviction": {
+        "field": "MonthDayYear_3",
+        "item": 12,
+        "VERIFIED": "item 12 = DATE OF CONVICTION"
+      },
+      "exact_offense": {
+        "field": "13 Exact crime you were convicted of or received a deferred adjudication",
+        "item": 13
+      },
+      "narrative": {
+        "field": "if you need more space to write attached additional sheets 1",
+        "item": 14,
+        "value": "SEE ATTACHED CONTINUATION SHEET - INCIDENT n OF m"
+      },
+      "sentence": {
+        "field": "15 Sentence or action imposed by the court ex six months in Travis County Jail 1",
+        "item": 15
+      }
+    },
+    "supervision": {
+      "renewal_question": {
+        "field": "#16",
+        "item": 16,
+        "type": "button",
+        "values": {
+          "no": "/Choice1",
+          "yes": "/Choice2"
+        },
+        "OPEN_QUESTION": "Renewals-only question. SurePath users are always NEW. Tick 'No', or leave /Off? Leaving it off collides with 'do not leave blank fields'. ASK TDLR."
+      },
+      "on_parole": {
+        "field": "#17",
+        "item": 17,
+        "type": "button",
+        "values": {
+          "no": "/Choice1",
+          "yes": "/Choice3"
+        },
+        "WARNING": "NON-SEQUENTIAL. Yes is /Choice3, not /Choice2. Unguessable."
+      },
+      "parole_officer": {
+        "field": "Parole Officers Name",
+        "item": 17
+      },
+      "parole_phone": {
+        "field": "PO Phone Number 1",
+        "item": 17,
+        "VERIFIED": "'PO' = PAROLE officer, not probation."
+      },
+      "on_probation": {
+        "field": "#18",
+        "item": 18,
+        "type": "button",
+        "values": {
+          "no": "/Choice1",
+          "yes": "/Choice2"
+        }
+      },
+      "probation_officer": {
+        "field": "Probation Officers Name",
+        "item": 18
+      },
+      "probation_phone": {
+        "field": "Area Code Phone Number_3",
+        "item": 18,
+        "VERIFIED": "This is the PROBATION officer's phone."
+      }
+    },
+    "signature": {
+      "date_signed": {
+        "field": "Date Signed",
+        "item": 19,
+        "value": "LEAVE EMPTY - user hand-dates"
+      },
+      "signature": {
+        "field": "Signature3",
+        "item": 19,
+        "type": "/Sig",
+        "NEVER_FILL": true,
+        "reason": "Invariant L6. Digital signature field. User signs by hand, in ink."
+      }
+    }
+  }
+}

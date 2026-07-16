@@ -33,12 +33,17 @@ function ChargeRow({
   const patch = (p: Partial<DraftCharge>) =>
     dispatch({ type: 'update-charge', incidentId: incident.id, chargeId: charge.id, patch: p })
 
+  // Never call a deferred adjudication a conviction — not even in a row label. Once the
+  // person says which it was, the label says what they said. (D2, and the Q4 decision.)
+  const noun =
+    charge.disposition === 'deferred_adjudication' ? 'deferred adjudication' : config.copy.chargeNoun
+
   return (
     /* Nesting device: indent + one left rule. Not a box in a box. */
     <div className="flex flex-col gap-4 border-l-2 border-line pl-5">
       <div className="flex items-center justify-between">
         <span className="text-[12.5px] font-semibold uppercase tracking-[0.07em] text-muted">
-          {config.copy.chargeNoun} {ordinal}
+          {noun} {ordinal}
         </span>
         {removable && (
           <button

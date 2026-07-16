@@ -36,11 +36,17 @@ export function Rail() {
   const counts = draftCounts(state.draft)
   const currentIdx = config.sections.findIndex((s) => s.id === state.sectionId)
 
+  const recordsLabel =
+    counts.records === 1
+      ? counts.deferrals === 1
+        ? 'deferred adjudication'
+        : 'conviction'
+      : counts.deferrals > 0
+        ? 'convictions & deferrals'
+        : 'convictions'
   const counterText =
     `${counts.incidents} ${counts.incidents === 1 ? 'incident' : 'incidents'} · ` +
-    `${counts.records} ${
-      counts.deferrals > 0 ? 'convictions & deferrals' : counts.records === 1 ? 'conviction' : 'convictions'
-    }`
+    `${counts.records} ${recordsLabel}`
 
   return (
     <aside className="flex w-[272px] shrink-0 flex-col overflow-y-auto border-r border-line bg-rail">

@@ -1,57 +1,54 @@
 /*
- * SurePath design tokens. DESIGN_SYSTEM.md §3, §4, §8.
+ * SurePath design tokens — DESIGN_SYSTEM.md §3 (v3): white fields on a soft warm ground.
  *
- * The ban list is enforced HERE, at the theme level, not by discipline:
+ * Contrast must be present at every layer, subtle but always there:
+ *   rail ↔ ground · ground ↔ surface · surface ↔ WHITE FIELD (the strongest —
+ *   the one that kills "murky"). A flat single-tone screen is the failure.
+ *
+ * The ban list is enforced HERE, at the theme level:
  *   - the entire default Tailwind palette is cleared — `bg-blue-500` does not exist
  *   - every shadow utility is cleared — a drop shadow cannot be typed
- *   - every radius above 2px is cleared — `rounded-xs` (2px) is the only one left
- *
- * Seven color tokens. Two faces. That is all there is.
+ *   - MONO IS DEAD (§4). One friendly sans. There is no --font-mono.
  */
 @import 'tailwindcss';
 @import '@fontsource-variable/public-sans';
-@import '@fontsource/ibm-plex-mono/400.css';
-@import '@fontsource/ibm-plex-mono/500.css';
 
 @theme {
-  /* Colors: wipe the default palette, then the seven tokens. */
+  /* Colors: wipe the default palette, then the eight tokens (+ one derived rail tint). */
   --color-*: initial;
-  --color-paper: #e7e0cf; /* warm ground. white glares on a bad monitor. */
-  --color-card: #f2ede1; /* the sheet, inputs, panels */
-  --color-ink: #1c1e26; /* body text */
-  --color-rule: #b6ae99; /* borders, dividers */
-  --color-pen: #1f3a8a; /* primary actions, focus, links */
-  --color-state: #b3261e; /* HARD requirements only. Never an accent. Never a delete button. */
-  --color-muted: #6b6553; /* captions, hints */
+  --color-ground: #f1ebdd; /* the app ground. soft, warm, NOT white. */
+  --color-rail: #eae3d0; /* the rail — one step darker than ground, so the nav reads as its own place */
+  --color-surface: #fbf7ef; /* a section/panel — one step lighter than ground */
+  --color-field: #ffffff; /* INPUT FIELDS. crisp white. the contrast that fixes "murky". */
+  --color-ink: #24221c; /* primary text */
+  --color-muted: #8a8266; /* labels, hints, secondary */
+  --color-line: #d8d0bc; /* borders, dividers */
+  --color-accent: #2a4ba8; /* primary actions, focus, links, current step */
+  --color-state: #a6392f; /* HARD requirements only. Never a stylistic accent. */
 
   /* Shadows: none exist. A focus ring is not a shadow; it lives in CSS below. */
   --shadow-*: initial;
   --inset-shadow-*: initial;
   --drop-shadow-*: initial;
 
-  /* Radii: 2px on things you touch, 0 on things that organize. Nothing else exists. */
-  --radius-*: initial;
-  --radius-xs: 2px;
-
-  /* Type */
+  /* One warm, legible sans. Everywhere. Labels vs values differ by weight/color/size,
+     never by a second face. */
   --font-sans: 'Public Sans Variable', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 
 body {
-  background: var(--color-paper);
+  background: var(--color-ground);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-/*
- * The focus ring — required, everywhere, an accessibility floor (§5, §11).
- * Rendered as a box-shadow but it is a RING, not a drop shadow: no offset, no blur.
- */
+/* The focus ring — required everywhere, an accessibility floor. A RING: no offset, no blur. */
 :focus-visible {
   outline: none;
-  border-color: var(--color-pen);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-pen) 25%, transparent);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {

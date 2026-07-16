@@ -1,0 +1,108 @@
+/* Styles for the two DEV HARNESSES only (#smoke, #packet). Not the product. Not the
+   design system. These pages exist so a human can verify the document service. */
+
+.dev {
+  min-height: 100vh;
+  padding: 2.5rem;
+  background: #ffffff;
+  color: #1c1e26;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+.dev main,
+main.dev {
+  max-width: 60rem;
+}
+
+.dev h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+}
+
+.dev h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 2.5rem 0 0.75rem;
+}
+
+.dev .verdict {
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  font-weight: 600;
+}
+.dev .verdict.good {
+  border-color: #1a7f37;
+  color: #1a7f37;
+}
+.dev .verdict.bad {
+  border-color: #b3261e;
+  color: #b3261e;
+}
+
+.dev table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+.dev td {
+  border-top: 1px solid #dcdcdc;
+  padding: 0.6rem 0.5rem;
+  vertical-align: top;
+}
+.dev .mark {
+  font-family: ui-monospace, monospace;
+  font-weight: 700;
+  width: 4rem;
+}
+.dev tr.pass .mark {
+  color: #1a7f37;
+}
+.dev tr.fail .mark {
+  color: #b3261e;
+}
+.dev tr.manual .mark {
+  color: #8a6d00;
+}
+.dev .id {
+  font-family: ui-monospace, monospace;
+  color: #6b6553;
+  width: 3rem;
+}
+.dev .label {
+  font-weight: 600;
+}
+.dev .detail {
+  color: #6b6553;
+  font-size: 0.9rem;
+  margin-top: 0.15rem;
+}
+
+.dev .evidence,
+.dev .artifacts {
+  padding-left: 1.1rem;
+}
+.dev .evidence li {
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+.dev .artifacts li,
+.dev p.artifacts {
+  margin-bottom: 0.4rem;
+}
+.dev a {
+  color: #1f3a8a;
+  text-decoration: underline;
+}
+
+.dev .crash {
+  color: #b3261e;
+  white-space: pre-wrap;
+}
+.dev .wait {
+  color: #6b6553;
+}

@@ -1,97 +1,64 @@
-/* PHASE 0 ONLY — legibility, not design.
-   The seven-token @theme block from DESIGN_SYSTEM.md §3 lands with the shell. */
+/*
+ * SurePath design tokens. DESIGN_SYSTEM.md §3, §4, §8.
+ *
+ * The ban list is enforced HERE, at the theme level, not by discipline:
+ *   - the entire default Tailwind palette is cleared — `bg-blue-500` does not exist
+ *   - every shadow utility is cleared — a drop shadow cannot be typed
+ *   - every radius above 2px is cleared — `rounded-xs` (2px) is the only one left
+ *
+ * Seven color tokens. Two faces. That is all there is.
+ */
+@import 'tailwindcss';
+@import '@fontsource-variable/public-sans';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+@theme {
+  /* Colors: wipe the default palette, then the seven tokens. */
+  --color-*: initial;
+  --color-paper: #e7e0cf; /* warm ground. white glares on a bad monitor. */
+  --color-card: #f2ede1; /* the sheet, inputs, panels */
+  --color-ink: #1c1e26; /* body text */
+  --color-rule: #b6ae99; /* borders, dividers */
+  --color-pen: #1f3a8a; /* primary actions, focus, links */
+  --color-state: #b3261e; /* HARD requirements only. Never an accent. Never a delete button. */
+  --color-muted: #6b6553; /* captions, hints */
+
+  /* Shadows: none exist. A focus ring is not a shadow; it lives in CSS below. */
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+
+  /* Radii: 2px on things you touch, 0 on things that organize. Nothing else exists. */
+  --radius-*: initial;
+  --radius-xs: 2px;
+
+  /* Type */
+  --font-sans: 'Public Sans Variable', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
 
 body {
-  margin: 0;
-  padding: 2.5rem;
-  background: #ffffff;
-  color: #1c1e26;
-  font-family: system-ui, sans-serif;
-  line-height: 1.5;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
 }
 
-main {
-  max-width: 60rem;
+/*
+ * The focus ring — required, everywhere, an accessibility floor (§5, §11).
+ * Rendered as a box-shadow but it is a RING, not a drop shadow: no offset, no blur.
+ */
+:focus-visible {
+  outline: none;
+  border-color: var(--color-pen);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-pen) 25%, transparent);
 }
 
-h1 {
-  font-size: 1.5rem;
-  margin: 0 0 1rem;
-}
-
-h2 {
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 2.5rem 0 0.75rem;
-}
-
-.verdict {
-  padding: 0.75rem 1rem;
-  border: 1px solid;
-  font-weight: 600;
-}
-.verdict.good {
-  border-color: #1a7f37;
-  color: #1a7f37;
-}
-.verdict.bad {
-  border-color: #b3261e;
-  color: #b3261e;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-  margin-top: 1.5rem;
-}
-td {
-  border-top: 1px solid #dcdcdc;
-  padding: 0.6rem 0.5rem;
-  vertical-align: top;
-}
-.mark {
-  font-family: ui-monospace, monospace;
-  font-weight: 700;
-  width: 4rem;
-}
-tr.pass .mark {
-  color: #1a7f37;
-}
-tr.fail .mark {
-  color: #b3261e;
-}
-tr.manual .mark {
-  color: #8a6d00;
-}
-.id {
-  font-family: ui-monospace, monospace;
-  color: #6b6553;
-  width: 3rem;
-}
-.label {
-  font-weight: 600;
-}
-.detail {
-  color: #6b6553;
-  font-size: 0.9rem;
-  margin-top: 0.15rem;
-}
-
-.evidence,
-.artifacts {
-  padding-left: 1.1rem;
-}
-.evidence li {
-  font-family: ui-monospace, monospace;
-  font-size: 0.85rem;
-  margin-bottom: 0.35rem;
-}
-.artifacts li {
-  margin-bottom: 0.4rem;
-}
-
-.crash {
-  color: #b3261e;
-  white-space: pre-wrap;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

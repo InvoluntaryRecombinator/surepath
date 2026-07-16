@@ -5,6 +5,7 @@
  */
 import { useEffect, useState } from 'react'
 import { runSmoke, type SmokeReport } from './smoke'
+import './devHarness.css'
 
 const MARK: Record<string, string> = { pass: 'PASS', fail: 'FAIL', manual: 'LOOK' }
 
@@ -18,14 +19,24 @@ export default function SmokePage() {
       .catch((e) => setCrashed(e instanceof Error ? `${e.message}\n${e.stack}` : String(e)))
   }, [])
 
-  if (crashed) return <pre className="crash">Smoke run threw:{'\n\n'}{crashed}</pre>
-  if (!report) return <p className="wait">Running smoke test…</p>
+  if (crashed)
+    return (
+      <div className="dev">
+        <pre className="crash">Smoke run threw:{'\n\n'}{crashed}</pre>
+      </div>
+    )
+  if (!report)
+    return (
+      <div className="dev">
+        <p className="wait">Running smoke test…</p>
+      </div>
+    )
 
   const failed = report.checks.filter((c) => c.status === 'fail').length
   const manual = report.checks.filter((c) => c.status === 'manual').length
 
   return (
-    <main>
+    <main className="dev">
       <h1>SurePath — Phase 0 smoke test</h1>
       <p className={failed ? 'verdict bad' : 'verdict good'}>
         {failed === 0

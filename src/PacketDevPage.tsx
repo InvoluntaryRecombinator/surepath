@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { generateAllPackets, type GeneratedPacket } from './documents/assemblePacket'
 import { marcusRivera } from './fixtures/marcusRivera'
 import { allCharges } from './types/case'
+import './devHarness.css'
 
 export default function PacketDevPage() {
   const [packets, setPackets] = useState<GeneratedPacket[] | null>(null)
@@ -23,14 +24,24 @@ export default function PacketDevPage() {
       .catch((e) => setError(e instanceof Error ? `${e.message}\n${e.stack}` : String(e)))
   }, [])
 
-  if (error) return <pre className="crash">Generation threw:{'\n\n'}{error}</pre>
-  if (!packets) return <p className="wait">Generating the packet…</p>
+  if (error)
+    return (
+      <div className="dev">
+        <pre className="crash">Generation threw:{'\n\n'}{error}</pre>
+      </div>
+    )
+  if (!packets)
+    return (
+      <div className="dev">
+        <p className="wait">Generating the packet…</p>
+      </div>
+    )
 
   const violations = packets.flatMap((p) => p.violations)
   const charges = allCharges(marcusRivera)
 
   return (
-    <main>
+    <main className="dev">
       <h1>SurePath — Phase 1: the document service</h1>
       <p className={violations.length ? 'verdict bad' : 'verdict good'}>
         {violations.length === 0

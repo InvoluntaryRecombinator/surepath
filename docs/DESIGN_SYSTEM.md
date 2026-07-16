@@ -60,7 +60,7 @@ that a scared person feels safe. Calm *is* the win.
 
 ---
 
-## 1. The thesis
+## 1. The thesis## 1. The thesis
 
 > **THE FORM IS THE ENEMY. THIS SITE IS THE ANTIDOTE.**
 
@@ -84,11 +84,6 @@ reclaim its design devices.** There is nothing there worth reclaiming.
 |---|---|
 | **PDF correctness** | **Life or death.** Field map, `/Choice3`, `zeroAllFields()`, `/Sig` untouched, no blanks. See `CLAUDE.md` F1–F10. **Nothing here changes, ever.** |
 | **PDF aesthetics** | **Irrelevant.** The user sees the PDF **once, at the end, already finished.** It is never a design reference. |
-
-> **Scope note (§1 ↔ §13):** "PDF aesthetics are irrelevant" applies **only to the TDLR form
-> pages**, which we cannot change and do not restyle. The pages **we generate** — the cover
-> page, the mailing checklist, the continuation sheets — are §13's territory and get real
-> typographic craft. **No contradiction: don't polish theirs, do polish ours.**
 
 **The user is never asked to think about the PDF. That's the product.**
 
@@ -145,129 +140,62 @@ distinctiveness budget goes to the surfaces that aren't forms:
 **Forms are competent. Chrome and lists are where it looks expensive.**
 - **The stepper is the anchor** (§5.5). The counter is the promise (§6).
 
-## 3. Palette — six tokens. That is all there is.
+## 3. Palette — white fields on a soft warm ground
+
+> ⚠️ **Two corrections from earlier revisions, both learned from live screenshots the
+> human rejected:**
+> 1. **The old khaki-on-khaki was murky** — input fields and background blurred into one
+>    muddy surface. **Fix: crisp white/near-white fields on a soft tinted ground.** That
+>    field-vs-ground contrast is what reads as clean and modern. See §5.
+> 2. **Mono type is dead.** (See §4.) It made the whole thing read as dated and hostile.
 
 ```css
 @theme {
-  --color-paper:   #E7E0CF;   /* warm ground. WHY: white glares on a bad monitor. That's the whole reason. */
-  --color-card:    #F2EDE1;   /* lifted surface for inputs/panels */
-  --color-ink:     #1C1E26;   /* body text. near-black, slightly blue. */
-  --color-rule:    #B6AE99;   /* borders, dividers */
-  --color-pen:     #1F3A8A;   /* primary actions, focus, links */
-  --color-state:   #B3261E;   /* HARD REQUIREMENTS ONLY */
-  --color-muted:   #6B6553;   /* captions, hints */
+  --color-ground:  #F1EBDD;   /* the app ground / rail. soft, warm, NOT white. */
+  --color-surface: #FBF7EF;   /* a section/panel, one step lighter than ground */
+  --color-field:   #FFFFFF;   /* INPUT FIELDS. crisp white. this is the contrast that fixes "murky". */
+  --color-ink:     #24221C;   /* primary text */
+  --color-muted:   #8A8266;   /* labels, hints, secondary */
+  --color-line:    #D8D0BC;   /* borders, dividers */
+  --color-accent:  #2A4BA8;   /* primary actions, focus, links, current-step. a warm confident blue. */
+  --color-state:   #A6392F;   /* HARD REQUIREMENTS ONLY */
 }
 ```
 
-**Seven values. Nothing else exists.** The Tailwind default palette is **disabled** (§8) —
-an agent physically cannot type `bg-blue-500`, because it isn't there.
+**Contrast must be present at every layer — subtle, but always there:**
+- rail ↔ ground (rail slightly darker/different from the content ground)
+- content ground ↔ section surface (section a touch lighter)
+- section surface ↔ **white input field** (the strongest of the three — this is the one
+  that kills "murky")
 
-`--color-state` is for **real requirements only**: a blank required field, a missing
-conviction, a genuine warning. **Never a stylistic accent. Never a delete button.**
+Not loud. Not high-contrast. **Present.** A flat single-tone screen is the failure.
 
-> **Deliberately avoided:** khaki + burnt orange. That lands on the most common AI-design
-> cliché (cream ground, warm-clay accent) and reads as generated no matter how well it's
-> executed.
+`--color-state` (red) is for **real requirements only** — a required-field mark, a missing
+conviction, a genuine warning. **Never a stylistic accent.** The exact tints above are a
+starting point; tune them against the reference image the agent is given.
 
-## 4. Type
+## 4. Type — one friendly sans. Mono is DEAD.
 
-| Face | Role |
-|---|---|
-| **Public Sans** | Everything. Headings, prose, buttons, labels, guidance. |
-| **IBM Plex Mono** | **Only for data the user entered** — dates, offense names, case details. |
+> ⚠️ **Correction — earlier revisions used IBM Plex Mono for "the record's voice."**
+> **Remove it entirely.** On data-entry fields, mono reads as terminal, dated, and cold —
+> it was the single biggest reason the live screens felt hostile and unfriendly. There is
+> no mono in this product.
 
-The mono is **functional, not conceptual**: it makes the review screen scannable, so a
-nine-conviction list can be checked at a glance against a rap sheet. That's the entire
-reason. No philosophy attached.
+**One warm, highly legible sans, everywhere.** Labels, values, headings, buttons, prose.
 
-> **Public Sans** is the U.S. government's open typeface — built for legibility and forms,
-> free, and *not* the default choice (that's Inter, which is banned in §8).
->
-> **No display serif.** A high-contrast serif on a warm ground is AI-design cliché #1. Scale
-> and weight do the work: Public Sans 800, large, tight tracking, for the few moments that
-> need force.
+- Recommended: **Inter is BANNED** (the default-AI tell). Use a friendly, humane sans —
+  e.g. **Public Sans**, or another warm grotesque/geometric with real personality. Pick one
+  with a friendly lowercase and good weights. Self-host it.
+- **The label-vs-value distinction is carried by weight, color, and size — NOT by a second
+  font:**
+  - **Label** (what we ask): smaller, `--color-muted`, medium weight. It recedes.
+  - **Value** (what they type): larger, `--color-ink`, on a white field. It's the figure.
+- **Type must be comfortably large.** The old screens were too small and too tight. Generous
+  size, generous line-height (~1.6 on prose). When in doubt, bigger.
 
 ```css
---font-sans: "Public Sans", system-ui, sans-serif;
---font-mono: "IBM Plex Mono", ui-monospace, monospace;
+--font-sans: "Public Sans", system-ui, sans-serif;   /* or another friendly sans — NOT Inter, NOT mono */
 ```
-
-## 4.5 THE SHEET — one surface, not a pile of cards
-
-**This is the single most important layout rule, and the easiest one to get wrong.**
-
-> ⚠️ **The failure it prevents:** a column of bordered cards floating on the khaki ground,
-> with more bordered cards nested inside them. That is **"rounded cards floating on gray"**
-> in a different palette. It is the #1 AI-slop layout, it is banned in §8, and it is what a
-> first draft of this mockup did anyway.
-
-### The rule
-
-**The page is ONE continuous surface.** `--color-card`, running from under the header to
-above the action bar. The khaki ground (`--color-paper`) is visible **only as the margins to
-the left and right of the sheet.**
-
-**Nothing else on the screen is a card.** Not a section. Not an incident. Not a charge.
-Not the FAQ panel.
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│  HEADER — full bleed, sticky, --color-card, 1px rule below    │
-├──────────────────────────────────────────────────────────────┤
-│▒▒▒▒│                                                    │▒▒▒▒│
-│▒▒▒▒│   THE SHEET — one surface, --color-card            │▒▒▒▒│
-│▒▒▒▒│   min-height: calc(100vh - header - actionbar)     │▒▒▒▒│
-│▒▒▒▒│                                                    │▒▒▒▒│
-│▒▒▒▒│   Section heading                                  │▒▒▒▒│
-│▒▒▒▒│   fields, fields                                   │▒▒▒▒│
-│▒▒▒▒│   ──────────────────────────────  ← a RULE, not   │▒▒▒▒│
-│▒▒▒▒│   Section heading                    a card edge   │▒▒▒▒│
-│▒▒▒▒│   fields                                           │▒▒▒▒│
-│▒▒▒▒│                                                    │▒▒▒▒│
-│▒▒▒▒│   (empty space accumulates HERE, at the bottom,    │▒▒▒▒│
-│▒▒▒▒│    INSIDE the sheet — never as a frame around it)  │▒▒▒▒│
-├──────────────────────────────────────────────────────────────┤
-│  ACTION BAR — full bleed, sticky, Back / Continue             │
-└──────────────────────────────────────────────────────────────┘
-   ▒ = --color-paper, visible ONLY as side margins
-```
-
-### Structure comes from RULES and SPACE, not from boxes
-
-| Instead of | Do |
-|---|---|
-| A bordered card per section | A **full-width hairline rule** between sections |
-| A bordered card per incident | A **section** on the sheet, with a rule above it |
-| A bordered box per charge | **Indent + ONE left rule.** That's the whole nesting device. |
-| A boxed FAQ panel | Plain rows, hairline above, hairline below |
-| A dashed "+ Add" box | A **text button with an icon**, sitting on a rule |
-
-**Maximum two levels of nesting. Ever.** If you are drawing a border inside a border,
-**stop** — you have already lost.
-
-**Maximum one elevated surface per screen.** The sheet is it.
-
-### Hierarchy comes from type and whitespace
-
-The eye should find the section headings **without reading them.**
-
-| | Size | Weight | Space above | Space below |
-|---|---|---|---|---|
-| Section heading | 17px | 700 | **32px** | 12px |
-| Field label (eyebrow) | 11px mono, uppercase, tracked | 500 | 20px | 6px |
-| Field value | 14px mono | 400 | — | — |
-| Hint / caption | 12px sans, `--color-muted` | 400 | 4px | — |
-
-**Cramped is cheap.** `line-height: 1.6` on prose. **20px between fields. 32px between
-sections.** If a screen feels empty, you didn't say enough — the box is not too small.
-
-### The header deserves room
-
-**80px, not 64.** The stepper is the anchor of the whole product; give it space to
-breathe. Wordmark left · stepper centered and generous · Save / Clear right. Second row:
-current step name (left) + the live counter (right).
-
----
 
 ## 5. Inputs — normal, obvious, well-made
 
@@ -304,6 +232,53 @@ grids. No black header bars. No ledgers.**
 
 ---
 
+
+### Placeholder examples in fields
+
+Every field where the format isn't obvious carries a **greyed, legible example** as
+placeholder text — it disappears on typing:
+
+```
+Sentence imposed:  [ e.g. 6 months county jail; $1,500 fine (paid)        ]
+Exact offense:     [ e.g. Possession of Controlled Substance, PG1 <1g     ]
+```
+
+This teaches format without a manual, and it fills the empty-field silence with something
+warm and human. Use it liberally.
+
+### Info bubbles — help on demand, not flags everywhere
+
+Some fields need deeper explanation (what "exact offense" means, why deferred adjudication
+still counts). **Do not** put that explanation inline as a permanent block — that's flag
+soup and it overwhelms. Instead: a small **ⓘ** next to the label. Click → a small dismissible
+popover (with an ✕) explaining it. Quiet by default, there when needed.
+
+```
+Exact offense ⓘ *
+```
+
+This keeps the screen calm while making depth reachable — the opposite of drowning the user
+in warnings. Reserve the always-visible red (`--color-state`) for real requirements; put
+*explanation* behind the ⓘ.
+
+### The rail (the app's left nav — see SITE_STRUCTURE.md)
+
+The form flow uses a **persistent left rail**, not a top stepper. (Klaviyo's shape, chosen
+because this product collects a lot of information and the rail gives the content room to be
+long while keeping the user oriented.)
+
+- Static on the left; content scrolls on the right; the rail stays put.
+- The rail **is** the progress indicator — same three states as the stepper, vertical:
+  done (filled accent + check) · current (accent ring + fill on the row) · ahead (hollow,
+  muted). **A dashed connector between the dots** is welcome — it reads friendlier than bare
+  gaps.
+- Completed sections are **clickable**; future ones are not.
+- The rail is **driven by the state config's section list** — a different state shows a
+  different list, and that's the entire per-state difference. (SITE_STRUCTURE.md §3.)
+- Counter (INCIDENTS · CONVICTIONS only) sits in the rail. Save / Delete live in the rail.
+- **Logo:** a real mark (SVG) top-left when available — not just the wordmark. Placeholder
+  wordmark is fine for now; leave the slot.
+
 ## 5.5 The stepper — the single biggest lever on whether this feels premium
 
 A long multi-step wizard lives or dies on its stepper. Get this right and the whole app
@@ -317,7 +292,7 @@ reads as considered.
 │                                                                                   │
 │                  Step 3 of 6 · Your story        3 INC · 9 CONV · 22p · $10       │
 └──────────────────────────────────────────────────────────────────────────────────┘
-  Sticky. 80px. 1px --color-rule bottom border. NO SHADOW.
+  Sticky. ~64px. 1px --color-rule bottom border. NO SHADOW.
 ```
 
 **Why cheap steppers look cheap:** equal-width segments, generic circles, an icon-library
@@ -451,7 +426,7 @@ old machines with old browsers. Nothing fancy.**
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────┐
-│  SUREPATH        ✓───────✓───────●───────○───────○───────○         [Save]  [Clear]    │  ← sticky, 80px
+│  SUREPATH        ✓───────✓───────●───────○───────○───────○         [Save]  [Clear]    │  ← sticky, 64px
 │                  YOUR     YOUR    YOUR    YOUR    LICENSES REVIEW                     │    1px rule below
 │                  TRADE    INFO   RECORD   STORY                                       │    NO SHADOW
 │                                                                                       │

@@ -10,6 +10,66 @@ reason is there so you do not rationalize around the rule. If a rule seems wrong
 
 ---
 
+## GIT WORKFLOW — commit constantly, in small pieces
+
+**This is a standing rule for every session. Follow it without being asked.**
+
+The human needs a dense, legible commit history — both to roll back cleanly when something
+goes wrong, and to see progress. **Large uncommitted working trees are a failure state.**
+
+### Commit after every meaningful unit of work
+
+Not "at the end." After each unit — a passing test, a working component, a fixed bug, a
+completed doc correction. If you just made something work, **commit it before starting the
+next thing.** A good rule of thumb: if you would be annoyed to lose it, it should already be
+committed.
+
+**Never batch a whole phase into one commit.** A phase is many commits.
+
+### Commit message format
+
+```
+<type>: <what changed, imperative, specific>
+
+<why, if not obvious. reference the invariant or acceptance criterion.>
+```
+
+`type` ∈ `feat` · `fix` · `test` · `docs` · `chore` · `refactor`
+
+**Good:**
+```
+fix: correct ENF003 parole export values (were inverted)
+
+Parole yes was /Choice3, is actually /Choice1. Verified by widget geometry
+on the real blank — "No" is the left box. Old value made the packet tell TDLR
+a man not on parole IS on parole. CLAUDE.md F8.
+```
+```
+test: add set-equality "no charge dropped" guard (D1)
+feat: Stepper — three states differ in form not color (DESIGN_SYSTEM §5.5)
+docs: resolve header height to 80px across DESIGN_SYSTEM
+```
+
+**Bad:** `updates` · `wip` · `phase 2` · `fixed stuff` · `changes per feedback`
+
+### Rules
+
+- **Commit before you refactor**, so the working version is a restore point.
+- **One logical change per commit.** Don't mix a bug fix and a new feature. If you did two
+  things, make two commits (`git add -p` for partial staging).
+- **Never commit broken code to `main`** knowingly. If a test is red, either fix it or mark it
+  clearly in the message (`test: add failing case for X (not yet implemented)`).
+- **After a batch of commits, print `git log --oneline -n 10`** so the human can see the trail.
+- **Do not `git push` unless asked** — the human controls the remote.
+- The human commits at their own checkpoints too; your commits and theirs interleave. Keep
+  yours small enough that theirs never collides.
+
+### At the start of a session
+
+If `git status` shows an uncommitted working tree from a previous session, **stop and tell the
+human before doing anything** — don't bury their work under yours. Offer to commit it with a
+descriptive message first.
+
 ## 0. What SurePath is
 
 SurePath helps a justice-impacted person in Texas assemble a **complete, correct
@@ -132,6 +192,38 @@ catastrophic. **Wet ink. Their hand. Always.**
 
 *(`form.flatten()` has been smoke-tested with `/Sig` present and works — but verify
 in the browser on day 1. Some libraries throw on `/Sig`.)*
+
+### L9 — SurePath informs. It does not steer.
+
+**The through-line of L1, L2, L5, and L8, stated plainly.** SurePath presents accurate
+information about the user's options. **It does not make the user's decisions for them.**
+
+**The concrete case: how they get their criminal record.** Texas offers two paths, with a
+real tradeoff:
+
+| | Online name search | Fingerprint personal review |
+|---|---|---|
+| Cost | ~$3 | ~$25 |
+| Time | minutes, right now, on this computer | days to weeks, in person |
+| Shows | convictions + deferred adjudications | the complete record |
+| Accuracy | matched on **name** — DPS warns it can miss records or match someone else | matched on **fingerprints** — positively them |
+
+**Present both. Flat. No thumb on the scale.** Which one to use — trading cost against time
+against completeness — is a decision about **their own life and their own money.** It is not
+ours to make.
+
+⚠️ **Do not hard-gate on the fingerprint review.** *"Go get fingerprinted, wait two weeks,
+then come back"* means **nobody comes back.** A gate like that doesn't make the product
+safer. It makes it **unused** — which helps precisely zero people.
+
+**The right mitigation is a reframe, not a gate:**
+
+> **The report is a starting point, not the final word. You know things it doesn't.**
+> If you remember a conviction that isn't on the report, **put it in anyway.**
+
+The report is a **memory aid, not an oracle.** And SurePath has **save/resume** — so the
+honest path is: *start now from memory, save, get your report, come back and reconcile.*
+The Review stage's count check is exactly where that reconciliation lands.
 
 ### L8 — SurePath does not advise on expunged or sealed records. Ever.
 
@@ -405,81 +497,77 @@ the user hand-writes it (see D3).
 | ENF003 | `#17` (parole) | No = **`/Choice3`** · Yes = **`/Choice1`** ⚠️ |
 | ENF003 | `#18` (probation) | No = **`/Choice2`** · Yes = **`/Choice1`** ⚠️ |
 
-🚨 **CORRECTION — the two parole/probation rows above were INVERTED in every earlier
-revision of this file, and the packet lied to TDLR because of it.**
+🚨 **THE TWO PAROLE/PROBATION ROWS ABOVE WERE INVERTED IN EVERY EARLIER REVISION OF THIS
+FILE, AND THE PACKET LIED TO TDLR BECAUSE OF IT.**
 
-The old table said parole *Yes* = `/Choice3`. **It is the opposite: `/Choice3` is NO.**
-Verified by reading each widget's on-value **and its rectangle** off the real blank — on the
-printed form **"No" is the LEFT box, "Yes" is the RIGHT box**:
+The old table said parole *Yes* = `/Choice3`. **It is the opposite — `/Choice3` is NO.**
+
+Verified by reading each widget's on-value **together with its rectangle** off the real
+blank. On the printed form, **"No" is the LEFT box and "Yes" is the RIGHT box:**
 
 ```
-#17 (parole)     left  x=192 → /Choice3 = NO      right x=226 → /Choice1 = YES
-#18 (probation)  left  x=191 → /Choice2 = NO      right x=225 → /Choice1 = YES
-#16 (renewals)   left  x=481 → /Choice1 = NO      right x=529 → /Choice2 = YES
+#16 (renewals)   left x=481 → /Choice1 = NO      right x=529 → /Choice2 = YES
+#17 (parole)     left x=192 → /Choice3 = NO      right x=226 → /Choice1 = YES
+#18 (probation)  left x=191 → /Choice2 = NO      right x=225 → /Choice1 = YES
 ```
 
-**What that bug actually did:** for a man who is **not on parole** and **is on probation**, the
-generated packet ticked *"Yes, I am on parole"* and *"No, I am not on probation."* Both
-backwards. On a form he signs **under penalty of administrative sanction**, affirming it is
+**What that bug actually did:** for a man who is **not on parole** and **is on probation**,
+the generated packet ticked *"Yes, I am on parole"* and *"No, I am not on probation."* Both
+backwards — on a form he signs **under penalty of administrative sanction**, affirming it is
 his full and accurate account.
 
 **And every single check was green.** The field map said so. pdf-lib validated the export
-value and read it back. The PDF was well-formed. `A13` confirmed the packet held exactly the
-values we intended to write — *we intended to write the wrong ones.* No test can catch this,
-because the error was in the ground truth the tests were written from.
+value and read it back. The PDF was well-formed. **A13 confirmed the packet held exactly the
+values we intended to write — we intended the wrong ones.** No test could catch it, because
+**the error was in the ground truth the tests were written from.**
 
-**ONLY PRINTING THE PAGE AND LOOKING AT IT CAUGHT THIS.** That is why `BUILD_SEQUENCE`
-Phase 1 says *"Then print it. On paper. Look at it."* It is not a nicety. It is the only
-control that can detect a lie the whole system agrees on.
+**ONLY PRINTING THE PAGE AND LOOKING AT IT CAUGHT THIS.** That is why `BUILD_SEQUENCE` Phase 1
+ends with *"Then print it. On paper. Look at it."* **It is not a nicety. It is the only
+control that can detect a lie the entire system agrees on.**
 
-⚠️ **`/Choice1` means YES on `#17` and `#18`, and NO on `#16`.** The number carries no
-meaning whatsoever. **Never reason from the number. Read the map, and if the map is the thing
-you are checking, read the geometry.**
+⚠️ **`/Choice1` means YES on `#17` and NO on `#16` — same form, same value, opposite
+meanings. THE NUMBER CARRIES NO MEANING. Never reason from it.** And if the thing you are
+checking *is the map*, read the **geometry** — it is the only ground truth independent of us
+being right.
 
-**Correction (Phase 0, verified against the real blanks).** An earlier revision of this
-file said that assuming `/Yes`/`/No` on ENF003 leaves the box *silently* `/Off`. **That was
-wrong, and the truth is better:** pdf-lib **throws loudly** on an export value the field
-does not have — *"`option` must be one of 'Choice3' or 'Choice1'"*. You cannot ship a
-silently-unticked box by guessing the wrong **syntax**.
+**⚠️ pdf-lib call syntax — the map stores the truth, the helper strips the slash.**
+This table lists the **real PDF export values, with the slash** — that is literally
+what is inside the file. But `PDFRadioGroup.select()` wants the **bare name**:
 
-**The distinction that survives, and it is the entire reason the probe exists:** pdf-lib
-validates **syntax** — that the value exists on the field. It cannot validate **semantics** —
-that `/Choice3` is the one meaning *yes, I am on parole*. Nothing in the PDF says so. **Only
-the labeled render told us that.** A wrong-but-valid value (`/Choice1` where you meant
-`/Choice3`) ticks cleanly, throws nothing, and tells TDLR **the opposite of the truth about
-a man's parole status.** **Read the map. Never reason from the number.**
+```ts
+select('Choice3')     // ✅
+select('/Choice3')    // ❌ THROWS
+```
+
+Route **every** tick through **one** helper that strips the slash, asserts the value
+exists on that field, selects it, and **reads it back.** Map stays true; adapter
+absorbs the quirk.
+
+*Correction to an earlier revision of this file: it claimed that guessing `/Yes` on
+ENF003 would leave every box **silently** `/Off`. **It doesn't — pdf-lib throws
+loudly.** So that failure is a nuisance, not a catastrophe. **But the map still earns
+its keep:** pdf-lib will tell you `'/Choice3'` is malformed. It will **never** tell you
+that **`Choice3` is what parole-yes means.** The probe found the value; pdf-lib only
+validates the syntax.*
+
+### F11 — `/Off` IS NOT AN OPTION. Never `select` it.
+
+**`/Off` is the ABSENCE of a selection, not a selectable value.** It does not appear in
+a radio group's option list. **`select('Off')` throws.**
+
+To leave a group unselected: **clear it, or never touch it.** Build `clearButton()` as a
+**distinct primitive** from `tickButton()`.
+
+**Where this bites:** `Type of Ownership` on ENF006. Its real options are
+`[/General Partnership, /Sole Proprietor, /LLC, /LLP, /Corporation]` — **and nothing
+else.** The **non-business-owner** case is **both the default and the common one.**
+
+*An earlier revision of `tdlr_field_map.json` listed `"none": "/Off"` for this field.
+**That was wrong**, and it is exactly the kind of thing that reads as fine in code review
+and **ships a packet declaring the applicant a General Partnership.* Caught in the Phase 0
+browser probe. Fixed.*
 
 Full map: `data/tdlr_field_map.json`. Labeled renders: `probe/*_labeled.png`.
-
-### F11 — `/Off` is NOT an option. It is the ABSENCE of one. `select('Off')` throws.
-
-`/Off` is not among a radio group's on-values — it is what the group holds when nothing is
-selected. This bit the field map, which listed `"none": "/Off"` for ENF006's **`Type of
-Ownership`**. That field's only real options are:
-
-```
-/General Partnership · /Sole Proprietor · /LLC · /LLP · /Corporation
-```
-
-There is **no export value meaning "not a business owner"** — which is the **default** case
-and the **common** one (A9: the business branch is hidden unless the user is a controlling
-person of a company).
-
-**Therefore two distinct primitives, never one:**
-
-| Primitive | Use |
-|---|---|
-| `tickButton(field, exportValue)` | Select a value. Verifies it exists on the field first. Fails closed. |
-| `clearButton(field)` | Leave the group unticked. **The only correct way to say "none."** |
-
-*Reason: `select('/Off')` throws — and an agent "fixing" that throw reaches for the nearest
-value that works. On this field, the nearest value is **`/General Partnership`**. That ships
-TDLR a signed statement that a man with no business is a general partnership. It is the D7
-failure exactly, arrived at from a different direction.*
-
-**Slash convention:** the map stores the **true PDF value, with the slash** (`/Choice3`).
-pdf-lib's `select()` wants it **bare** (`Choice3`) and throws on the slash. `tickButton()`
-strips it. **The map stays true; the adapter absorbs the quirk. Do not "fix" the map.**
 
 ### F9 — ENF006 splits county and state. ENF003 combines them. Same packet.
 

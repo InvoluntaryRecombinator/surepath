@@ -5,7 +5,8 @@
  */
 import type { StateConfig } from '../state-config/types'
 import { AppLayout } from './AppLayout'
-import { AppStoreProvider, useAppStore } from './store'
+import { AppStoreProvider } from './store'
+import { useAppStore } from './storeContext'
 import { RecordSection } from './sections/RecordSection'
 import { StubSection } from './sections/StubSection'
 

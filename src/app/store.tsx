@@ -6,16 +6,9 @@
  * The words "localStorage"/"sessionStorage" never reach the user — storage is framed as
  * protection, deletion as safety. The stored data never includes an SSN (D3).
  */
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  type Dispatch,
-  type ReactNode,
-} from 'react'
+import { useEffect, useMemo, useReducer, type ReactNode } from 'react'
 import type { StateConfig } from '../state-config/types'
+import { StoreCtx, storageKey } from './storeContext'
 import {
   emptyDraft,
   newCharge,
@@ -25,7 +18,7 @@ import {
   type DraftIncident,
 } from './draft'
 
-type AppState = {
+export type AppState = {
   draft: DraftCase
   sectionId: string
   /** Highest section index reached — the rail lets you revisit, never skip ahead. */
@@ -34,7 +27,7 @@ type AppState = {
   resumed: boolean
 }
 
-type Action =
+export type Action =
   | { type: 'go'; sectionId: string; index: number }
   | { type: 'add-incident' }
   | { type: 'add-single-charge' }
@@ -114,8 +107,6 @@ function makeReducer(config: StateConfig) {
   }
 }
 
-const storageKey = (config: StateConfig) => `surepath.${config.code.toLowerCase()}.v1`
-
 type Stored = { draft: DraftCase; sectionId: string; maxReachedIndex: number; savedAt: string }
 
 function initialState(config: StateConfig, restore = true): AppState {
@@ -144,16 +135,6 @@ function initialState(config: StateConfig, restore = true): AppState {
   }
 }
 
-/** Wipe this state's saved data from this computer. Used by "Delete my information". */
-export function eraseStoredData(config: StateConfig): void {
-  localStorage.removeItem(storageKey(config))
-}
-
-const StoreCtx = createContext<{
-  state: AppState
-  dispatch: Dispatch<Action>
-  config: StateConfig
-} | null>(null)
 
 export function AppStoreProvider({
   config,
@@ -181,10 +162,4 @@ export function AppStoreProvider({
   }, [state, config])
 
   return <StoreCtx.Provider value={{ state, dispatch, config }}>{children}</StoreCtx.Provider>
-}
-
-export function useAppStore() {
-  const ctx = useContext(StoreCtx)
-  if (!ctx) throw new Error('useAppStore must be used inside <AppStoreProvider>')
-  return ctx
 }

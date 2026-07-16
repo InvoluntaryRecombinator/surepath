@@ -1,22 +1,33 @@
-import { useEffect, useState } from 'react'
-import App from './App.tsx'
-import PacketDevPage from './PacketDevPage.tsx'
-import SmokePage from './SmokePage.tsx'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { ApplyPage } from './app/ApplyPage'
+import { MarketingLayout } from './marketing/MarketingLayout'
+import { About, Faq, Landing, States, Texas } from './marketing/pages'
+import { txConfig } from './state-config/tx'
+import PacketDevPage from './PacketDevPage'
+import SmokePage from './SmokePage'
 
 /**
- * The product is the default. Two DEV HARNESSES stay reachable by hash:
- *   #smoke   → the Phase 0 eleven-check smoke test
- *   #packet  → Phase 1 packet generation from the Marcus Rivera fixture
+ * Routes per SITE_STRUCTURE §2. Two shells: <MarketingLayout> for content pages,
+ * <ApplyPage> (the rail) for /<state>/apply. A new state is a new config + two routes.
+ *
+ * Dev harnesses stay reachable by hash on any route: #smoke, #packet.
  */
 export default function Root() {
-  const [hash, setHash] = useState(window.location.hash)
-  useEffect(() => {
-    const onChange = () => setHash(window.location.hash)
-    window.addEventListener('hashchange', onChange)
-    return () => window.removeEventListener('hashchange', onChange)
-  }, [])
+  if (window.location.hash === '#smoke') return <SmokePage />
+  if (window.location.hash === '#packet') return <PacketDevPage />
 
-  if (hash === '#smoke') return <SmokePage />
-  if (hash === '#packet') return <PacketDevPage />
-  return <App />
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MarketingLayout />}>
+          <Route index element={<Landing />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/states" element={<States />} />
+          <Route path="/texas" element={<Texas />} />
+        </Route>
+        <Route path="/texas/apply" element={<ApplyPage config={txConfig} />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }

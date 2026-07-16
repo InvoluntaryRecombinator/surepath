@@ -9,7 +9,7 @@
  */
 import { useNavigate } from 'react-router-dom'
 import { draftCounts } from './draft'
-import { eraseStoredData, useAppStore } from './store'
+import { eraseStoredData, useAppStore } from './storeContext'
 import { CheckSmall, Icon, Mark } from '../ui/icons'
 
 function downloadJson(filename: string, data: unknown) {

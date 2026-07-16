@@ -5,7 +5,7 @@
  */
 import type { ReactNode } from 'react'
 import { Button } from '../ui/Button'
-import { useAppStore } from './store'
+import { useAppStore } from './storeContext'
 import { Rail } from './Rail'
 
 export function AppLayout({ children }: { children: ReactNode }) {

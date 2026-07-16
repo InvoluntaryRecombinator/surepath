@@ -16,7 +16,7 @@ import { ChoiceField, TextField } from '../../ui/Field'
 import { FaqPanel } from '../../ui/FaqPanel'
 import { SectionIntro } from '../../ui/SectionIntro'
 import type { DraftCharge, DraftIncident } from '../draft'
-import { useAppStore } from '../store'
+import { useAppStore } from '../storeContext'
 
 function ChargeRow({
   incident,

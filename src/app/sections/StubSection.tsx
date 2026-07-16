@@ -1,6 +1,6 @@
 /** A not-yet-built section: the real intro copy from the config, and nothing invented. */
 import { SectionIntro } from '../../ui/SectionIntro'
-import { useAppStore } from '../store'
+import { useAppStore } from '../storeContext'
 
 export function StubSection({ sectionId }: { sectionId: string }) {
   const { config } = useAppStore()

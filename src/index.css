@@ -16,8 +16,8 @@
 @theme {
   /* Colors: wipe the default palette, then the eight tokens (+ one derived rail tint). */
   --color-*: initial;
-  --color-ground: #f1ebdd; /* the app ground. soft, warm, NOT white. */
-  --color-rail: #eae3d0; /* the rail — one step darker than ground, so the nav reads as its own place */
+  --color-ground: #efe7d2; /* the app ground. soft, warm, NOT white. */
+  --color-rail: #e7ddc4; /* the rail — one step darker than ground, so the nav reads as its own place */
   --color-surface: #fbf7ef; /* a section/panel — one step lighter than ground */
   --color-field: #ffffff; /* INPUT FIELDS. crisp white. the contrast that fixes "murky". */
   --color-ink: #24221c; /* primary text */

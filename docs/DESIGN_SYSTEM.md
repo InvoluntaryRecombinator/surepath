@@ -60,7 +60,7 @@ that a scared person feels safe. Calm *is* the win.
 
 ---
 
-## 1. The thesis## 1. The thesis
+## 1. The thesis
 
 > **THE FORM IS THE ENEMY. THIS SITE IS THE ANTIDOTE.**
 
@@ -84,6 +84,11 @@ reclaim its design devices.** There is nothing there worth reclaiming.
 |---|---|
 | **PDF correctness** | **Life or death.** Field map, `/Choice3`, `zeroAllFields()`, `/Sig` untouched, no blanks. See `CLAUDE.md` F1–F10. **Nothing here changes, ever.** |
 | **PDF aesthetics** | **Irrelevant.** The user sees the PDF **once, at the end, already finished.** It is never a design reference. |
+
+> **Scope note (§1 ↔ §13):** "PDF aesthetics are irrelevant" applies **only to the TDLR form
+> pages**, which we cannot change and do not restyle. The pages **we generate** — the cover
+> page, the mailing checklist, the continuation sheets — are §13's territory and get real
+> typographic craft. **No contradiction: don't polish theirs, do polish ours.**
 
 **The user is never asked to think about the PDF. That's the product.**
 
@@ -258,7 +263,7 @@ sections.** If a screen feels empty, you didn't say enough — the box is not to
 
 ### The header deserves room
 
-**76–84px, not 64.** The stepper is the anchor of the whole product; give it space to
+**80px, not 64.** The stepper is the anchor of the whole product; give it space to
 breathe. Wordmark left · stepper centered and generous · Save / Clear right. Second row:
 current step name (left) + the live counter (right).
 
@@ -312,7 +317,7 @@ reads as considered.
 │                                                                                   │
 │                  Step 3 of 6 · Your story        3 INC · 9 CONV · 22p · $10       │
 └──────────────────────────────────────────────────────────────────────────────────┘
-  Sticky. ~64px. 1px --color-rule bottom border. NO SHADOW.
+  Sticky. 80px. 1px --color-rule bottom border. NO SHADOW.
 ```
 
 **Why cheap steppers look cheap:** equal-width segments, generic circles, an icon-library
@@ -446,7 +451,7 @@ old machines with old browsers. Nothing fancy.**
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────┐
-│  SUREPATH        ✓───────✓───────●───────○───────○───────○         [Save]  [Clear]    │  ← sticky, 64px
+│  SUREPATH        ✓───────✓───────●───────○───────○───────○         [Save]  [Clear]    │  ← sticky, 80px
 │                  YOUR     YOUR    YOUR    YOUR    LICENSES REVIEW                     │    1px rule below
 │                  TRADE    INFO   RECORD   STORY                                       │    NO SHADOW
 │                                                                                       │

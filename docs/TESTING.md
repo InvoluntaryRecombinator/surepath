@@ -252,13 +252,29 @@ These tests exist to **freeze ground truth**. If someone "cleans up" the field m
 
 ```ts
 describe('button export values (F8) — proven, not remembered', () => {
-  it('ENF003 parole YES is Choice3.  NOT Choice2.  There is no Choice2.', () => {
-    expect(tick('ENF003', 'on_parole', 'yes')).toBe('Choice3')
+  // ⚠️ CORRECTED 2026-07-14. An earlier revision of this example asserted parole
+  // yes = Choice3 — INVERTED, copied from a field map that was itself wrong. Ground
+  // truth, read off the widget geometry of the real blank ("No" is the LEFT box,
+  // "Yes" is the RIGHT box — never trust the field name or the Choice number):
+  //   #17 (parole)     no = Choice3   yes = Choice1
+  //   #18 (probation)  no = Choice2   yes = Choice1
+  it('ENF003 parole YES is Choice1 and NO is Choice3.  The number carries no meaning.', () => {
+    expect(tick('ENF003', 'on_parole', 'yes')).toBe('Choice1')
+    expect(tick('ENF003', 'on_parole', 'no')).toBe('Choice3')
+  })
+
+  it('ENF003 probation YES is Choice1 and NO is Choice2.', () => {
+    expect(tick('ENF003', 'on_probation', 'yes')).toBe('Choice1')
+    expect(tick('ENF003', 'on_probation', 'no')).toBe('Choice2')
   })
 
   it('the two forms use DIFFERENT conventions.  This is not a bug.', () => {
     expect(tick('ENF006', 'on_parole', 'no')).toBe('No')        // semantic
-    expect(tick('ENF003', 'on_parole', 'no')).toBe('Choice1')   // ChoiceN
+    expect(tick('ENF003', 'on_parole', 'no')).toBe('Choice3')   // ChoiceN, arbitrary
+  })
+
+  it('Choice1 means YES on #17 and NO on #16 — same form, same value, opposite meanings', () => {
+    expect(tick('ENF003', 'on_parole', 'yes')).toBe(tick('ENF003', 'renewal_question', 'no'))
   })
 
   it('the leading slash is stripped for pdf-lib (the map stores the truth)', () => {

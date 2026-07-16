@@ -9,7 +9,58 @@
 
 ---
 
-## 1. The thesis
+## 0. Read this first — the guardrails are a floor, not a ceiling
+
+Most of this document is rules and prohibitions. **They are guardrails, not the goal.** They
+exist to prevent specific, real failures (cards floating on gray; the default-Tailwind look;
+the site accidentally resembling the government form it rescues people from). **Stay inside
+them. But do not mistake "inside the guardrails" for "done."**
+
+Within the tokens, the type, and the one-sheet rule, **you are expected to bring real craft.**
+Judgment about rhythm, weight, spacing, and restraint is wanted here, not suppressed. A screen
+that merely *avoids every banned thing* and stops there will be bland — and bland, for this
+product, is a failure. **Clear the fences, then make it genuinely good.**
+
+### What "good" feels like here
+
+The emotional target is **"I am in steady, competent hands."** Not delight. Not playfulness.
+Not flash. The person on the other side has nine convictions and is filling out paperwork that
+decides their future. What earns their trust is **calm, clarity, and obvious competence** —
+the feeling that whoever built this knew exactly what they were doing.
+
+That is a real aesthetic, and it is hard to achieve. It is not the absence of design — it is
+**disciplined** design. Reference points, in spirit:
+
+- **Stripe** — dense information made calm. Nothing shouts; everything is legible; you trust it
+  with your money without thinking about why.
+- **Linear** — typographic confidence. Type, weight, and space do the work; almost no
+  decoration; it still looks unmistakably *crafted*.
+- **A great tax or legal product** (not a bad one) — it makes a frightening task feel handled.
+
+**Calm is not the same as unfinished.** A first reviewer may read *restraint* as *incomplete*.
+The answer to that is not to add flash — it is to make the restraint more precise: better
+spacing rhythm, better type hierarchy, a more confident header, a cover page that carries the
+brand. **Elevate through craft, not decoration.**
+
+### Where flash IS welcome
+
+Restraint governs the **form**. It does **not** govern:
+
+- **The landing page** — nobody is vulnerable yet. Big type, motion, a real logo moment, scroll
+  reveals. Sell hard.
+- **The header and footer** — these frame every screen as a *product*. Make them genuinely
+  polished.
+- **The generated cover page and checklist** — **this is the sleeper.** It is the one piece of
+  paper in the packet that is entirely *ours* — our fonts, our layout, our mark. It is the first
+  thing anyone sees when the PDF downloads. Make it beautiful. It should look like a branded
+  action plan, not a script dump. (Details in §13.)
+
+**On the form screens themselves: elevate through precision, not ornament.** The win there is
+that a scared person feels safe. Calm *is* the win.
+
+---
+
+## 1. The thesis## 1. The thesis
 
 > **THE FORM IS THE ENEMY. THIS SITE IS THE ANTIDOTE.**
 
@@ -135,6 +186,83 @@ reason. No philosophy attached.
 --font-sans: "Public Sans", system-ui, sans-serif;
 --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 ```
+
+## 4.5 THE SHEET — one surface, not a pile of cards
+
+**This is the single most important layout rule, and the easiest one to get wrong.**
+
+> ⚠️ **The failure it prevents:** a column of bordered cards floating on the khaki ground,
+> with more bordered cards nested inside them. That is **"rounded cards floating on gray"**
+> in a different palette. It is the #1 AI-slop layout, it is banned in §8, and it is what a
+> first draft of this mockup did anyway.
+
+### The rule
+
+**The page is ONE continuous surface.** `--color-card`, running from under the header to
+above the action bar. The khaki ground (`--color-paper`) is visible **only as the margins to
+the left and right of the sheet.**
+
+**Nothing else on the screen is a card.** Not a section. Not an incident. Not a charge.
+Not the FAQ panel.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  HEADER — full bleed, sticky, --color-card, 1px rule below    │
+├──────────────────────────────────────────────────────────────┤
+│▒▒▒▒│                                                    │▒▒▒▒│
+│▒▒▒▒│   THE SHEET — one surface, --color-card            │▒▒▒▒│
+│▒▒▒▒│   min-height: calc(100vh - header - actionbar)     │▒▒▒▒│
+│▒▒▒▒│                                                    │▒▒▒▒│
+│▒▒▒▒│   Section heading                                  │▒▒▒▒│
+│▒▒▒▒│   fields, fields                                   │▒▒▒▒│
+│▒▒▒▒│   ──────────────────────────────  ← a RULE, not   │▒▒▒▒│
+│▒▒▒▒│   Section heading                    a card edge   │▒▒▒▒│
+│▒▒▒▒│   fields                                           │▒▒▒▒│
+│▒▒▒▒│                                                    │▒▒▒▒│
+│▒▒▒▒│   (empty space accumulates HERE, at the bottom,    │▒▒▒▒│
+│▒▒▒▒│    INSIDE the sheet — never as a frame around it)  │▒▒▒▒│
+├──────────────────────────────────────────────────────────────┤
+│  ACTION BAR — full bleed, sticky, Back / Continue             │
+└──────────────────────────────────────────────────────────────┘
+   ▒ = --color-paper, visible ONLY as side margins
+```
+
+### Structure comes from RULES and SPACE, not from boxes
+
+| Instead of | Do |
+|---|---|
+| A bordered card per section | A **full-width hairline rule** between sections |
+| A bordered card per incident | A **section** on the sheet, with a rule above it |
+| A bordered box per charge | **Indent + ONE left rule.** That's the whole nesting device. |
+| A boxed FAQ panel | Plain rows, hairline above, hairline below |
+| A dashed "+ Add" box | A **text button with an icon**, sitting on a rule |
+
+**Maximum two levels of nesting. Ever.** If you are drawing a border inside a border,
+**stop** — you have already lost.
+
+**Maximum one elevated surface per screen.** The sheet is it.
+
+### Hierarchy comes from type and whitespace
+
+The eye should find the section headings **without reading them.**
+
+| | Size | Weight | Space above | Space below |
+|---|---|---|---|---|
+| Section heading | 17px | 700 | **32px** | 12px |
+| Field label (eyebrow) | 11px mono, uppercase, tracked | 500 | 20px | 6px |
+| Field value | 14px mono | 400 | — | — |
+| Hint / caption | 12px sans, `--color-muted` | 400 | 4px | — |
+
+**Cramped is cheap.** `line-height: 1.6` on prose. **20px between fields. 32px between
+sections.** If a screen feels empty, you didn't say enough — the box is not too small.
+
+### The header deserves room
+
+**76–84px, not 64.** The stepper is the anchor of the whole product; give it space to
+breathe. Wordmark left · stepper centered and generous · Save / Clear right. Second row:
+current step name (left) + the live counter (right).
+
+---
 
 ## 5. Inputs — normal, obvious, well-made
 
@@ -263,6 +391,10 @@ Set these up so violating them is *impossible*, not merely discouraged. Same phi
 | Border radius above 2px | 2px on things you touch. 0 on things that organize. |
 | Shadcn's default theme | It *is* the slop look. Radix primitives only; our tokens for everything visible. |
 | **Anything that makes the site resemble the government form** | Ledgers, dense grids, black header bars, boxed cells, numbered form-style sections. **The form is the enemy.** |
+| **Cards floating on the khaki ground** | §4.5. **ONE SHEET.** This is "cards on gray" with a different palette. |
+| **A border inside a border** | Two levels of nesting, max — and the second level is **indent + one left rule**, not a box. |
+| **Dashed borders** | Cliché. A "+ Add" affordance is a text button with an icon. |
+| **More than one elevated surface on a screen** | The sheet is it. |
 | Minimal/clever inputs (bare underlines, invisible fields) | **Affordance beats cleverness.** Stressed users on bad monitors must never guess where to click. |
 | A lonely centered 600px column with acres of dead space | You said it yourself: *too much white space is glaring*. **Density is honest here** — the real form is dense. Use a measured two-column grid that mirrors it. |
 | Gradients. Any gradient, anywhere. | |
@@ -430,3 +562,39 @@ page nobody opens.
 
 Collapsed by default. Sits above the record intake. Content and placement live in
 `data/tdlr_links.json` → `tdlr_faq_panel`.
+
+
+---
+
+## 13. The cover page & checklist — the one surface that is fully OURS
+
+Every TDLR form in the packet looks how TDLR made it look — you cannot change them. **But the
+cover page and the continuation/addendum sheets are generated by our code.** They are the only
+paper in the packet with our fonts, our layout, and our mark. **Spend real craft here** — it is
+the first thing anyone sees when the PDF opens, and in a demo it is what makes the product look
+finished.
+
+**This is not "later" polish. It is a demo centerpiece.** Treat it with the same care as a
+landing page.
+
+**The cover page (page 1, DO NOT MAIL):**
+- SurePath wordmark/mark, top corner. Quiet, confident.
+- The applicant's name and the trade this packet is for.
+- A real, typeset **checklist** — actual checkbox glyphs, generous leading, not a text dump:
+  - every place to hand-write the SSN, **by document and item number**
+  - every place to sign, by document and item number
+  - the exact money-order amount and payee
+  - the mailing address, in a clean block
+  - the page count ("you are mailing 22 pages")
+  - the reminder to keep a copy, and to delete the download on a shared computer
+- It should read like a **branded action plan**, not a wall of instructions.
+- Typographically calm: our two faces, clear hierarchy, real white space. It can be beautiful
+  and still be all business.
+
+**The continuation / addendum sheets:** same typographic care. A clean header block (the
+identifiers that link it to its questionnaire), then the narrative, set to read well on paper —
+correct size, correct measure, correct leading. Not dumped 11-point text overflowing a box.
+
+**Font sizing is a real requirement, not a nicety.** These are printed on a library printer and
+read by a reviewer. Size, measure, and leading must be deliberate. This is exactly the kind of
+detail that separates "looks like a product" from "looks like a script wrote it."

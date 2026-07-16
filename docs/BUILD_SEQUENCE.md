@@ -37,14 +37,13 @@ entire architecture rests on. Two hours to validate. Do not skip.
 [ ] pdf-lib loads assets/ENF006_blank.pdf IN THE BROWSER (not Node).
 [ ] form.getFields() returns 33 fields on ENF006, 24 on ENF003.
 [ ] getTextField('Last Name').setText('RIVERA')          → renders.
-[ ] getRadioGroup('Are you currently on parole?').select('No')      → ticks.     (ENF006: Yes/No)
-[ ] getRadioGroup('#17').select('Choice1')                          → ticks No.  (ENF003: ChoiceN !!)
-[ ] getRadioGroup('#17').select('Choice3')                          → ticks Yes. (NOT Choice2)
-    ⚠️ NO LEADING SLASH. The PDF stores /Choice3; pdf-lib's select() wants the bare
-    name and THROWS on the slash. The field map keeps the true value; tickButton()
-    strips it. (CLAUDE.md F11)
-[ ] 'Type of Ownership' has NO /Off option. Not-a-business-owner = clearButton(), never
-    select(). select('Off') throws — and the nearest working value is General Partnership.
+[ ] getRadioGroup('Are you currently on parole?').select('No')     → ticks.     (ENF006: Yes/No)
+[ ] getRadioGroup('#17').select('Choice1')                         → ticks No.  (ENF003: ChoiceN !!)
+[ ] getRadioGroup('#17').select('Choice3')                         → ticks Yes. (NOT Choice2)
+        ⚠️ NO LEADING SLASH. The map stores '/Choice3' (the true PDF value);
+           pdf-lib's select() wants the bare 'Choice3'. Passing the slash THROWS.
+[ ] 'Type of Ownership' → leaving it UNSELECTED must CLEAR the group, never select('Off').
+        ⚠️ /Off is not an option. select('Off') THROWS. See CLAUDE.md F11.
 [ ] form.flatten() succeeds WITH the /Sig field present and does not throw.
 [ ] Flattened output renders identically in Chrome preview and in a print preview.
 [ ] Blob download works. File opens. Text is burned in, not a live field.

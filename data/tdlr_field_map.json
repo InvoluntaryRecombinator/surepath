@@ -9,8 +9,9 @@
     "packet_math": "N convictions => 1 x ENF006 (carries conviction #1) + (N-1) x ENF003",
     "flatten": "Flatten on output. Text is burned into the page -> identical on every printer.",
     "signature_fields": "BOTH forms carry a /Sig (cryptographic digital signature) field, and the AcroForm sets /SigFlags 1. NEVER POPULATE THEM. Invariant L6: the user signs in wet ink; liability transfers at physical execution. form.flatten() has been smoke-tested with /Sig present and works.",
-    "slash_convention": "THIS MAP STORES THE TRUE PDF EXPORT VALUE, WITH THE SLASH ('/Choice3', '/No'). That is what is actually inside the PDF. pdf-lib's select() wants the BARE name ('Choice3', 'No') and THROWS if you pass the slash. Do not 'fix' the map. The tickButton() adapter strips the slash. Map stays true; the adapter absorbs the quirk.",
-    "off_is_not_an_option": "/Off IS NOT A SELECTABLE VALUE. It is the ABSENCE of a selection. select('Off') throws. To leave a radio group unticked, CLEAR it -- see CLAUDE.md F11 and the clearButton() primitive. Verified against the real blanks in the Phase 0 probe."
+    "pdf_lib_call_syntax": "GROUND TRUTH vs API SYNTAX. This map stores the TRUE PDF export value, WITH the leading slash ('/Choice3', '/Male', '/No') -- that is literally what is inside the PDF. BUT pdf-lib's PDFRadioGroup.select() wants the BARE name: select('Choice3'), NOT select('/Choice3'). Passing the slash THROWS. Route every tick through ONE helper that strips the slash, asserts the value exists on that field, selects it, and reads it back. The map stays true; the adapter absorbs the quirk. (Verified in the browser, Phase 0.)",
+    "OFF_IS_NOT_AN_OPTION": "CRITICAL. /Off is the ABSENCE of a selection, not a selectable option. It does NOT appear in a radio group's option list. Calling select('Off') THROWS. To leave a group unselected you must CLEAR it (or never touch it) -- never 'select /Off'. Build clearButton() as a DISTINCT primitive from tickButton(). This bites hardest on 'Type of Ownership', where the non-business-owner case is BOTH the default AND the common one -- get it wrong and you ship a pre-ticked General Partnership.",
+    "GROUND_TRUTH_WARNING": "The parole and probation export values in this file were WRONG until 2026-07-14, and were labelled 'VERIFIED', which made every downstream reader trust them MORE. A confident wrong answer in the ground-truth layer is worse than no answer -- nothing downstream can detect it, and every test written from it confirms it. If you ever need to check a claim in this file, do not read the field NAME or the export NUMBER. Read the WIDGET RECTANGLES: on these forms, 'No' is the LEFT box and 'Yes' is the RIGHT box. Geometry is the only ground truth independent of us being right."
   },
   "ENF006": {
     "_note": "Carries the applicant data AND CONVICTION #1. 33 fields (32 fillable + 1 /Sig).",
@@ -93,15 +94,22 @@
         "field": "Type of Ownership",
         "item": 14,
         "type": "button",
-        "NOT_A_BUSINESS_OWNER": "There is NO value for 'not a business owner'. The five below are the ONLY options this field has -- verified by reading the field's on-values off the real blank (Phase 0 probe). '/Off' is NOT among them; it is the absence of a selection, and select('Off') THROWS. When the user is not a controlling person of a company (the DEFAULT and the common case), CLEAR this group -- never select it. An earlier revision of this map listed \"none\": \"/Off\", which reads as fine in review and ships a pre-ticked General Partnership. See CLAUDE.md F11 and D7.",
         "values": {
           "general_partnership": "/General Partnership",
           "sole_proprietor": "/Sole Proprietor",
-          "llc": "/LLC",
-          "llp": "/LLP",
           "corporation": "/Corporation",
-          "none": null
-        }
+          "llc": "/LLC",
+          "llp": "/LLP"
+        },
+        "none": null,
+        "NOT_A_BUSINESS_OWNER": "Leave this group UNSELECTED. Use clearButton(), or never touch it. There is NO '/Off' option on this field -- select('Off') THROWS. (An earlier revision of this map listed \"none\": \"/Off\". That was WRONG. Caught in the Phase 0 browser probe.)",
+        "verified_options": [
+          "/General Partnership",
+          "/Sole Proprietor",
+          "/LLC",
+          "/LLP",
+          "/Corporation"
+        ]
       }
     },
     "conviction_1": {
@@ -296,8 +304,8 @@
           "no": "/Choice3",
           "yes": "/Choice1"
         },
-        "CORRECTED_2026_07_14": "THIS WAS INVERTED IN THE PREVIOUS REVISION OF THIS MAP, which said no=/Choice1, yes=/Choice3. Verified by widget geometry against the real blank: on the printed form 'No' is the LEFT box and 'Yes' is the RIGHT box. #17 widgets: x=192 -> /Choice3 (NO), x=226 -> /Choice1 (YES). The old map ticked YES for a man who is NOT on parole. Every automated test passed; pdf-lib validated the value; the PDF was well-formed. Only PRINTING THE PAGE caught it.",
-        "WARNING": "NON-SEQUENTIAL and semantically arbitrary. /Choice1 means YES here and NO on #16. The number carries no meaning. Never reason from it."
+        "WARNING": "/Choice1 means YES on #17 and NO on #16 -- same form, same value, opposite meanings. THE NUMBER CARRIES NO MEANING. Never reason from it. If you are checking the map itself, read the widget geometry.",
+        "CORRECTED_2026_07_14": "THIS WAS INVERTED. The previous revision said no=/Choice1, yes=/Choice3. It was WRONG, and it generated packets telling TDLR that a man who is NOT on parole IS on parole. Verified by WIDGET GEOMETRY against the real blank: on the printed form 'No' is the LEFT box and 'Yes' is the RIGHT box. #17 widgets: x=192 -> /Choice3 (NO), x=226 -> /Choice1 (YES). Every automated test passed on the wrong value, because the tests were written FROM it. ONLY PRINTING THE PAGE CAUGHT IT."
       },
       "parole_officer": {
         "field": "Parole Officers Name",

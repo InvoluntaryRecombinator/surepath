@@ -43,7 +43,7 @@ export function Rail() {
     }`
 
   return (
-    <aside className="flex w-[272px] shrink-0 flex-col border-r border-line bg-rail">
+    <aside className="flex w-[272px] shrink-0 flex-col overflow-y-auto border-r border-line bg-rail">
       {/* ── identity ── */}
       <div className="px-6 pb-2 pt-7">
         <div className="flex items-center gap-2.5">

@@ -17,12 +17,16 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const go = (i: number) => dispatch({ type: 'go', sectionId: config.sections[i].id, index: i })
 
   return (
-    <div className="flex h-screen bg-ground">
+    /* fixed inset-0: the app owns the viewport. The document can never scroll the frame —
+       only the content pane scrolls. Modal-feel, page-mechanics (SITE_STRUCTURE §2). */
+    <div className="fixed inset-0 flex bg-ground">
       <Rail />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Content scrolls; the rail and the action bar stay put. Never vertically centered. */}
-        <main className="flex-1 overflow-y-auto">
+        {/* Content scrolls; the rail and the action bar stay put. Never vertically centered.
+            min-h-0 matters: without it the pane forces the page taller and the RAIL scrolls
+            away with the document — the one thing a persistent rail must never do. */}
+        <main className="min-h-0 flex-1 overflow-y-auto">
           <div className="mx-auto flex max-w-[760px] flex-col gap-8 px-10 pb-16 pt-10">
             {state.resumed && (
               <p className="flex items-baseline justify-between gap-4 rounded-[6px] border border-line bg-surface px-4 py-2.5 text-[13px] text-muted">

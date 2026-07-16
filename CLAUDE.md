@@ -64,6 +64,26 @@ docs: resolve header height to 80px across DESIGN_SYSTEM
 - The human commits at their own checkpoints too; your commits and theirs interleave. Keep
   yours small enough that theirs never collides.
 
+### This repo will be reviewed by humans — commit like it
+
+This project is a **portfolio piece**. The commit history itself is part of what gets
+judged — by a course reviewer, and potentially by people evaluating the author for jobs.
+A history of many small, well-described commits reads as competent, deliberate engineering.
+A history of three giant "wip" commits reads as the opposite.
+
+So, beyond the granularity rules above:
+- **Err on the side of MORE commits, smaller.** A component, a test, a fix, a doc
+  correction, a refactor — each is its own commit. If you did two nameable things, that's
+  two commits.
+- **Every commit message is a sentence someone will read.** Specific, imperative, and it
+  says *what* and (if not obvious) *why*, referencing the invariant or acceptance criterion.
+- **TDD is visible in the history when you let it be.** When you write a test then make it
+  pass, that can be two commits — `test: add failing X` then `feat: implement X` — and that
+  sequence is *good* to show: it demonstrates test-driven work to anyone reading the log.
+  Do this whenever it's natural; don't contort the work for it.
+- The history should read like a **clean, steady narrative of the build** — someone
+  scrolling `git log --oneline` should be able to follow what happened and when.
+
 ### At the start of a session
 
 If `git status` shows an uncommitted working tree from a previous session, **stop and tell the
@@ -309,19 +329,31 @@ is applicable, so N/A is wrong. The user must write it in. The checklist must be
 
 ### D4 — No database. No accounts. No server-side persistence of user data.
 
-Progress is saved by **exporting a JSON file to the user's own disk** and
-re-importing it. That is the entire persistence layer.
+The user's data lives **on the user's own device** and is carried between devices by a
+**file the user exports** (download or email). It is **never** stored on our servers.
 
 Do not add: user accounts, login, JWTs, Postgres, Mongo, Redis, Supabase, Firebase,
-session cookies carrying user data, or any server-side store of anything the user
-typed.
+session cookies carrying user data, or any **server-side** store of anything the user typed.
 
-*Reason: a database of names, addresses, DOBs and full criminal histories of
-justice-impacted people is a honeypot. The people who would be harmed by a breach
-are the people we are trying to serve. We do not build it.*
+**On-device autosave IS allowed, and is required.** Autosave to **`localStorage`** so an
+accidental tab-close doesn't destroy 45 minutes of work.
 
-*Note: `sessionStorage` may be used for in-session working state. `localStorage`
-must NOT be used — these users are frequently on shared/public/library computers.*
+> ⚠️ **This reverses an earlier version of this rule, which banned `localStorage`.** The
+> reversal is deliberate and the reasoning is:
+> - The honeypot risk D4 exists to prevent is a **server-side database** of criminal
+>   histories — a single breachable store of many people's data. `localStorage` is none of
+>   that: it's one person's data, on their own machine, that never transmits.
+> - **Nobody clicks "Save" mid-session.** If autosave died on tab-close (`sessionStorage`),
+>   the exact failure we're trying to prevent — lost work from a stray Cmd-W — is what we'd
+>   ship. Autosave must survive tab-close. That requires `localStorage`.
+> - **The SSN is never in the data at all (D3)** — the most radioactive field never touches
+>   the disk. That's what makes on-device storage defensible here.
+> - The residual risk (data left on a shared/library computer) is mitigated by a prominent
+>   **"Delete my information from this computer"** control, framed as protection. See
+>   `SITE_STRUCTURE.md` §4.
+
+**Never say "localStorage" or "sessionStorage" to the user** — the words alarm without
+informing this audience. Frame storage as protection and deletion as safety, not loss.
 
 ### D5 — PDF generation is entirely client-side.
 

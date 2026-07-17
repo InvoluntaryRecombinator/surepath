@@ -9,7 +9,7 @@
  */
 import type { ReactNode } from 'react'
 import { Button } from '../ui/Button'
-import { CheckSmall } from '../ui/icons'
+import { ArrowLeft, ArrowRight, CheckSmall } from '../ui/icons'
 import { SectionBriefing } from '../ui/SectionIntro'
 import { useAppStore } from './storeContext'
 import { Rail } from './Rail'
@@ -33,20 +33,23 @@ export function AppLayout({ children }: { children: ReactNode }) {
         {/* ── the content header bar — the pane's top edge. The rail already says where
             you are; this bar carries the one thing nothing else says: the formal name of
             the legal artifact being assembled. ─────────────────────────────────────────── */}
-        <header className="flex h-[52px] shrink-0 items-center justify-between border-b border-line/70 px-14">
-          <p className="text-[13px] font-medium text-muted">{config.processName}</p>
-          <p className="flex items-center gap-1.5 text-[12.5px] text-muted">
-            <span className="text-accent">
+        <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-line/70 px-14">
+          <p className="text-[13.5px] font-semibold text-ink/70">{config.processName}</p>
+          <p className="flex items-center gap-2.5 text-muted">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full border border-line bg-field text-accent">
               <CheckSmall size={9} />
             </span>
-            Saved on this computer — never sent to our servers
+            <span className="flex flex-col leading-tight">
+              <span className="text-[12.5px] font-medium text-ink/70">Saved on this computer</span>
+              <span className="mt-0.5 text-[11.5px]">Never sent to our servers</span>
+            </span>
           </p>
         </header>
 
         {/* ── the sheet — content scrolls; the frame stays put. The briefing band rides
             at the top of the scroll: explanation above the seal, work below it. ────────── */}
         <main className="min-h-0 flex-1 overflow-y-auto">
-          <SectionBriefing section={stage} />
+          <SectionBriefing section={stage} index={idx} total={config.sections.length} />
           <div className="px-14 pb-20 pt-9">
             {state.resumed && (
               <p className="mb-8 flex max-w-[760px] items-baseline justify-between gap-4 rounded-[4px] border border-line/70 bg-ground/40 px-4 py-2.5 text-[13px] text-muted">
@@ -69,7 +72,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <footer className="shrink-0 border-t border-line/70">
           <div className="flex h-[68px] items-center justify-between px-14">
             <Button variant="ghost" disabled={isFirst} onClick={() => go(idx - 1)}>
-              ← Back
+              <ArrowLeft />
+              Back
             </Button>
             {isLast ? (
               <Button variant="primary" disabled title="The review step is being built.">
@@ -77,7 +81,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </Button>
             ) : (
               <Button variant="primary" onClick={() => go(idx + 1)}>
-                Continue →
+                Continue
+                <ArrowRight />
               </Button>
             )}
           </div>

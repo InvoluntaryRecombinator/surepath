@@ -31,7 +31,7 @@ const DELETE_CONFIRM =
   'your progress file first (Cancel, then "Save my progress").\n\nDelete everything from ' +
   'this computer?'
 
-const ROW_H = 46 // px — one nav row. The connector geometry derives from this.
+const ROW_H = 50 // px — one nav row. The connector geometry derives from this.
 
 export function Rail() {
   const { state, dispatch, config } = useAppStore()
@@ -53,12 +53,12 @@ export function Rail() {
     `${counts.records} ${recordsLabel}`
 
   return (
-    <aside className="flex w-[276px] shrink-0 flex-col overflow-y-auto border-r border-line bg-rail">
+    <aside className="flex w-[264px] shrink-0 flex-col overflow-y-auto border-r border-line bg-rail">
       {/* ── identity ── */}
       <div className="px-6 pb-1 pt-7">
         <div className="flex items-center gap-2.5">
           <Mark />
-          <span className="text-[17px] font-extrabold tracking-tight text-ink">SurePath</span>
+          <span className="text-[18px] font-[750] text-ink">SurePath</span>
         </div>
         <p className="mt-1.5 pl-[34px] text-[12px] font-medium text-muted">{config.railTag}</p>
       </div>
@@ -68,14 +68,14 @@ export function Rail() {
         {/* the full run, quiet */}
         <span
           aria-hidden="true"
-          className="absolute left-[35px] border-l border-dashed border-ink/20"
+          className="absolute left-[40px] border-l border-dashed border-ink/20"
           style={{ top: ROW_H / 2, height: (n - 1) * ROW_H }}
         />
         {/* the traveled portion — a record of work done */}
         {currentIdx > 0 && (
           <span
             aria-hidden="true"
-            className="absolute left-[35px] border-l border-dashed border-accent/60"
+            className="absolute left-[40px] border-l border-dashed border-accent/60"
             style={{ top: ROW_H / 2, height: currentIdx * ROW_H }}
           />
         )}
@@ -92,7 +92,7 @@ export function Rail() {
               onClick={() => clickable && dispatch({ type: 'go', sectionId: section.id, index: i })}
               aria-current={status === 'current' ? 'step' : undefined}
               style={{ height: ROW_H }}
-              className={`relative flex w-full items-center gap-3 rounded-[6px] px-2.5 text-left transition-colors duration-150 ${
+              className={`relative flex w-full items-center gap-3 rounded-[5px] px-2.5 text-left transition-colors duration-150 ${
                 status === 'current'
                   ? 'border border-line/70 bg-surface text-ink'
                   : clickable
@@ -100,22 +100,21 @@ export function Rail() {
                     : 'text-muted'
               }`}
             >
-              <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center">
+              <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center">
                 {status === 'done' ? (
-                  <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-accent text-surface">
-                    <CheckSmall size={8} />
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-surface">
+                    <CheckSmall size={10} />
                   </span>
                 ) : status === 'current' ? (
-                  <span className="h-[18px] w-[18px] rounded-full border-2 border-accent bg-field" />
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-accent bg-field text-accent">
+                    <Icon name={section.icon} size={15} />
+                  </span>
                 ) : (
-                  <span className="h-[13px] w-[13px] rounded-full border border-ink/25 bg-rail" />
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-ink/25 bg-rail text-muted">
+                    <Icon name={section.icon} size={15} />
+                  </span>
                 )}
               </span>
-              <Icon
-                name={section.icon}
-                size={17}
-                className={status === 'current' ? 'text-accent' : 'text-muted'}
-              />
               <span
                 className={`text-[14px] ${status === 'current' ? 'font-semibold' : 'font-medium'}`}
               >
@@ -130,7 +129,7 @@ export function Rail() {
 
       {/* ── the counter — the promise, rendered ── */}
       <div className="mx-6 border-t border-ink/10 pt-5">
-        <p className="text-[12.5px] font-semibold uppercase tracking-[0.07em] text-ink">
+        <p className="text-[12.5px] font-semibold uppercase text-ink">
           {counterText}
         </p>
       </div>

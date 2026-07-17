@@ -97,3 +97,35 @@ export const CheckSmall = ({ size = 10 }: { size?: number }) => (
     />
   </svg>
 )
+
+export const ArrowLeft = ({ size = 16 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M13 8H3M7 4 3 8l4 4" />
+  </svg>
+)
+
+export const ArrowRight = ({ size = 16 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M3 8h10M9 4l4 4-4 4" />
+  </svg>
+)

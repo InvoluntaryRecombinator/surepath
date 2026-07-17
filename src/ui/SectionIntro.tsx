@@ -8,18 +8,26 @@
  */
 import type { SectionDef } from '../state-config/types'
 
-export function SectionBriefing({ section }: { section: SectionDef }) {
+export function SectionBriefing({
+  section,
+  index,
+  total,
+}: {
+  section: SectionDef
+  index: number
+  total: number
+}) {
   const { intro } = section
   return (
-    <div className="border-b-2 border-line bg-ground/60 px-14 pb-8 pt-9">
+    <div className="border-b-2 border-line bg-ground/60 px-14 pb-8 pt-8">
       <div className="max-w-[760px]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted">
-          {intro.eyebrow}
+        <p className="text-[11.5px] font-semibold uppercase text-muted">
+          Step {index + 1} of {total} · {intro.eyebrow}
         </p>
-        <h1 className="mt-2 text-[27px] font-bold leading-tight tracking-tight text-ink">
+        <h1 className="mt-2.5 text-[28px] font-bold leading-[1.2] text-ink">
           {intro.title}
         </h1>
-        <p className="mt-3 max-w-[62ch] text-[14.5px] leading-relaxed text-ink/75">
+        <p className="mt-3.5 max-w-[68ch] text-[15px] leading-[1.65] text-ink/75">
           {intro.lead}
         </p>
         {intro.points && (

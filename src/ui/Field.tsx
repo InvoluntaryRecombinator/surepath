@@ -72,6 +72,7 @@ export function ChoiceField({
   value,
   options,
   onChange,
+  layout = 'stacked',
 }: {
   label: string
   required?: boolean
@@ -80,7 +81,65 @@ export function ChoiceField({
   value: string
   options: { value: string; label: string }[]
   onChange: (value: string) => void
+  layout?: 'stacked' | 'decision'
 }) {
+  const controls = (
+    <div className="flex gap-2">
+      {options.map((o) => {
+        const active = value === o.value
+        return (
+          <label
+            key={o.value}
+            className={`inline-flex h-11 min-w-[92px] cursor-pointer items-center gap-2.5 rounded-[4px] border px-3.5 text-[14px] transition-colors duration-150 ${
+              active
+                ? 'border-accent bg-accent/5 font-semibold text-accent'
+                : 'border-line bg-field text-ink hover:border-muted/70'
+            }`}
+          >
+            <input
+              type="radio"
+              name={name}
+              value={o.value}
+              checked={active}
+              onChange={() => onChange(o.value)}
+              required={required}
+              className="peer sr-only"
+            />
+            <span
+              aria-hidden="true"
+              className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent ${
+                active ? 'border-accent' : 'border-muted/70'
+              }`}
+            >
+              {active && <span className="h-2 w-2 rounded-full bg-accent" />}
+            </span>
+            {o.label}
+          </label>
+        )
+      })}
+    </div>
+  )
+
+  if (layout === 'decision') {
+    return (
+      <fieldset>
+        <legend className="sr-only">{label}</legend>
+        <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-5">
+          <div className="flex items-center gap-1.5 text-[14px] font-semibold leading-[1.45] text-ink">
+            <span aria-hidden="true">{label}</span>
+            {required && (
+              <span className="text-state/80" aria-hidden="true">
+                *
+              </span>
+            )}
+            {info && <InfoBubble label={label}>{info}</InfoBubble>}
+          </div>
+          {controls}
+        </div>
+      </fieldset>
+    )
+  }
+
   return (
     <fieldset className="flex flex-col gap-[7px]">
       <legend className="flex items-center gap-1.5 text-[13.5px] font-semibold leading-[18px] text-muted">
@@ -92,40 +151,7 @@ export function ChoiceField({
         )}
         {info && <InfoBubble label={label}>{info}</InfoBubble>}
       </legend>
-      <div className="flex gap-2">
-        {options.map((o) => {
-          const active = value === o.value
-          return (
-            <label
-              key={o.value}
-              className={`inline-flex h-11 min-w-[92px] cursor-pointer items-center gap-2.5 rounded-[4px] border px-3.5 text-[14px] transition-colors duration-150 ${
-                active
-                  ? 'border-accent bg-accent/5 font-semibold text-accent'
-                  : 'border-line bg-field text-ink hover:border-muted/70'
-              }`}
-            >
-              <input
-                type="radio"
-                name={name}
-                value={o.value}
-                checked={active}
-                onChange={() => onChange(o.value)}
-                required={required}
-                className="peer sr-only"
-              />
-              <span
-                aria-hidden="true"
-                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent ${
-                  active ? 'border-accent' : 'border-muted/70'
-                }`}
-              >
-                {active && <span className="h-2 w-2 rounded-full bg-accent" />}
-              </span>
-              {o.label}
-            </label>
-          )
-        })}
-      </div>
+      {controls}
     </fieldset>
   )
 }

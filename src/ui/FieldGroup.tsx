@@ -1,38 +1,70 @@
 /**
- * A logical group of fields, the reference's core rhythm:
+ * A logical group of fields with two jobs kept distinct:
  *
- *   group heading          15px / 600, ink
- *   one-line description   13.5px, muted           ← 4px below the heading
- *   the fields             20px below, 640px cap
- *   ────────────────────   full-width hairline     ← 36px below, FAINTER than input borders
+ *   guidance / why         restrained left column
+ *   fields / action        wider right column
+ *   ────────────────────   full-width hairline between groups
  *
- * Two line weights on one screen: component borders at --color-line, structural hairlines
- * at --color-line/60. Nobody consciously notices; everyone feels it.
+ * The columns collapse below wide desktop. The empty signature slot is deliberate: it
+ * reserves a home for a future visual element without inventing a placeholder card.
  */
 import type { ReactNode } from 'react'
 
 export function FieldGroup({
   heading,
   description,
+  signatureSlot = false,
   last = false,
   children,
 }: {
   heading: string
   description?: string
+  signatureSlot?: boolean
   last?: boolean
   children: ReactNode
 }) {
   return (
-    <section className={last ? '' : 'border-b border-line/60 pb-10'}>
-      <h2 className="text-[17px] font-semibold leading-[1.35] text-ink">{heading}</h2>
-      {description && (
-        <p className="mt-1.5 max-w-[62ch] text-[14px] leading-[1.6] text-muted">
-          {description}
-        </p>
-      )}
-      <div className="mt-6 flex max-w-[640px] flex-col gap-5">{children}</div>
+    <section
+      className={`grid grid-cols-1 gap-x-12 xl:grid-cols-[216px_minmax(0,1fr)] ${
+        last ? '' : 'border-b border-line/55 pb-11'
+      }`}
+    >
+      <aside className="flex flex-col">
+        <h2 className="text-[17px] font-semibold leading-[1.35] text-ink">{heading}</h2>
+        {description && (
+          <p className="mt-2 text-[14px] leading-[1.65] text-muted">{description}</p>
+        )}
+        {signatureSlot && (
+          <div
+            aria-hidden="true"
+            data-signature-slot
+            className="mt-10 hidden min-h-24 xl:block"
+          />
+        )}
+      </aside>
+      <div className="mt-6 flex max-w-[640px] flex-col gap-5 xl:mt-0 xl:max-w-none">
+        {children}
+      </div>
     </section>
   )
+}
+
+export function DecisionBlock({
+  children,
+  last = false,
+}: {
+  children: ReactNode
+  last?: boolean
+}) {
+  return (
+    <div className={`flex flex-col gap-5 ${last ? '' : 'border-b border-line/50 pb-5'}`}>
+      {children}
+    </div>
+  )
+}
+
+export function ConditionalFields({ children }: { children: ReactNode }) {
+  return <div className="border-l border-line pl-5">{children}</div>
 }
 
 /** A genuine pair, side by side — dates, first/last, city/state. Never a dense grid. */

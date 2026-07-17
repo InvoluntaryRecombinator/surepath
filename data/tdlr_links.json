@@ -40,26 +40,28 @@
   },
 
   "get_your_record": {
-    "_CRITICAL": "There are TWO paths and the cheap one CAN LOSE YOU THE CASE. Steer users to the FINGERPRINT review. A name-based search can silently miss a conviction -- which is the exact omission that voids the evaluation letter.",
+    "_L9": "PRESENT BOTH PATHS FLAT. NO THUMB ON THE SCALE. (CLAUDE.md L9 — SurePath informs, it does not steer.) Which one to use trades cost against time against completeness; that is a decision about the user's own life and money, and it is not ours to make. Do NOT hard-gate on either path. The mitigating reframe, not a gate: the report is a starting point, not the final word -- if you remember a conviction that is not on the report, put it in anyway.",
 
-    "RECOMMENDED_fingerprint_personal_review": {
-      "label": "Texas DPS — Personal Review of your complete criminal history (fingerprint-based)",
+    "fingerprint_personal_review": {
+      "label": "Texas DPS — Personal Review of your criminal history (fingerprint-based)",
       "url": "https://uenroll.identogo.com/servicecode/11FT12",
       "verify": true,
       "service_code": "11FT12",
       "cost_usd": 25.0,
       "cost_breakdown": "$10 fingerprint capture at IdentoGO + $15 for the criminal history record",
-      "turnaround": "typically days (mail results can take ~10 business days)",
+      "turnaround": "days to weeks, in person (mail results can take ~10 business days)",
       "phone": "1-888-467-2080",
-      "why": "This is your COMPLETE Texas record, including arrests that did not lead to conviction. Fingerprints positively identify you. Nothing gets missed because of a name spelling.",
+      "shows": "The complete Texas record. Fingerprints positively identify you -- nothing is missed because of a name spelling.",
       "use_on": ["Stage 2 (Get your record)"]
     },
 
-    "NOT_RECOMMENDED_name_search": {
+    "name_based_search": {
       "label": "DPS public name-based conviction search",
       "cost_usd": 3.0,
-      "why_not": "DPS itself warns: 'The only way to positively link someone to a criminal record is through fingerprint identification.' A name search uses Soundex matching -- it CAN MISS your records and CAN return someone else's. It also only shows convictions and deferred adjudications (Gov't Code §411.135). A missed conviction voids the TDLR letter.",
-      "surepath_position": "Mention it exists, and say plainly why it is the wrong tool for this. Do not link it as the primary path."
+      "turnaround": "minutes, right now, on this computer",
+      "shows": "Convictions and deferred adjudications only (Gov't Code §411.135).",
+      "accuracy_note": "Matched on NAME. DPS itself warns: 'The only way to positively link someone to a criminal record is through fingerprint identification.' A name search can miss records or match someone else's.",
+      "use_on": ["Stage 2 (Get your record)"]
     },
 
     "out_of_state_and_federal": {

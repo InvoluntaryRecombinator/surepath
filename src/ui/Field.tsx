@@ -100,7 +100,7 @@ export function ChoiceField({
               key={o.value}
               className={`inline-flex h-10 cursor-pointer items-center rounded-[4px] border px-4 text-[14px] transition-colors duration-150 ${
                 active
-                  ? 'border-accent bg-field font-semibold text-accent'
+                  ? 'border-accent bg-accent/5 font-semibold text-accent'
                   : 'border-line bg-field text-ink hover:border-muted/70'
               }`}
             >

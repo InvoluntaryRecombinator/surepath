@@ -19,7 +19,7 @@ function CurrentSection() {
     case 'record':
       return <RecordSection />
     default:
-      return <StubSection sectionId={state.sectionId} />
+      return <StubSection />
   }
 }
 

@@ -14,7 +14,6 @@
 import { Button } from '../../ui/Button'
 import { ChoiceField, TextField } from '../../ui/Field'
 import { FaqPanel } from '../../ui/FaqPanel'
-import { SectionIntro } from '../../ui/SectionIntro'
 import type { DraftCharge, DraftIncident } from '../draft'
 import { useAppStore } from '../storeContext'
 
@@ -205,13 +204,10 @@ function IncidentCard({ incident, ordinal }: { incident: DraftIncident; ordinal:
 
 export function RecordSection() {
   const { state, dispatch, config } = useAppStore()
-  const section = config.sections.find((s) => s.id === 'record')!
   const incidents = state.draft.incidents
 
   return (
     <div className="flex flex-col gap-8">
-      <SectionIntro section={section} />
-
       {incidents.length === 0 ? (
         <p className="text-[15px] text-muted">{config.copy.recordEmptyInvitation}</p>
       ) : (

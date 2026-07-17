@@ -15,6 +15,7 @@ export const txConfig: StateConfig = {
   stateName: 'Texas',
   agency: 'TDLR',
   railTag: 'Texas · TDLR',
+  processName: 'Criminal History Evaluation Letter — request packet',
   routeBase: '/texas',
 
   sections: [
@@ -23,8 +24,9 @@ export const txConfig: StateConfig = {
       label: 'Your trade',
       icon: 'briefcase',
       intro: {
-        title: 'Your trade',
-        lead: 'Find the trade you want to work in and check that TDLR is the agency that licenses it — before you type anything else.',
+        eyebrow: 'Before you begin',
+        title: 'Check that TDLR licenses your trade',
+        lead: 'The Criminal History Evaluation Letter comes from the Texas Department of Licensing and Regulation, and it covers only the trades TDLR licenses. Nursing, medicine, and several other fields belong to different boards with their own processes. Confirm your trade is TDLR\u2019s before entering anything else.',
       },
     },
     {
@@ -32,8 +34,9 @@ export const txConfig: StateConfig = {
       label: 'About you',
       icon: 'person',
       intro: {
-        title: 'About you',
-        lead: 'The basics that go on every page of the packet — you enter them once, and SurePath writes them everywhere they belong. TDLR mails their decision to the address you give here and contacts you by email, so make sure both are current and ones you check.',
+        eyebrow: 'Applicant',
+        title: 'Your identifying information',
+        lead: 'TDLR uses this section to identify you, to match the history you report against state records, and to mail you their written decision. It is entered onto the official forms exactly as you type it here — use your legal name, and an address and email you check.',
       },
     },
     {
@@ -41,8 +44,9 @@ export const txConfig: StateConfig = {
       label: 'Your record',
       icon: 'folder',
       intro: {
-        title: 'Your record',
-        lead: 'Work from your criminal history report and list each incident — one arrest or event — with every conviction that came from it. Just the facts here; you will tell the story behind each one in the next step.',
+        eyebrow: 'Criminal history',
+        title: 'Every conviction and deferred adjudication',
+        lead: 'Working from your criminal history report, list each incident \u2014 one arrest or event \u2014 and every conviction that came from it. Only the facts are needed on this page; the explanation TDLR asks for is written in the next section, one account per incident.',
         points: [
           'TDLR requires every conviction and every deferred adjudication, no matter how old. There is no cutoff year.',
           'Enter what you know. If a detail like the court name is beyond reach, say so in the field and keep going.',
@@ -54,8 +58,9 @@ export const txConfig: StateConfig = {
       label: 'Your story',
       icon: 'pen',
       intro: {
-        title: 'Your story',
-        lead: 'TDLR asks what happened and why, for every conviction. You write it once per incident — one arrest, one honest account.',
+        eyebrow: 'Your account',
+        title: 'What happened, in your own words',
+        lead: 'TDLR requires a description of what you did and why, for every conviction. It is written once per incident and it stays in your words \u2014 nothing is added that you did not say.',
       },
     },
     {
@@ -63,8 +68,9 @@ export const txConfig: StateConfig = {
       label: 'Licenses',
       icon: 'certificate',
       intro: {
-        title: 'Choose your licenses',
-        lead: 'Pick the license types you want TDLR to review. Each one is its own packet and its own $10 money order.',
+        eyebrow: 'License selection',
+        title: 'The licenses TDLR will evaluate',
+        lead: 'Choose the license types you want TDLR to review your history against. Each license type requires its own request packet and its own $10 fee, and TDLR answers each one separately.',
       },
     },
     {
@@ -72,8 +78,9 @@ export const txConfig: StateConfig = {
       label: 'Review & generate',
       icon: 'seal',
       intro: {
-        title: 'Review & generate',
-        lead: 'Check the count against your criminal history report, then generate the packet. TDLR will not process an incomplete request.',
+        eyebrow: 'Final check',
+        title: 'Confirm your record is complete',
+        lead: 'TDLR does not process incomplete requests, and a conviction left out can make the letter worthless at the real application. Check the count on this page against your criminal history report before generating the packet.',
       },
     },
   ],

@@ -10,6 +10,7 @@
 import type { ReactNode } from 'react'
 import { Button } from '../ui/Button'
 import { CheckSmall } from '../ui/icons'
+import { SectionBriefing } from '../ui/SectionIntro'
 import { useAppStore } from './storeContext'
 import { Rail } from './Rail'
 
@@ -29,13 +30,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <Rail />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* ── the content header bar — the pane's top edge ─────────────────────────── */}
+        {/* ── the content header bar — the pane's top edge. The rail already says where
+            you are; this bar carries the one thing nothing else says: the formal name of
+            the legal artifact being assembled. ─────────────────────────────────────────── */}
         <header className="flex h-[52px] shrink-0 items-center justify-between border-b border-line/70 px-14">
-          <p className="text-[13px] text-muted">
-            Step {idx + 1} of {config.sections.length}
-            <span className="mx-2 text-line">·</span>
-            <span className="font-semibold text-ink">{stage.label}</span>
-          </p>
+          <p className="text-[13px] font-medium text-muted">{config.processName}</p>
           <p className="flex items-center gap-1.5 text-[12.5px] text-muted">
             <span className="text-accent">
               <CheckSmall size={9} />
@@ -44,9 +43,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </p>
         </header>
 
-        {/* ── the sheet — content scrolls; the frame stays put ─────────────────────── */}
+        {/* ── the sheet — content scrolls; the frame stays put. The briefing band rides
+            at the top of the scroll: explanation above the seal, work below it. ────────── */}
         <main className="min-h-0 flex-1 overflow-y-auto">
-          <div className="px-14 pb-20 pt-10">
+          <SectionBriefing section={stage} />
+          <div className="px-14 pb-20 pt-9">
             {state.resumed && (
               <p className="mb-8 flex max-w-[760px] items-baseline justify-between gap-4 rounded-[4px] border border-line/70 bg-ground/40 px-4 py-2.5 text-[13px] text-muted">
                 Welcome back — everything you entered is right where you left it.

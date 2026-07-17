@@ -14,8 +14,12 @@ export type SectionDef = {
   /** Rail label. Short. */
   label: string
   icon: IconKey
-  /** The section intro block — the what and the why, partitioned at the top of the page. */
+  /** The section briefing — the what and the why, a separate zone above the form.
+   *  Register: plain, calm, instructional. A government process, not a product pitch. */
   intro: {
+    /** Small tracked caps above the headline: the section's formal category. */
+    eyebrow: string
+    /** The headline ADDS meaning — the rail already says where you are. Never echo the rail label. */
     title: string
     lead: string
     /** Optional short points that must not be missed. Kept few — calm, not flag soup. */
@@ -37,6 +41,8 @@ export type StateConfig = {
   agency: string // 'TDLR'
   /** The rail's small tag under the wordmark: "Texas · TDLR" */
   railTag: string
+  /** The formal name of the legal artifact, anchoring the content header bar. */
+  processName: string
   /** Route base for this state's pages: '/texas' */
   routeBase: string
 

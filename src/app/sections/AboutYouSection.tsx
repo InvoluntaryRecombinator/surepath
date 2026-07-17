@@ -16,7 +16,6 @@ import { ChoiceField, TextField } from '../../ui/Field'
 import { FieldGroup, FieldRow } from '../../ui/FieldGroup'
 import { InfoBubble } from '../../ui/InfoBubble'
 import { SelectField } from '../../ui/Select'
-import { SectionIntro } from '../../ui/SectionIntro'
 import { formatDate, formatPhone, formatZip, US_STATES } from '../lib/format'
 import type { DraftApplicant } from '../draft'
 import { useAppStore } from '../storeContext'
@@ -42,14 +41,11 @@ const OWNERSHIP_LABEL: Record<string, string> = Object.fromEntries(
 
 export function AboutYouSection() {
   const { state, dispatch, config } = useAppStore()
-  const section = config.sections.find((s) => s.id === 'info')!
   const a = state.draft.applicant
   const patch = (p: Partial<DraftApplicant>) => dispatch({ type: 'update-applicant', patch: p })
 
   return (
     <div className="flex flex-col gap-8">
-      <SectionIntro section={section} />
-
       <FieldGroup
         heading="Who you are"
         description="Your name exactly as it appears on your government-issued ID — the packet and your ID need to match."

@@ -10,26 +10,9 @@
  */
 import { useNavigate } from 'react-router-dom'
 import { draftCounts } from './draft'
+import { DELETE_CONFIRM, downloadJson, formatCounter } from './railShared'
 import { eraseStoredData, useAppStore } from './storeContext'
 import { CheckSmall, Icon, Mark } from '../ui/icons'
-
-function downloadJson(filename: string, data: unknown) {
-  const url = URL.createObjectURL(
-    new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
-  )
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
-const DELETE_CONFIRM =
-  'We never store your information on our servers — it stays on this computer while ' +
-  'you work.\n\nThis will remove everything you have entered from this computer, so ' +
-  'nothing is left behind.\n\nIf you want to pick up where you left off later, download ' +
-  'your progress file first (Cancel, then "Save my progress").\n\nDelete everything from ' +
-  'this computer?'
 
 const ROW_H = 50 // px — one nav row. The connector geometry derives from this.
 
@@ -40,20 +23,10 @@ export function Rail() {
   const currentIdx = config.sections.findIndex((s) => s.id === state.sectionId)
   const n = config.sections.length
 
-  const recordsLabel =
-    counts.records === 1
-      ? counts.deferrals === 1
-        ? 'deferred adjudication'
-        : 'conviction'
-      : counts.deferrals > 0
-        ? 'convictions & deferrals'
-        : 'convictions'
-  const counterText =
-    `${counts.incidents} ${counts.incidents === 1 ? 'incident' : 'incidents'} · ` +
-    `${counts.records} ${recordsLabel}`
+  const counterText = formatCounter(counts)
 
   return (
-    <aside className="flex w-[264px] shrink-0 flex-col overflow-y-auto border-r border-line bg-rail">
+    <aside className="hidden w-[264px] shrink-0 flex-col overflow-y-auto border-r border-line bg-rail lg:flex">
       {/* ── identity ── */}
       <div className="px-6 pb-1 pt-7">
         <div className="flex items-center gap-2.5">

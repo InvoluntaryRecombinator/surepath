@@ -10,19 +10,15 @@ import type { SectionDef } from '../state-config/types'
 
 export function SectionBriefing({
   section,
-  index,
-  total,
 }: {
   section: SectionDef
-  index: number
-  total: number
 }) {
   const { intro } = section
   return (
-    <div className="border-b-2 border-line bg-ground/60 px-14 pb-8 pt-8">
+    <div className="border-b-2 border-line bg-ground/60 px-5 pb-7 pt-7 sm:px-8 sm:pb-8 sm:pt-8 lg:px-14">
       <div className="max-w-[760px]">
         <p className="text-[11.5px] font-semibold uppercase text-muted">
-          Step {index + 1} of {total} · {intro.eyebrow}
+          {intro.eyebrow}
         </p>
         <h1 className="mt-2.5 text-[28px] font-bold leading-[1.2] text-ink">
           {intro.title}

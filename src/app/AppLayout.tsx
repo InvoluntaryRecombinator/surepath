@@ -12,6 +12,7 @@ import { Button } from '../ui/Button'
 import { ArrowLeft, ArrowRight, CheckSmall } from '../ui/icons'
 import { SectionBriefing } from '../ui/SectionIntro'
 import { useAppStore } from './storeContext'
+import { MobileRail } from './MobileRail'
 import { Rail } from './Rail'
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -30,10 +31,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <Rail />
 
       <div className="flex min-w-0 flex-1 flex-col">
+        <MobileRail />
         {/* ── the content header bar — the pane's top edge. The rail already says where
             you are; this bar carries the one thing nothing else says: the formal name of
             the legal artifact being assembled. ─────────────────────────────────────────── */}
-        <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-line/70 px-14">
+        <header className="hidden h-[60px] shrink-0 items-center justify-between border-b border-line/70 px-14 lg:flex">
           <p className="text-[13.5px] font-semibold text-ink/70">{config.processName}</p>
           <p className="flex items-center gap-2.5 text-muted">
             <span className="flex h-5 w-5 items-center justify-center rounded-full border border-line bg-field text-accent">
@@ -49,8 +51,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
         {/* ── the sheet — content scrolls; the frame stays put. The briefing band rides
             at the top of the scroll: explanation above the seal, work below it. ────────── */}
         <main className="min-h-0 flex-1 overflow-y-auto">
-          <SectionBriefing section={stage} index={idx} total={config.sections.length} />
-          <div className="px-14 pb-20 pt-9">
+          <SectionBriefing section={stage} />
+          <div className="px-5 pb-16 pt-7 sm:px-8 sm:pb-20 sm:pt-9 lg:px-14">
             {state.resumed && (
               <p className="mb-8 flex max-w-[760px] items-baseline justify-between gap-4 rounded-[4px] border border-line/70 bg-ground/40 px-4 py-2.5 text-[13px] text-muted">
                 Welcome back — everything you entered is right where you left it.
@@ -70,7 +72,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
         {/* ── the action bar — the pane's bottom edge ──────────────────────────────── */}
         <footer className="shrink-0 border-t border-line/70">
-          <div className="flex h-[68px] items-center justify-between px-14">
+          <div className="flex h-[68px] items-center justify-between px-5 sm:px-8 lg:px-14">
             <Button variant="ghost" disabled={isFirst} onClick={() => go(idx - 1)}>
               <ArrowLeft />
               Back

@@ -129,3 +129,18 @@ export const ArrowRight = ({ size = 16 }: { size?: number }) => (
     <path d="M3 8h10M9 4l4 4-4 4" />
   </svg>
 )
+
+export const Menu = ({ size = 18 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 18 18"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    aria-hidden="true"
+  >
+    <path d="M3 4.5h12M3 9h12M3 13.5h12" />
+  </svg>
+)

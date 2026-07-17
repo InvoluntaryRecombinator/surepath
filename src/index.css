@@ -23,7 +23,8 @@
   --color-ink: #24221c; /* primary text */
   --color-muted: #8a8266; /* labels, hints, secondary */
   --color-line: #d8d0bc; /* borders, dividers */
-  --color-accent: #2a4ba8; /* primary actions, focus, links, current step */
+  --color-accent: #3f5795; /* primary actions, focus, links, current step — warmed + desaturated so it belongs to the ground, not to a defaults palette */
+  --color-accent-deep: #33477c; /* the accent, pressed/hovered. A shade, not a second hue. */
   --color-state: #a6392f; /* HARD requirements only. Never a stylistic accent. */
 
   /* Shadows: none exist. A focus ring is not a shadow; it lives in CSS below. */

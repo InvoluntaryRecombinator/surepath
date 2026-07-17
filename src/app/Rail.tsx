@@ -26,7 +26,7 @@ export function Rail() {
   const counterText = formatCounter(counts)
 
   return (
-    <aside className="hidden w-[264px] shrink-0 flex-col overflow-y-auto border-r border-line bg-rail lg:flex">
+    <aside className="hidden w-[232px] shrink-0 flex-col overflow-y-auto border-r-2 border-line bg-rail lg:flex">
       {/* ── identity ── */}
       <div className="px-6 pb-1 pt-7">
         <div className="flex items-center gap-2.5">
@@ -45,16 +45,16 @@ export function Rail() {
           style={{ top: ROW_H / 2, height: (n - 1) * ROW_H }}
         />
         {/* the traveled portion — a record of work done */}
-        {currentIdx > 0 && (
+        {state.maxReachedIndex > 0 && (
           <span
             aria-hidden="true"
             className="absolute left-[40px] border-l border-dashed border-accent/60"
-            style={{ top: ROW_H / 2, height: currentIdx * ROW_H }}
+            style={{ top: ROW_H / 2, height: state.maxReachedIndex * ROW_H }}
           />
         )}
 
         {config.sections.map((section, i) => {
-          const status = i < currentIdx ? 'done' : i === currentIdx ? 'current' : 'ahead'
+          const status = i === currentIdx ? 'current' : i <= state.maxReachedIndex ? 'done' : 'ahead'
           const clickable = i <= state.maxReachedIndex && i !== currentIdx
 
           return (
@@ -67,10 +67,10 @@ export function Rail() {
               style={{ height: ROW_H }}
               className={`relative flex w-full items-center gap-3 rounded-[5px] px-2.5 text-left transition-colors duration-150 ${
                 status === 'current'
-                  ? 'border border-line/70 bg-surface text-ink'
+                  ? 'cursor-default border border-line/70 bg-surface text-ink'
                   : clickable
-                    ? 'text-ink/85 hover:bg-surface/45'
-                    : 'text-muted'
+                    ? 'cursor-pointer text-ink/85 hover:bg-surface/45'
+                    : 'cursor-default text-muted'
               }`}
             >
               <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center">

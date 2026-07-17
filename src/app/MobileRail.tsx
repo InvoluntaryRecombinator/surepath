@@ -53,7 +53,8 @@ export function MobileRail() {
               </p>
               <nav aria-label="Application steps" className="border-y border-line/70 py-2">
                 {config.sections.map((section, i) => {
-                  const status = i < currentIdx ? 'done' : i === currentIdx ? 'current' : 'ahead'
+                  const status =
+                    i === currentIdx ? 'current' : i <= state.maxReachedIndex ? 'done' : 'ahead'
                   const clickable = i <= state.maxReachedIndex && i !== currentIdx
 
                   return (
@@ -67,10 +68,10 @@ export function MobileRail() {
                         aria-current={status === 'current' ? 'step' : undefined}
                         className={`flex h-11 w-full items-center gap-3 rounded-[4px] px-2 text-left ${
                           status === 'current'
-                            ? 'bg-ground/60 text-ink'
+                            ? 'cursor-default bg-ground/60 text-ink'
                             : clickable
-                              ? 'text-ink/80 hover:bg-ground/35'
-                              : 'text-muted'
+                              ? 'cursor-pointer text-ink/80 hover:bg-ground/35'
+                              : 'cursor-default text-muted'
                         }`}
                       >
                         <span
@@ -134,7 +135,7 @@ export function MobileRail() {
         </Popover.Root>
       </div>
 
-      <div className="flex items-center justify-between border-b border-line bg-rail px-5 py-3 sm:px-8">
+      <div className="flex items-center justify-between border-b-2 border-line bg-rail px-5 py-3 sm:px-8">
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-accent bg-field text-accent">
             <Icon name={current.icon} size={14} />

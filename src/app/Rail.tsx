@@ -102,8 +102,10 @@ export function Rail() {
 
       {/* ── the counter — the promise, rendered ── */}
       <div className="mx-6 border-t border-ink/10 pt-5">
-        <p className="text-[12.5px] font-semibold uppercase text-ink">
-          {counterText}
+        <p className="flex flex-col gap-0.5 text-[12px] font-semibold uppercase leading-[1.45] text-ink">
+          {counterText.split(' · ').map((part) => (
+            <span key={part}>{part}</span>
+          ))}
         </p>
       </div>
 

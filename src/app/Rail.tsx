@@ -11,6 +11,7 @@
 import { useNavigate } from 'react-router-dom'
 import { draftCounts } from './draft'
 import { DELETE_CONFIRM, downloadJson, formatCounter } from './railShared'
+import { validateSection } from './sectionValidation'
 import { eraseStoredData, useAppStore } from './storeContext'
 import { CheckSmall, Icon, Mark } from '../ui/icons'
 
@@ -54,7 +55,10 @@ export function Rail() {
         )}
 
         {config.sections.map((section, i) => {
-          const status = i === currentIdx ? 'current' : i <= state.maxReachedIndex ? 'done' : 'ahead'
+          const visited = i <= state.maxReachedIndex
+          const complete = validateSection(section.id, state.draft).complete
+          const status =
+            i === currentIdx ? 'current' : !visited ? 'ahead' : complete ? 'done' : 'visited'
           const clickable = i <= state.maxReachedIndex && i !== currentIdx
 
           return (
@@ -82,6 +86,10 @@ export function Rail() {
                   <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-accent bg-field text-accent">
                     <Icon name={section.icon} size={15} />
                   </span>
+                ) : status === 'visited' ? (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-accent/60 bg-surface/45 text-accent">
+                    <Icon name={section.icon} size={15} />
+                  </span>
                 ) : (
                   <span className="flex h-7 w-7 items-center justify-center rounded-full border border-ink/25 bg-rail text-muted">
                     <Icon name={section.icon} size={15} />
@@ -92,6 +100,13 @@ export function Rail() {
                 className={`text-[14px] ${status === 'current' ? 'font-semibold' : 'font-medium'}`}
               >
                 {section.label}
+                <span className="sr-only">
+                  {status === 'done'
+                    ? ' — complete'
+                    : status === 'visited'
+                      ? ' — needs attention'
+                      : ''}
+                </span>
               </span>
             </button>
           )

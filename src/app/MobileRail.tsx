@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { CheckSmall, Icon, Mark, Menu } from '../ui/icons'
 import { draftCounts } from './draft'
 import { DELETE_CONFIRM, downloadJson, formatCounter } from './railShared'
+import { validateSection } from './sectionValidation'
 import { eraseStoredData, useAppStore } from './storeContext'
 
 export function MobileRail() {
@@ -53,8 +54,16 @@ export function MobileRail() {
               </p>
               <nav aria-label="Application steps" className="border-y border-line/70 py-2">
                 {config.sections.map((section, i) => {
+                  const visited = i <= state.maxReachedIndex
+                  const complete = validateSection(section.id, state.draft).complete
                   const status =
-                    i === currentIdx ? 'current' : i <= state.maxReachedIndex ? 'done' : 'ahead'
+                    i === currentIdx
+                      ? 'current'
+                      : !visited
+                        ? 'ahead'
+                        : complete
+                          ? 'done'
+                          : 'visited'
                   const clickable = i <= state.maxReachedIndex && i !== currentIdx
 
                   return (
@@ -80,6 +89,8 @@ export function MobileRail() {
                               ? 'border-accent bg-accent text-field'
                               : status === 'current'
                                 ? 'border-2 border-accent bg-field text-accent'
+                                : status === 'visited'
+                                  ? 'border-accent/60 bg-ground/30 text-accent'
                                 : 'border-ink/20 text-muted'
                           }`}
                         >
@@ -93,6 +104,13 @@ export function MobileRail() {
                           className={`text-[14px] ${status === 'current' ? 'font-semibold' : 'font-medium'}`}
                         >
                           {section.label}
+                          <span className="sr-only">
+                            {status === 'done'
+                              ? ' — complete'
+                              : status === 'visited'
+                                ? ' — needs attention'
+                                : ''}
+                          </span>
                         </span>
                         <span className="ml-auto text-[11.5px] text-muted">
                           {String(i + 1).padStart(2, '0')}

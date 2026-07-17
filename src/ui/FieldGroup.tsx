@@ -23,19 +23,29 @@ export function FieldGroup({
   children: ReactNode
 }) {
   return (
-    <section className={last ? '' : 'border-b border-line/60 pb-9'}>
-      <h2 className="text-[15px] font-semibold leading-snug text-ink">{heading}</h2>
+    <section className={last ? '' : 'border-b border-line/60 pb-10'}>
+      <h2 className="text-[17px] font-semibold leading-[1.35] text-ink">{heading}</h2>
       {description && (
-        <p className="mt-1 max-w-[58ch] text-[13.5px] leading-relaxed text-muted">
+        <p className="mt-1.5 max-w-[62ch] text-[14px] leading-[1.6] text-muted">
           {description}
         </p>
       )}
-      <div className="mt-5 flex max-w-[640px] flex-col gap-[18px]">{children}</div>
+      <div className="mt-6 flex max-w-[640px] flex-col gap-5">{children}</div>
     </section>
   )
 }
 
 /** A genuine pair, side by side — dates, first/last, city/state. Never a dense grid. */
-export function FieldRow({ children }: { children: ReactNode }) {
-  return <div className="grid grid-cols-2 gap-x-5 gap-y-[18px]">{children}</div>
+export function FieldRow({
+  children,
+  className = '',
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <div className={`grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 ${className}`}>
+      {children}
+    </div>
+  )
 }

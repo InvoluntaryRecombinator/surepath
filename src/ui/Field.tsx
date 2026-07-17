@@ -4,15 +4,15 @@
  * manual. A real <label> on every input. Required marks use --color-state, the only
  * always-visible red in the app.
  *
- * Metrics are deliberate and shared: 40px inputs, 4px radius, 13px labels with a whisper
- * of tracking, hover darkens the border one step (the border reacts; nothing else moves).
+ * Metrics are deliberate and shared: 44px inputs, 4px radius, compact semibold labels,
+ * and a border that darkens one step on hover (nothing else moves).
  */
 import type { InputHTMLAttributes, ReactNode } from 'react'
 import { useId } from 'react'
 import { InfoBubble } from './InfoBubble'
 
 export const inputClass =
-  'h-10 w-full rounded-[4px] border border-line bg-field px-3.5 text-[15px] text-ink ' +
+  'h-11 w-full rounded-[4px] border border-line bg-field px-4 text-[15px] text-ink ' +
   'placeholder:text-muted/60 transition-colors duration-150 hover:border-muted/70'
 
 type FieldShellProps = {
@@ -26,11 +26,11 @@ type FieldShellProps = {
 
 export function FieldShell({ label, required, hint, info, htmlFor, children }: FieldShellProps) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-[7px]">
       <div className="flex items-center gap-1.5">
         <label
           htmlFor={htmlFor}
-          className="text-[13px] font-medium tracking-[0.01em] text-muted"
+          className="text-[13.5px] font-semibold leading-[18px] text-muted"
         >
           {label}
           {required && (
@@ -42,7 +42,7 @@ export function FieldShell({ label, required, hint, info, htmlFor, children }: F
         {info && <InfoBubble label={label}>{info}</InfoBubble>}
       </div>
       {children}
-      {hint && <p className="text-[12.5px] leading-snug text-muted">{hint}</p>}
+      {hint && <p className="text-[12.5px] leading-[18px] text-muted">{hint}</p>}
     </div>
   )
 }
@@ -63,7 +63,7 @@ export function TextField({ label, required, hint, info, ...input }: TextFieldPr
   )
 }
 
-/** A labeled pair of choices rendered as obvious pill radios — nothing to figure out. */
+/** A labeled pair of choices with visible radio structure — nothing to figure out. */
 export function ChoiceField({
   label,
   required,
@@ -82,8 +82,8 @@ export function ChoiceField({
   onChange: (value: string) => void
 }) {
   return (
-    <fieldset className="flex flex-col gap-1.5">
-      <legend className="flex items-center gap-1.5 text-[13px] font-medium tracking-[0.01em] text-muted">
+    <fieldset className="flex flex-col gap-[7px]">
+      <legend className="flex items-center gap-1.5 text-[13.5px] font-semibold leading-[18px] text-muted">
         {label}
         {required && (
           <span className="text-state/80" aria-hidden="true">
@@ -98,7 +98,7 @@ export function ChoiceField({
           return (
             <label
               key={o.value}
-              className={`inline-flex h-10 cursor-pointer items-center rounded-[4px] border px-4 text-[14px] transition-colors duration-150 ${
+              className={`inline-flex h-11 min-w-[92px] cursor-pointer items-center gap-2.5 rounded-[4px] border px-3.5 text-[14px] transition-colors duration-150 ${
                 active
                   ? 'border-accent bg-accent/5 font-semibold text-accent'
                   : 'border-line bg-field text-ink hover:border-muted/70'
@@ -110,8 +110,17 @@ export function ChoiceField({
                 value={o.value}
                 checked={active}
                 onChange={() => onChange(o.value)}
-                className="sr-only"
+                required={required}
+                className="peer sr-only"
               />
+              <span
+                aria-hidden="true"
+                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent ${
+                  active ? 'border-accent' : 'border-muted/70'
+                }`}
+              >
+                {active && <span className="h-2 w-2 rounded-full bg-accent" />}
+              </span>
               {o.label}
             </label>
           )

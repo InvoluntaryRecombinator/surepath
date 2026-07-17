@@ -35,7 +35,7 @@ export function SelectField({
     <FieldShell label={label} required={required} hint={hint} info={info} htmlFor={id}>
       <select
         id={id}
-        className="h-10 w-full cursor-pointer appearance-none rounded-[4px] border border-line bg-field bg-[length:12px_8px] bg-[position:right_12px_center] bg-no-repeat pl-3.5 pr-9 text-[15px] text-ink transition-colors duration-150 hover:border-muted/70"
+        className="h-11 w-full cursor-pointer appearance-none rounded-[4px] border border-line bg-field bg-[length:12px_8px] bg-[position:right_14px_center] bg-no-repeat pl-4 pr-10 text-[15px] text-ink transition-colors duration-150 hover:border-muted/70"
         style={{ backgroundImage: chevron }}
         {...select}
       >

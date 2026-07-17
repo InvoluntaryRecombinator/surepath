@@ -66,7 +66,7 @@ export function AboutYouSection() {
             onChange={(e) => patch({ firstName: e.target.value })}
           />
         </FieldRow>
-        <FieldRow>
+        <FieldRow className="sm:grid-cols-[minmax(0,1fr)_132px]">
           <TextField
             label="Middle name"
             autoComplete="additional-name"
@@ -146,7 +146,7 @@ export function AboutYouSection() {
             value={a.addressCity}
             onChange={(e) => patch({ addressCity: e.target.value })}
           />
-          <div className="grid grid-cols-[1fr_110px] gap-x-5">
+          <div className="grid grid-cols-[minmax(0,1fr)_104px] gap-x-4 sm:grid-cols-[minmax(0,1fr)_110px] sm:gap-x-6">
             <SelectField
               label="State"
               required

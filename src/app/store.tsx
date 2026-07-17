@@ -10,9 +10,11 @@ import { useEffect, useMemo, useReducer, type ReactNode } from 'react'
 import type { StateConfig } from '../state-config/types'
 import { StoreCtx, storageKey } from './storeContext'
 import {
+  emptyApplicant,
   emptyDraft,
   newCharge,
   newIncident,
+  type DraftApplicant,
   type DraftCase,
   type DraftCharge,
   type DraftIncident,
@@ -29,6 +31,7 @@ export type AppState = {
 
 export type Action =
   | { type: 'go'; sectionId: string; index: number }
+  | { type: 'update-applicant'; patch: Partial<DraftApplicant> }
   | { type: 'add-incident' }
   | { type: 'add-single-charge' }
   | { type: 'update-incident'; id: string; patch: Partial<DraftIncident> }
@@ -56,6 +59,11 @@ function makeReducer(config: StateConfig) {
           ...s,
           sectionId: a.sectionId,
           maxReachedIndex: Math.max(s.maxReachedIndex, a.index),
+        }
+      case 'update-applicant':
+        return {
+          ...s,
+          draft: { ...s.draft, applicant: { ...s.draft.applicant, ...a.patch } },
         }
       case 'add-incident':
       case 'add-single-charge':
@@ -123,7 +131,13 @@ function initialState(config: StateConfig, restore = true): AppState {
     const stored = JSON.parse(raw) as Stored
     if (stored.draft?.version !== 1) return fresh
     return {
-      draft: stored.draft,
+      // Defensive merge: a draft saved by an older build may lack newer fields. Missing
+      // keys get empty defaults instead of becoming undefined in controlled inputs.
+      draft: {
+        ...fresh.draft,
+        ...stored.draft,
+        applicant: { ...emptyApplicant, ...stored.draft.applicant },
+      },
       sectionId: config.sections.some((x) => x.id === stored.sectionId)
         ? stored.sectionId
         : config.sections[0].id,

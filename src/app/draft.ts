@@ -36,10 +36,27 @@ export type DraftApplicant = {
   allKnownNames: string
   dob: string
   gender: 'male' | 'female' | ''
-  mailingAddress: string
+  // The address is collected structured (street/city/state/zip) and composed into the
+  // form's single mailing-address line at fill time.
+  addressStreet: string
+  addressCity: string
+  addressState: string
+  addressZip: string
   phone: string
   email: string
   isControllingPerson: boolean
+  // The business branch — hidden in the UI unless isControllingPerson; written N/A in the
+  // PDF otherwise, with the ownership radio CLEARED, never selected (A9, F11).
+  businessName: string
+  businessDba: string
+  businessTaxId: string
+  businessOwnership:
+    | 'general_partnership'
+    | 'sole_proprietor'
+    | 'llc'
+    | 'llp'
+    | 'corporation'
+    | ''
   onParole: boolean
   paroleOfficerName: string
   paroleOfficerPhone: string
@@ -63,10 +80,17 @@ export const emptyApplicant: DraftApplicant = {
   allKnownNames: '',
   dob: '',
   gender: '',
-  mailingAddress: '',
+  addressStreet: '',
+  addressCity: '',
+  addressState: 'Texas',
+  addressZip: '',
   phone: '',
   email: '',
   isControllingPerson: false,
+  businessName: '',
+  businessDba: '',
+  businessTaxId: '',
+  businessOwnership: '',
   onParole: false,
   paroleOfficerName: '',
   paroleOfficerPhone: '',

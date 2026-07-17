@@ -7,13 +7,14 @@
  * The sheet is anchored top and bottom: a content header bar (step position left, the
  * saved-state whisper right) and the action bar. Nothing floats.
  */
-import type { ReactNode } from 'react'
+import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Button } from '../ui/Button'
 import { ArrowLeft, ArrowRight, CheckSmall } from '../ui/icons'
 import { SectionBriefing } from '../ui/SectionIntro'
 import { useAppStore } from './storeContext'
 import { MobileRail } from './MobileRail'
 import { Rail } from './Rail'
+import { validateSection } from './sectionValidation'
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const { state, dispatch, config } = useAppStore()
@@ -21,8 +22,25 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const stage = config.sections[idx]
   const isFirst = idx === 0
   const isLast = idx === config.sections.length - 1
+  const [attemptedSectionId, setAttemptedSectionId] = useState<string | null>(null)
+  const errorSummaryRef = useRef<HTMLDivElement>(null)
+  const validation = validateSection(stage.id, state.draft)
+  const showValidation = attemptedSectionId === stage.id && !validation.complete
 
-  const go = (i: number) => dispatch({ type: 'go', sectionId: config.sections[i].id, index: i })
+  const go = (i: number) => {
+    setAttemptedSectionId(null)
+    dispatch({ type: 'go', sectionId: config.sections[i].id, index: i })
+  }
+
+  const continueForward = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!validation.complete) {
+      setAttemptedSectionId(stage.id)
+      requestAnimationFrame(() => errorSummaryRef.current?.focus())
+      return
+    }
+    go(idx + 1)
+  }
 
   return (
     /* fixed inset-0: the app owns the viewport. The document can never scroll the frame —
@@ -66,7 +84,30 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 </button>
               </p>
             )}
-            <div className="max-w-[960px]">{children}</div>
+            <form
+              id="apply-section-form"
+              className="max-w-[960px]"
+              data-validation-attempted={showValidation || undefined}
+              onInvalidCapture={() => setAttemptedSectionId(stage.id)}
+              onSubmit={continueForward}
+            >
+              {showValidation && (
+                <div
+                  ref={errorSummaryRef}
+                  role="alert"
+                  tabIndex={-1}
+                  className="mb-8 border-l-2 border-state py-0.5 pl-4 outline-none"
+                >
+                  <p className="text-[14px] font-semibold text-ink">Complete this section</p>
+                  <p className="mt-1 max-w-[62ch] text-[13.5px] leading-[1.55] text-muted">
+                    {validation.issues.length}{' '}
+                    {validation.issues.length === 1 ? 'answer needs' : 'answers need'} attention.{' '}
+                    {validation.issues[0]?.message}
+                  </p>
+                </div>
+              )}
+              {children}
+            </form>
           </div>
         </main>
 
@@ -83,7 +124,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   Generate my packet
                 </Button>
               ) : (
-                <Button variant="primary" onClick={() => go(idx + 1)}>
+                <Button variant="primary" type="submit" form="apply-section-form">
                   Continue
                   <ArrowRight />
                 </Button>

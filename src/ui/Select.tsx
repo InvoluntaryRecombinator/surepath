@@ -38,6 +38,7 @@ export function SelectField({
         className="h-11 w-full cursor-pointer appearance-none rounded-[4px] border border-line bg-field bg-[length:12px_8px] bg-[position:right_14px_center] bg-no-repeat pl-4 pr-10 text-[15px] text-ink transition-colors duration-150 hover:border-muted/70"
         style={{ backgroundImage: chevron }}
         {...select}
+        required={required}
       >
         {placeholder !== undefined && (
           <option value="" disabled>

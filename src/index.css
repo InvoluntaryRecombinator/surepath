@@ -55,6 +55,15 @@ body {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 
+form[data-validation-attempted='true'] input:invalid,
+form[data-validation-attempted='true'] select:invalid {
+  border-color: var(--color-state);
+}
+
+form[data-validation-attempted='true'] fieldset:has(input:invalid) legend {
+  color: var(--color-state);
+}
+
 ::selection {
   background: color-mix(in srgb, var(--color-accent) 20%, transparent);
 }

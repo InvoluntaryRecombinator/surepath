@@ -109,6 +109,8 @@ export function AboutYouSection() {
             value={a.dob}
             onChange={(e) => patch({ dob: formatDate(e.target.value) })}
             placeholder="MM/DD/YYYY"
+            pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}"
+            title="Use MM/DD/YYYY."
           />
           <ChoiceField
             label="Gender"
@@ -165,8 +167,10 @@ export function AboutYouSection() {
               required
               inputMode="numeric"
               autoComplete="postal-code"
-              value={a.addressZip}
-              onChange={(e) => patch({ addressZip: formatZip(e.target.value) })}
+            value={a.addressZip}
+            onChange={(e) => patch({ addressZip: formatZip(e.target.value) })}
+            pattern="[0-9]{5}(-[0-9]{4})?"
+            title="Use a 5-digit or ZIP+4 code."
             />
           </div>
         </FieldRow>
@@ -180,6 +184,8 @@ export function AboutYouSection() {
             value={a.phone}
             onChange={(e) => patch({ phone: formatPhone(e.target.value) })}
             placeholder="(713) 555-0148"
+            pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
+            title="Use a 10-digit phone number."
           />
           <TextField
             label="Email"
@@ -238,6 +244,8 @@ export function AboutYouSection() {
                   value={a.paroleOfficerPhone}
                   onChange={(e) => patch({ paroleOfficerPhone: formatPhone(e.target.value) })}
                   placeholder="(512) 555-0100"
+                  pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
+                  title="Use a 10-digit phone number."
                 />
               </FieldRow>
             </ConditionalFields>
@@ -279,6 +287,8 @@ export function AboutYouSection() {
                   value={a.probationOfficerPhone}
                   onChange={(e) => patch({ probationOfficerPhone: formatPhone(e.target.value) })}
                   placeholder="(512) 555-0100"
+                  pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
+                  title="Use a 10-digit phone number."
                 />
               </FieldRow>
             </ConditionalFields>

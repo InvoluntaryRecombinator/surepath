@@ -56,9 +56,11 @@ type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id' | 'classN
 
 export function TextField({ label, required, hint, info, ...input }: TextFieldProps) {
   const id = useId()
+  const pattern =
+    input.pattern ?? (required && (input.type === undefined || input.type === 'text') ? '.*\\S.*' : undefined)
   return (
     <FieldShell label={label} required={required} hint={hint} info={info} htmlFor={id}>
-      <input id={id} className={inputClass} {...input} />
+      <input id={id} className={inputClass} {...input} required={required} pattern={pattern} />
     </FieldShell>
   )
 }

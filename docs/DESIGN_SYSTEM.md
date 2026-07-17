@@ -279,45 +279,6 @@ long while keeping the user oriented.)
 - **Logo:** a real mark (SVG) top-left when available — not just the wordmark. Placeholder
   wordmark is fine for now; leave the slot.
 
-## 5.5 The stepper — the single biggest lever on whether this feels premium
-
-A long multi-step wizard lives or dies on its stepper. Get this right and the whole app
-reads as considered.
-
-```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│  SUREPATH        ✓───────✓───────●───────○───────○───────○                        │
-│                  YOUR     YOUR    YOUR    YOUR    REVIEW  PACKET                  │
-│                  TRADE   RECORD   STORY  LICENSES                                 │
-│                                                                                   │
-│                  Step 3 of 6 · Your story        3 INC · 9 CONV · 22p · $10       │
-└──────────────────────────────────────────────────────────────────────────────────┘
-  Sticky. ~64px. 1px --color-rule bottom border. NO SHADOW.
-```
-
-**Why cheap steppers look cheap:** equal-width segments, generic circles, an icon-library
-checkmark, a blue fill, a tooltip. Avoid all five.
-
-**What makes this one read as expensive:**
-
-- **Three states that differ in FORM, not just color** — legible at a glance, no decoding:
-  - **Done** — filled `--color-pen` disc, hairline check, label at full weight.
-  - **Current** — `--color-pen` **ring**, unfilled, slightly larger. Label at full weight.
-  - **Ahead** — hollow, `--color-rule`, label at 50% opacity.
-- **The connector fills.** `--color-pen` behind you, `--color-rule` ahead. It is a *record
-  of work done*, not decoration.
-- **Real labels**, Public Sans, uppercase, small, tracked. Never numbers alone.
-- **The second line does two jobs:** `Step 3 of 6 · Your story` (orientation) on the left,
-  the **live counter** on the right.
-- **Completed steps are clickable. Future ones are not.** Always able to go back and fix
-  something. Never able to skip work.
-- **150ms color transition. That is the ENTIRE animation budget.** No spring, no GSAP, no
-  bounce. **Restraint is what reads as expensive.**
-
-**Wordmark:** type-only for now — `SUREPATH` in Public Sans 800, tight tracking, ink. A
-type-only wordmark is honest as a placeholder and usually beats a bad logo. Leave room for
-a mark later.
-
 ## 6. The counter — the emotional core
 
 Persistent. Always visible. Top-right of the rail. **Monospace.** It grows as they work.
@@ -358,6 +319,12 @@ everything visible.**
 
 ## 8. BAN LIST — enforceable, non-negotiable
 
+> **Note:** the app uses the **left rail** (SITE_STRUCTURE / the rail spec), not a horizontal
+> top stepper. Earlier revisions of this file specified a top stepper (old §5.5/§12) — those
+> are removed. If you find a reference to a horizontal stepper anywhere, it's stale; the rail
+> is authoritative.
+
+
 Set these up so violating them is *impossible*, not merely discouraged. Same philosophy as
 `CLAUDE.md`: make the wrong thing unreachable.
 
@@ -368,7 +335,7 @@ Set these up so violating them is *impossible*, not merely discouraged. Same phi
 | `bg-blue-500`, `text-gray-600`, any default Tailwind color | Not in the system. Disabled at the theme level. |
 | **Drop shadows** on inputs, cards, or the rail | The single loudest "AI generated this" tell. *(A **focus ring** is not a drop shadow. Focus rings are required — see §5.)* |
 | Rounded cards floating on a gray background | We have a **ledger**, not a deck of cards. |
-| Border radius above 2px | 2px on things you touch. 0 on things that organize. |
+| Border radius above ~6px | ~4px on inputs/buttons, ~6px on panels. Nothing pill-shaped, nothing blobby. |
 | Shadcn's default theme | It *is* the slop look. Radix primitives only; our tokens for everything visible. |
 | **Anything that makes the site resemble the government form** | Ledgers, dense grids, black header bars, boxed cells, numbered form-style sections. **The form is the enemy.** |
 | **Cards floating on the khaki ground** | §4.5. **ONE SHEET.** This is "cards on gray" with a different palette. |
@@ -411,137 +378,6 @@ Set these up so violating them is *impossible*, not merely discouraged. Same phi
 Responsive down to a laptop. Visible keyboard focus (the rule thickens — you get it free).
 `prefers-reduced-motion` respected. Real labels on every input. **These users are often on
 old machines with old browsers. Nothing fancy.**
-
-
----
-
-## 12. The shell — wireframe
-
-> **On wireframes generally:** don't make image mockups. **An agent reads text, not
-> pictures**, and it will deviate from a mockup anyway. Write the *structure* down (below),
-> then let the agent build the real screen — **you get a real thing in an hour, and a real
-> thing is far better feedback than a picture of a thing.**
-
-### The frame (every screen)
-
-```
-┌──────────────────────────────────────────────────────────────────────────────────────┐
-│  SUREPATH        ✓───────✓───────●───────○───────○───────○         [Save]  [Clear]    │  ← sticky, 64px
-│                  YOUR     YOUR    YOUR    YOUR    LICENSES REVIEW                     │    1px rule below
-│                  TRADE    INFO   RECORD   STORY                                       │    NO SHADOW
-│                                                                                       │
-│                  Step 3 of 6 · Your record        3 INC · 9 CONV · 22p · $10          │  ← counter, mono
-├──────────────────────────────────────────────────────────────────────────────────────┤
-│                                                                                       │
-│      ┌────────────────────────────────────────────────────────────┐                   │
-│      │                                                            │                   │
-│      │   CONTENT — starts at a FIXED offset. Grows DOWNWARD.      │  ← ~640px         │
-│      │   ⚠️ NEVER VERTICALLY CENTERED. A short page is just       │    left-ish,      │
-│      │      a short page; the dead space goes BELOW the fold,     │    not floating   │
-│      │      where nobody looks.                                   │    in the middle  │
-│      │                                                            │                   │
-│      └────────────────────────────────────────────────────────────┘                   │
-│                                                                                       │
-├──────────────────────────────────────────────────────────────────────────────────────┤
-│   ← Back                                                          Continue →          │  ← STICKY BOTTOM.
-└──────────────────────────────────────────────────────────────────────────────────────┘    Every screen has a
-                                                                                             bottom edge. Nothing
-                                                                                             floats. This alone
-                                                                                             kills the tiny-box bug.
-```
-
-### Stage 4 — Your story (the best-looking screen in the app)
-
-Lists are where design gets to be good. This one is a list. **Spend the effort here.**
-
-```
-   YOUR STORY
-   TDLR asks what you did and why, for every conviction. Write it once per
-   incident — one arrest, one account.
-
-   ┌──────────────────────────────────────────────────────────────────────────┐
-   │  ☑   MAR 14 2019 · Harris County · 178th District Court                   │
-   │      Possession of a Controlled Substance · Evading Arrest · Assault      │   ← mono
-   │      3 charges                                                  Edit →    │
-   └──────────────────────────────────────────────────────────────────────────┘
-   ┌──────────────────────────────────────────────────────────────────────────┐
-   │  ☐   JUL 22 2016 · Harris County · 351st District Court                   │
-   │      Theft of Property ≥ $100 < $750                                      │
-   │      1 charge                                        Tell this story →    │
-   └──────────────────────────────────────────────────────────────────────────┘
-   ┌──────────────────────────────────────────────────────────────────────────┐
-   │  ☐   NOV 02 2011 · Dallas County · 194th District Court                   │
-   │      Criminal Mischief · Driving While Intoxicated                        │
-   │      2 charges                                       Tell this story →    │
-   └──────────────────────────────────────────────────────────────────────────┘
-
-                                                             1 of 3 stories done
-```
-
-Wide, thin cards. Checkbox on the left. Charges in mono. **Continue is disabled until all
-three are checked** — Item 21 cannot be blank or TDLR won't process the request. But the
-copy is kind, not an error:
-
-> *"2 of 3 still need an explanation. TDLR won't process a request with Item 21 left blank."*
-
-### The narrative takeover (click a card)
-
-**The only full-bleed screen in the app.** It earns it.
-
-```
-   ← Back to your record
-
-   MARCH 14, 2019 · HARRIS COUNTY
-   Possession of a Controlled Substance · Evading Arrest · Assault        ← ALL charges,
-                                                                            visible while
-   ───────────────────────────────────────────────────────────────────      they write.
-                                                                            This is the point.
-   What happened?
-   ┌──────────────────────────────────────────────────────────────────┐
-   │                                                                  │
-   └──────────────────────────────────────────────────────────────────┘
-
-   Why did you make the decisions you made?
-   ┌──────────────────────────────────────────────────────────────────┐
-   └──────────────────────────────────────────────────────────────────┘
-
-   What has changed since then?
-   ┌──────────────────────────────────────────────────────────────────┐
-   └──────────────────────────────────────────────────────────────────┘
-
-   What have you done to make it right?
-   ┌──────────────────────────────────────────────────────────────────┐
-   └──────────────────────────────────────────────────────────────────┘
-
-   ┌─ WHAT TDLR LOOKS AT ─────────────────────────────────────────────┐   ← static copy.
-   │  Tex. Occ. Code §53.025(a) — the factors TDLR weighs:            │     NOT model output.
-   │  time elapsed · your conduct and work before and after ·         │     Quoted. Cited. (L5)
-   │  evidence of rehabilitation · letters of recommendation          │
-   └──────────────────────────────────────────────────────────────────┘
-
-   [ Phase 4: "Help me write this" lands here. Phase 2: nothing. ]
-
-                                                              Save this story →
-```
-
-**All the charges from that night are on screen while they write.** That's not decoration —
-it's what makes one honest account possible instead of three amputated fragments.
-
-### The FAQ panel
-
-TDLR published 16 FAQs. **The state's own words, on the state's own site** — quotable,
-citable, scrivener-safe. Surface them **where the question actually arises**, not on a help
-page nobody opens.
-
-```
-   ▸ What if I can't remember which court it was?
-   ▸ Do I have to report a DWI? Isn't that a traffic violation?
-   ▸ I got deferred adjudication and wasn't technically convicted. Do I still report it?
-   ▸ ⚠️ What about expunged or sealed records?          ← OURS, not TDLR's. Marked OPEN. (L8)
-```
-
-Collapsed by default. Sits above the record intake. Content and placement live in
-`data/tdlr_links.json` → `tdlr_faq_panel`.
 
 
 ---

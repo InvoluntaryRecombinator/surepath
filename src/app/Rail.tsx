@@ -124,12 +124,6 @@ export function Rail() {
         <p className="text-[12.5px] font-semibold uppercase tracking-[0.07em] text-ink">
           {counterText}
         </p>
-        <p className="mt-2 flex items-start gap-1.5 text-[12px] leading-snug text-muted">
-          <span className="mt-[3px] shrink-0 text-accent">
-            <CheckSmall size={9} />
-          </span>
-          Saved on this computer as you go — never sent to our servers.
-        </p>
       </div>
 
       {/* ── data controls ── */}

@@ -115,7 +115,7 @@ function IncidentCard({ incident, ordinal }: { incident: DraftIncident; ordinal:
   return (
     <section
       aria-label={`Incident ${ordinal}`}
-      className="rounded-[6px] border border-line bg-surface px-7 py-6"
+      className="rounded-[6px] border border-line bg-ground/30 px-7 py-6"
     >
       <div className="flex items-baseline justify-between">
         <h2 className="text-[15px] font-bold text-ink">
@@ -209,7 +209,7 @@ export function RecordSection() {
   const incidents = state.draft.incidents
 
   return (
-    <>
+    <div className="flex flex-col gap-8">
       <SectionIntro section={section} />
 
       {incidents.length === 0 ? (
@@ -239,6 +239,6 @@ export function RecordSection() {
       </div>
 
       <FaqPanel items={config.recordFaq} agency={config.agency} />
-    </>
+    </div>
   )
 }

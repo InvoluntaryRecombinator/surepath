@@ -33,7 +33,7 @@ export const txConfig: StateConfig = {
       icon: 'person',
       intro: {
         title: 'About you',
-        lead: 'The basics that go on every page of the packet. You enter them once — SurePath writes them everywhere they belong.',
+        lead: 'The basics that go on every page of the packet — you enter them once, and SurePath writes them everywhere they belong. TDLR mails their decision to the address you give here and contacts you by email, so make sure both are current and ones you check.',
       },
     },
     {

@@ -7,12 +7,15 @@ import type { StateConfig } from '../state-config/types'
 import { AppLayout } from './AppLayout'
 import { AppStoreProvider } from './store'
 import { useAppStore } from './storeContext'
+import { AboutYouSection } from './sections/AboutYouSection'
 import { RecordSection } from './sections/RecordSection'
 import { StubSection } from './sections/StubSection'
 
 function CurrentSection() {
   const { state } = useAppStore()
   switch (state.sectionId) {
+    case 'info':
+      return <AboutYouSection />
     case 'record':
       return <RecordSection />
     default:

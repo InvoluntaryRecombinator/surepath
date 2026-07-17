@@ -64,7 +64,7 @@ export function DecisionBlock({
 }
 
 export function ConditionalFields({ children }: { children: ReactNode }) {
-  return <div className="border-l border-line pl-5">{children}</div>
+  return <div className="flex flex-col gap-5 border-l border-line pl-5">{children}</div>
 }
 
 /** A genuine pair, side by side — dates, first/last, city/state. Never a dense grid. */

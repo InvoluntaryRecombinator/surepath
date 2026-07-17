@@ -13,7 +13,12 @@
  * in the PDF when hidden, ownership radio CLEARED, never selected (A9, F11).
  */
 import { ChoiceField, TextField } from '../../ui/Field'
-import { FieldGroup, FieldRow } from '../../ui/FieldGroup'
+import {
+  ConditionalFields,
+  DecisionBlock,
+  FieldGroup,
+  FieldRow,
+} from '../../ui/FieldGroup'
 import { InfoBubble } from '../../ui/InfoBubble'
 import { SelectField } from '../../ui/Select'
 import { formatDate, formatPhone, formatZip, US_STATES } from '../lib/format'
@@ -45,10 +50,11 @@ export function AboutYouSection() {
   const patch = (p: Partial<DraftApplicant>) => dispatch({ type: 'update-applicant', patch: p })
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-10 xl:gap-12">
       <FieldGroup
-        heading="Who you are"
-        description="Your name exactly as it appears on your government-issued ID — the packet and your ID need to match."
+        heading="Match your identification"
+        description="Use your name exactly as it appears on your government-issued ID. The packet and your ID need to match."
+        signatureSlot
       >
         <FieldRow>
           <TextField
@@ -126,8 +132,8 @@ export function AboutYouSection() {
       </FieldGroup>
 
       <FieldGroup
-        heading={`How ${config.agency} reaches you`}
-        description={`${config.agency} mails their decision to this address and may contact you by phone or email while they review — use ones you actually check.`}
+        heading="Use contact details you check"
+        description={`${config.agency} mails their decision here and may contact you during review. A P.O. Box works for the mailing address.`}
       >
         <TextField
           label="Street address"
@@ -199,137 +205,150 @@ export function AboutYouSection() {
       </FieldGroup>
 
       <FieldGroup
-        heading="Parole and probation"
-        description={`If you're currently on parole or probation, ${config.agency} asks for your supervising officer's name and phone.`}
+        heading="Answer for your status today"
+        description={`${config.agency} asks for supervising-officer details only when you are currently on parole or probation.`}
       >
-        <ChoiceField
-          label="Are you currently on parole?"
-          required
-          name="onParole"
-          value={a.onParole ? 'yes' : 'no'}
-          onChange={(v) => patch({ onParole: v === 'yes' })}
-          options={[
-            { value: 'no', label: 'No' },
-            { value: 'yes', label: 'Yes' },
-          ]}
-        />
-        {a.onParole && (
-          <FieldRow>
-            <TextField
-              label="Parole officer's name"
-              required
-              value={a.paroleOfficerName}
-              onChange={(e) => patch({ paroleOfficerName: e.target.value })}
-            />
-            <TextField
-              label="Parole officer's phone"
-              required
-              type="tel"
-              inputMode="numeric"
-              value={a.paroleOfficerPhone}
-              onChange={(e) => patch({ paroleOfficerPhone: formatPhone(e.target.value) })}
-              placeholder="(512) 555-0100"
-            />
-          </FieldRow>
-        )}
-        <ChoiceField
-          label="Are you currently on probation?"
-          required
-          name="onProbation"
-          value={a.onProbation ? 'yes' : 'no'}
-          onChange={(v) => patch({ onProbation: v === 'yes' })}
-          options={[
-            { value: 'no', label: 'No' },
-            { value: 'yes', label: 'Yes' },
-          ]}
-          info={
-            <>
-              Community supervision after a deferred adjudication counts as probation here.
-              If you report to an officer, answer yes and give their contact.
-            </>
-          }
-        />
-        {a.onProbation && (
-          <FieldRow>
-            <TextField
-              label="Probation officer's name"
-              required
-              value={a.probationOfficerName}
-              onChange={(e) => patch({ probationOfficerName: e.target.value })}
-            />
-            <TextField
-              label="Probation officer's phone"
-              required
-              type="tel"
-              inputMode="numeric"
-              value={a.probationOfficerPhone}
-              onChange={(e) => patch({ probationOfficerPhone: formatPhone(e.target.value) })}
-              placeholder="(512) 555-0100"
-            />
-          </FieldRow>
-        )}
+        <DecisionBlock>
+          <ChoiceField
+            layout="decision"
+            label="Are you currently on parole?"
+            required
+            name="onParole"
+            value={a.onParole ? 'yes' : 'no'}
+            onChange={(v) => patch({ onParole: v === 'yes' })}
+            options={[
+              { value: 'no', label: 'No' },
+              { value: 'yes', label: 'Yes' },
+            ]}
+          />
+          {a.onParole && (
+            <ConditionalFields>
+              <FieldRow>
+                <TextField
+                  label="Parole officer's name"
+                  required
+                  value={a.paroleOfficerName}
+                  onChange={(e) => patch({ paroleOfficerName: e.target.value })}
+                />
+                <TextField
+                  label="Parole officer's phone"
+                  required
+                  type="tel"
+                  inputMode="numeric"
+                  value={a.paroleOfficerPhone}
+                  onChange={(e) => patch({ paroleOfficerPhone: formatPhone(e.target.value) })}
+                  placeholder="(512) 555-0100"
+                />
+              </FieldRow>
+            </ConditionalFields>
+          )}
+        </DecisionBlock>
+        <DecisionBlock last>
+          <ChoiceField
+            layout="decision"
+            label="Are you currently on probation?"
+            required
+            name="onProbation"
+            value={a.onProbation ? 'yes' : 'no'}
+            onChange={(v) => patch({ onProbation: v === 'yes' })}
+            options={[
+              { value: 'no', label: 'No' },
+              { value: 'yes', label: 'Yes' },
+            ]}
+            info={
+              <>
+                Community supervision after a deferred adjudication counts as probation here.
+                If you report to an officer, answer yes and give their contact.
+              </>
+            }
+          />
+          {a.onProbation && (
+            <ConditionalFields>
+              <FieldRow>
+                <TextField
+                  label="Probation officer's name"
+                  required
+                  value={a.probationOfficerName}
+                  onChange={(e) => patch({ probationOfficerName: e.target.value })}
+                />
+                <TextField
+                  label="Probation officer's phone"
+                  required
+                  type="tel"
+                  inputMode="numeric"
+                  value={a.probationOfficerPhone}
+                  onChange={(e) => patch({ probationOfficerPhone: formatPhone(e.target.value) })}
+                  placeholder="(512) 555-0100"
+                />
+              </FieldRow>
+            </ConditionalFields>
+          )}
+        </DecisionBlock>
       </FieldGroup>
 
       <FieldGroup
-        heading="Applying for a company"
-        description="Almost everyone answers no. This only applies if a company you help control is seeking its own license."
+        heading="Only if a company is applying"
+        description="This applies when a company you own or direct is seeking its own license. Individual applicants answer no."
         last
       >
-        <ChoiceField
-          label="Are you a controlling person of a company applying for a license?"
-          required
-          name="isControllingPerson"
-          value={a.isControllingPerson ? 'yes' : 'no'}
-          onChange={(v) => patch({ isControllingPerson: v === 'yes' })}
-          options={[
-            { value: 'no', label: 'No' },
-            { value: 'yes', label: 'Yes' },
-          ]}
-          info={
-            <>
-              A "controlling person" owns or directs a company — an owner, partner, officer,
-              or major shareholder. If you're applying for a license as yourself, the answer
-              is no, and the company questions stay out of your way.
-            </>
-          }
-        />
-        {a.isControllingPerson && (
-          <>
-            <FieldRow>
-              <TextField
-                label="Company name"
-                required
-                value={a.businessName}
-                onChange={(e) => patch({ businessName: e.target.value })}
-              />
-              <TextField
-                label="DBA (doing business as)"
-                value={a.businessDba}
-                onChange={(e) => patch({ businessDba: e.target.value })}
-                hint="Leave blank if none."
-              />
-            </FieldRow>
-            <FieldRow>
-              <TextField
-                label="Federal tax ID"
-                required
-                inputMode="numeric"
-                value={a.businessTaxId}
-                onChange={(e) => patch({ businessTaxId: e.target.value })}
-              />
-              <SelectField
-                label="Type of ownership"
-                required
-                value={OWNERSHIP_LABEL[a.businessOwnership] ?? ''}
-                onChange={(e) =>
-                  patch({ businessOwnership: OWNERSHIP_VALUE[e.target.value] ?? '' })
-                }
-                options={OWNERSHIP_OPTIONS}
-                placeholder="Choose one"
-              />
-            </FieldRow>
-          </>
-        )}
+        <DecisionBlock last>
+          <ChoiceField
+            layout="decision"
+            label="Are you a controlling person of a company applying for a license?"
+            required
+            name="isControllingPerson"
+            value={a.isControllingPerson ? 'yes' : 'no'}
+            onChange={(v) => patch({ isControllingPerson: v === 'yes' })}
+            options={[
+              { value: 'no', label: 'No' },
+              { value: 'yes', label: 'Yes' },
+            ]}
+            info={
+              <>
+                A "controlling person" owns or directs a company — an owner, partner, officer,
+                or major shareholder. If you're applying for a license as yourself, the answer
+                is no, and the company questions stay out of your way.
+              </>
+            }
+          />
+          {a.isControllingPerson && (
+            <ConditionalFields>
+              <FieldRow>
+                <TextField
+                  label="Company name"
+                  required
+                  value={a.businessName}
+                  onChange={(e) => patch({ businessName: e.target.value })}
+                />
+                <TextField
+                  label="DBA (doing business as)"
+                  value={a.businessDba}
+                  onChange={(e) => patch({ businessDba: e.target.value })}
+                  hint="Leave blank if none."
+                />
+              </FieldRow>
+              <FieldRow>
+                <TextField
+                  label="Federal tax ID"
+                  required
+                  inputMode="numeric"
+                  value={a.businessTaxId}
+                  onChange={(e) => patch({ businessTaxId: e.target.value })}
+                />
+                <SelectField
+                  label="Type of ownership"
+                  required
+                  value={OWNERSHIP_LABEL[a.businessOwnership] ?? ''}
+                  onChange={(e) =>
+                    patch({ businessOwnership: OWNERSHIP_VALUE[e.target.value] ?? '' })
+                  }
+                  options={OWNERSHIP_OPTIONS}
+                  placeholder="Choose one"
+                />
+              </FieldRow>
+            </ConditionalFields>
+          )}
+        </DecisionBlock>
       </FieldGroup>
     </div>
   )

@@ -66,27 +66,29 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 </button>
               </p>
             )}
-            <div className="max-w-[760px]">{children}</div>
+            <div className="max-w-[960px]">{children}</div>
           </div>
         </main>
 
         {/* ── the action bar — the pane's bottom edge ──────────────────────────────── */}
         <footer className="shrink-0 border-t border-line/70">
-          <div className="flex h-[68px] items-center justify-between px-5 sm:px-8 lg:px-14">
-            <Button variant="ghost" disabled={isFirst} onClick={() => go(idx - 1)}>
-              <ArrowLeft />
-              Back
-            </Button>
-            {isLast ? (
-              <Button variant="primary" disabled title="The review step is being built.">
-                Generate my packet
+          <div className="px-5 sm:px-8 lg:px-14">
+            <div className="flex h-[68px] max-w-[960px] items-center justify-between">
+              <Button variant="ghost" disabled={isFirst} onClick={() => go(idx - 1)}>
+                <ArrowLeft />
+                Back
               </Button>
-            ) : (
-              <Button variant="primary" onClick={() => go(idx + 1)}>
-                Continue
-                <ArrowRight />
-              </Button>
-            )}
+              {isLast ? (
+                <Button variant="primary" disabled title="The review step is being built.">
+                  Generate my packet
+                </Button>
+              ) : (
+                <Button variant="primary" onClick={() => go(idx + 1)}>
+                  Continue
+                  <ArrowRight />
+                </Button>
+              )}
+            </div>
           </div>
         </footer>
       </div>

@@ -16,15 +16,18 @@
 @theme {
   /* Colors: wipe the default palette, then the eight tokens (+ one derived rail tint). */
   --color-*: initial;
-  --color-ground: #efe7d2; /* the app ground. soft, warm, NOT white. */
-  --color-rail: #e7ddc4; /* the rail — one step darker than ground, so the nav reads as its own place */
-  --color-surface: #fbf7ef; /* a section/panel — one step lighter than ground */
+  /* The tonal ladder, stretched so every region reads as its own place:
+       rail (deepest) → ground (the briefing band) → surface (the sheet) → field (white).
+     Muddy = neighbors too close. Crisp = four distinct, quiet steps. */
+  --color-ground: #ece3cc; /* mid warm — the briefing band, banners */
+  --color-rail: #ddd1af; /* the rail region. Distinctly deeper; the nav is its own place. */
+  --color-surface: #fcf9f1; /* the sheet — crisp near-white with the warmth kept */
   --color-field: #ffffff; /* INPUT FIELDS. crisp white. the contrast that fixes "murky". */
-  --color-ink: #24221c; /* primary text */
-  --color-muted: #8a8266; /* labels, hints, secondary */
-  --color-line: #d8d0bc; /* borders, dividers */
-  --color-accent: #3f5795; /* primary actions, focus, links, current step — warmed + desaturated so it belongs to the ground, not to a defaults palette */
-  --color-accent-deep: #33477c; /* the accent, pressed/hovered. A shade, not a second hue. */
+  --color-ink: #26231b; /* primary text */
+  --color-muted: #7d7458; /* labels, hints — darkened a step for legibility on the crisper sheet */
+  --color-line: #d5c9a9; /* borders, dividers */
+  --color-accent: #3a4a76; /* a warmer, grayer ink-blue — belongs to paper, not to a defaults palette */
+  --color-accent-deep: #2c3a5f; /* the accent, pressed/hovered. A shade, not a second hue. */
   --color-state: #a6392f; /* HARD requirements only. Never a stylistic accent. */
 
   /* Shadows: none exist. A focus ring is not a shadow; it lives in CSS below. */
@@ -50,6 +53,10 @@ body {
   outline: none;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {

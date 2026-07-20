@@ -3,7 +3,10 @@
  *
  * TWO prompts sharing one preamble: the INTERVIEW prompt (gathering, one question at a
  * time) and the DRAFTING prompt (a distinct "you are now writing the final account"
- * instruction — generation is its own job, not a mid-conversation side effect).
+ * instruction — generation is its own job, not a mid-conversation side effect). The
+ * DRAFTING body carries the deferred-adjudication language rules: a charge marked
+ * deferred was NOT a conviction, and writing "convicted" about it would put a false
+ * statement on a signed document.
  *
  * State-published guidance (the factors, the citation) is INJECTED from the request —
  * the client owns stateConfig; this file and the server are state-agnostic. The chassis
@@ -44,6 +47,7 @@ THE FOUR STAGES — report all four, every turn, from the WHOLE conversation
   right   — what they did to make it right (restitution, fines paid, supervision completed)
 
 Each stage is exactly one of:
+
   "empty"   — nothing said about it yet
   "thin"    — something said, but not usable: "I'm in a program" is thin until you know
               which program, roughly how long, and whether they finished. "It was dumb" is
@@ -69,9 +73,10 @@ One question at a time, in "followUp": a short direct question, with an optional
 weight; 'in a program' on its own doesn't say much." No reason when the question is
 obvious; a reason on every question reads as nagging.
 
-Probe thin stages for the concrete detail that would make them covered. Aim to resolve the
-conversation in a handful of questions — you are not conducting a deposition. If an answer
-gives you what you need, move on. Never ask about a stage the person has skipped.
+Ask as many questions as the account genuinely needs, and no more. Do not pad, and do not
+stop while a stage you are asking about is still thin — a thin answer is the moment to
+probe for the concrete detail that would make it covered. Never ask about a stage the
+person has skipped.
 
 "changed" and "right" are OPTIONAL for the person: if one is empty or thin, you may point
 it out ONCE, briefly, in "nudge" — like: "One thing — right now this doesn't mention
@@ -89,16 +94,54 @@ account exists.`
 
 const DRAFTING_BODY = `YOU ARE NOW WRITING THE FINAL ACCOUNT. The conversation is done; this is the document step.
 
-Write one honest account of the incident from everything the person told you, in their own
-voice, first person, plain language, at the reading level they wrote in. Do not make them
-sound like a lawyer. Cover all the charges from this arrest together, as one event. Include
-what they said about their own part, what has changed, and what they made right — exactly
-as they told it, nothing added.
+WHAT TO WRITE
+
+One honest account of this incident, built from everything the person told you. Cover all
+the charges from this arrest together, as a single event — not as separate incidents.
+
+Include whichever of these they actually addressed: what happened, why things went the way
+they did, their own part in it, what has changed since, and what they did to make it right.
+Say nothing about the ones they never raised. An account that covers only what happened and
+why is a complete account — do not gesture at a topic they left alone.
+
+CONVICTIONS VS. DEFERRED ADJUDICATION — read the charge list carefully
+
+A charge marked "(deferred adjudication)" was NOT a conviction. The person was placed on
+community supervision without a judgment of guilt being entered. Never write "convicted,"
+"conviction," "found guilty," or "my conviction for" about those charges. Write what
+actually happened: "I was placed on deferred adjudication for..." or "I received deferred
+adjudication on the possession charge."
+
+Charges without that marker are convictions and may be described as such.
+
+Getting this wrong puts a false statement on a document they sign as true and complete.
+When in doubt, describe the outcome without naming it: "the case was resolved with..."
+
+VOICE
+
+First person, plain language, their words. Use their vocabulary and their register — if
+they said "I messed up," do not write "I exercised poor judgment." If they said "my truck,"
+do not write "my vehicle."
+
+But fix spelling, grammar, and sentence structure. This is a formal document going to a
+licensing board, and clean writing is part of what you are doing for them. Their voice,
+correctly written. Never make them sound like a lawyer, and never make them sound careless.
+
+LENGTH AND SHAPE
+
+Two to four short paragraphs — roughly 150 to 300 words. This prints onto a single sheet
+attached to their forms and will be read by someone reviewing many of these. Longer is not
+better; a tight, specific account reads as more credible than a long one.
+
+Chronological. Continuous prose. No headings, no bullet points, no labels. Plainly: what
+happened, then why, then what has changed and what they did to make it right.
+
+OUTPUT
 
 Populate "draft" with the account. "reply" is a short handoff — for example: "I've put
 together an account from what you told me — it's below." — and never contains the draft or
-a question. Set "followUp" to null. Still report "stages" and "ownership" honestly from
-the conversation. You may include one "nudge" for an optional point never raised before;
+a question. Set "followUp" to null. Still report "stages" and "ownership" honestly from the
+conversation. You may include one "nudge" for an optional point never raised before;
 otherwise null.`
 
 /** The per-request injection + mode selection. */
@@ -165,11 +208,20 @@ ${chargeLines}`)
 }
 
 /**
- * D6, fail closed: reject any payload carrying an identifier-shaped key, anywhere in the
- * tree. The legitimate request has no key that names a person — this scan is the proxy's
- * proof of that, independent of the schema.
+ * D6 identifier guard, hardened.
+ *
+ * The original pattern missed prefixed keys: `applicantName` normalizes to `applicantname`,
+ * which does not match `^(first|last|middle|full|sur)?name$`. We cannot simply match
+ * `.*name$` because `courtName` and `programName` are legitimate and carry no identity.
+ *
+ * So: keep the exact-match pattern, and add an explicit deny-list of person-prefixed forms.
+ * The value-grep leak test remains the real proof; this is defense in depth.
  */
-const IDENTIFIER_KEY = /^(first|last|middle|full|sur)?name$|^(dob|dateofbirth|birthdate)$|^ssn$|social|^(mailing|street)?address$|^street$|^zip(code)?$|^phone(number)?$|^email(address)?$/
+const IDENTIFIER_KEY =
+  /^(first|last|middle|full|sur)?name$|^(dob|dateofbirth|birthdate)$|^ssn$|social|^(mailing|street)?address$|^street$|^zip(code)?$|^phone(number)?$|^email(address)?$/
+
+const PERSON_PREFIXED_KEY =
+  /^(applicant|person|client|user|subject|petitioner|defendant)(first|last|middle|full|sur)?name$/
 
 export function findIdentifierKeys(payload: unknown, found: string[] = []): string[] {
   if (Array.isArray(payload)) {
@@ -177,7 +229,9 @@ export function findIdentifierKeys(payload: unknown, found: string[] = []): stri
   } else if (payload !== null && typeof payload === 'object') {
     for (const [key, value] of Object.entries(payload)) {
       const normalized = key.toLowerCase().replace(/[^a-z]/g, '')
-      if (IDENTIFIER_KEY.test(normalized)) found.push(key)
+      if (IDENTIFIER_KEY.test(normalized) || PERSON_PREFIXED_KEY.test(normalized)) {
+        found.push(key)
+      }
       findIdentifierKeys(value, found)
     }
   }

@@ -14,24 +14,25 @@
 @import '@fontsource-variable/public-sans';
 
 @theme {
-  /* Colors: wipe the default palette, then define the product and chrome materials. */
+  /* Colors: wipe the default palette, then two MATERIALS and one accent.
+     Chrome (graphite) is what the app is made of — the rail and the page ground.
+     Paper is what the work sits on — one light panel, genuinely inset, with a real edge.
+     The two are different materials, not two tints of one. */
   --color-*: initial;
-  /* The rail is chrome, not another sheet tint. The remaining warm ladder belongs to
-     content: briefing ground → working surface → white fields. */
-  --color-ground: #ece3cc; /* mid warm — the briefing band, banners */
-  --color-rail: #20251f; /* deep neutral chrome */
-  --color-rail-inset: #292f29; /* active and hover structure inside the chrome */
-  --color-rail-ink: #f4f0e7; /* primary chrome type and completed markers */
-  --color-rail-muted: #aab1a6; /* secondary chrome type and future steps */
-  --color-rail-line: #424a41; /* internal chrome rules */
-  --color-surface: #fcf9f1; /* the sheet — crisp near-white with the warmth kept */
-  --color-field: #ffffff; /* INPUT FIELDS. crisp white. the contrast that fixes "murky". */
-  --color-ink: #26231b; /* primary text */
-  --color-muted: #7d7458; /* labels, hints — darkened a step for legibility on the crisper sheet */
-  --color-line: #d5c9a9; /* borders, dividers */
-  --color-accent: #3a4a76; /* a warmer, grayer ink-blue — belongs to paper, not to a defaults palette */
-  --color-accent-deep: #2c3a5f; /* the accent, pressed/hovered. A shade, not a second hue. */
-  --color-state: #a6392f; /* HARD requirements only. Never a stylistic accent. */
+  --color-rail: #202226; /* graphite chrome — the rail AND the app page ground */
+  --color-rail-inset: #2a2d33; /* active/hover structure inside the chrome */
+  --color-rail-ink: #ecebe6; /* primary chrome type and markers */
+  --color-rail-muted: #a2a19a; /* secondary chrome type, future steps */
+  --color-rail-line: #393c42; /* internal chrome rules + the panel's edge against chrome */
+  --color-surface: #faf9f6; /* PAPER — the content panel, marketing surfaces */
+  --color-ground: #f0eeea; /* a quiet tint WITHIN the light world: banners, in-panel insets, marketing body */
+  --color-field: #ffffff; /* input fields. crisp white on paper. */
+  --color-ink: #23252a; /* primary text */
+  --color-muted: #6f6c64; /* labels, hints */
+  --color-line: #d9d6cd; /* borders, dividers in the light world */
+  --color-accent: #4a5bd4; /* indigo — luminous against graphite, confident on paper */
+  --color-accent-deep: #3a49b3; /* pressed/hovered. A shade, not a second hue. */
+  --color-state: #b3372c; /* HARD requirements only. Never a stylistic accent. */
 
   /* Shadows: none exist. A focus ring is not a shadow; it lives in CSS below. */
   --shadow-*: initial;

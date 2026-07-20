@@ -26,8 +26,6 @@ export type AppState = {
   sectionId: string
   /** Highest section index reached — the rail lets you revisit, never skip ahead. */
   maxReachedIndex: number
-  /** True when this session was restored from a previous visit on this computer. */
-  resumed: boolean
 }
 
 export type Action =
@@ -43,7 +41,6 @@ export type Action =
   | { type: 'add-license'; program: string; specificLicenseType: string }
   | { type: 'remove-license'; index: number }
   | { type: 'delete-everything' }
-  | { type: 'dismiss-resumed' }
 
 function makeReducer(config: StateConfig) {
   const mapIncident = (
@@ -139,8 +136,6 @@ function makeReducer(config: StateConfig) {
         }
       case 'delete-everything':
         return initialState(config, /* restore */ false)
-      case 'dismiss-resumed':
-        return { ...s, resumed: false }
     }
   }
 }
@@ -154,7 +149,6 @@ function initialState(config: StateConfig, restore = true): AppState {
     draft: freshDraft,
     sectionId: config.sections[0].id,
     maxReachedIndex: 0,
-    resumed: false,
   }
   if (!restore) return fresh
   try {
@@ -182,7 +176,6 @@ function initialState(config: StateConfig, restore = true): AppState {
         config.sections.findIndex((x) => x.id === sectionId),
         Math.min(stored.maxReachedIndex ?? 0, config.sections.length - 1),
       ),
-      resumed: true,
     }
   } catch {
     return fresh

@@ -61,20 +61,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <div className="mx-auto max-w-[920px] px-6 pb-14 pt-9 sm:px-10 lg:px-12 lg:pt-11">
               <SectionBriefing section={stage} />
 
-              {state.resumed && (
-                <p className="mb-9 flex items-baseline justify-between gap-4 rounded-[6px] bg-ground px-4 py-3 text-[13px] text-muted">
-                  Welcome back — everything you entered is right where you left it.
-                  <button
-                    type="button"
-                    onClick={() => dispatch({ type: 'dismiss-resumed' })}
-                    className="font-medium text-accent hover:underline"
-                    aria-label="Dismiss"
-                  >
-                    ✕
-                  </button>
-                </p>
-              )}
-
               <form
                 id="apply-section-form"
                 data-validation-attempted={showValidation || undefined}

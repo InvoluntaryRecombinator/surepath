@@ -120,3 +120,20 @@ describe('fail closed on the model side', () => {
     expect(res.status).toBe(400)
   })
 })
+
+describe('reply never carries the draft (§4)', () => {
+  it('substitutes the handoff when the model duplicates the draft into reply', async () => {
+    const dup = {
+      ...cleanTurn,
+      draft: 'On March 14, 2019, in Harris County, I was arrested after police found a controlled substance in my truck.',
+      reply: 'On March 14, 2019, in Harris County, I was arrested after police found a controlled substance in my truck.',
+      followUp: null,
+    }
+    const res = await handleNarrativeRequest(request, env, async () => dup)
+    expect(res.status).toBe(200)
+    const turn = res.body.turn as typeof dup
+    expect(turn.draft).toBe(dup.draft)
+    expect(turn.reply).not.toContain('Harris County')
+    expect(turn.reply).toContain('on the right')
+  })
+})

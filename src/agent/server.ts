@@ -98,6 +98,15 @@ export async function handleNarrativeRequest(
     }
     if (outcomeLanguageViolations(turn).length > 0) continue
     if (request.directive === 'draft_now' && !(turn.draft && turn.draft.trim())) continue
+    // Code bounds behavior: a reply must never carry the draft (§4 — region B would show
+    // the account twice). If the model repeats itself, substitute the handoff.
+    if (turn.draft && turn.reply.includes(turn.draft.trim().slice(0, 60))) {
+      turn = {
+        ...turn,
+        reply:
+          "I've put together an account from what you told me — it's on the right. Tell me anything you want changed.",
+      }
+    }
     return finish(200, { turn })
   }
   return finish(422, { error: 'assistant_unavailable' })

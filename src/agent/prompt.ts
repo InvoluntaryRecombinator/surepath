@@ -50,8 +50,11 @@ give. Prefer to write something usable from thin material over extracting more.
 OUTPUT
 
 Respond with the structured object. Write the draft when you judge you have enough to write
-it honestly — do not ask permission. Never put a question in "reply"; questions go only in
-"followUp". List in "assumptions" anything you filled in that the person did not say
+it honestly — do not ask permission. "reply" is one or two short conversational sentences and
+NEVER contains the draft or any part of it. When you DO draft, "reply" only hands off — for
+example: "I've put together an account from what you told me — it's on the right." When you
+are NOT drafting, "reply" is a brief acknowledgment of what they said, and never claims an
+account exists or mentions anything being "on the right". Never put a question in "reply"; questions go only in "followUp". List in "assumptions" anything you filled in that the person did not say
 directly. Write the draft in the person's own voice, first person, plain language, at the
 reading level they wrote in. Do not make them sound like a lawyer.`
 

@@ -83,6 +83,17 @@ That last row is the only structural consequence, and `packetPlan()` already own
 //                          →  all three point to ONE sheet carrying ONE account
 ```
 
+> ⚠️ **Corrected — three claims in earlier drafts were false, verified against the codebase:**
+> - `buildNarrativeContext` **does not exist.** It was specified in ARCHITECTURE §8.4 and never
+>   implemented. Build it (small, pure).
+> - The `<NarrativeStep>` seam **does not exist.** The section-registry replaced that idea —
+>   adding a section means adding a `case` and a component. New construction on a prepared lot,
+>   not a drop-in.
+> - `CONTINUATION_SHEETS = 'per_questionnaire'` is the settled decision: **N self-contained
+>   sheets, each duplicating the one authored account.** Earlier text claimed one shared sheet.
+>   The account is authored once per incident either way — but do not "fix" the flag to match
+>   the old wording.
+
 **Guard, in a comment on the type:** the narrative is keyed by `incidentId`, never by
 `chargeId`. If you ever find yourself writing `charge.narrative`, stop — you are about to make
 someone write the same story four times.
@@ -162,85 +173,122 @@ hard-gated until all are complete.
 
 ---
 
-## 4. The output contract — model proposes, code disposes
+## 4. The contract — model proposes, code disposes
 
-**Every model turn returns exactly one JSON object.** Not prose. The system prompt enforces the
-shape; the proxy validates it and fails closed.
+### The REQUEST carries a directive. Code decides what the model may do.
+
+```ts
+type AgentRequest = {
+  context: NarrativeContext
+  messages: { role: 'user' | 'assistant'; content: string }[]
+  directive: 'converse' | 'draft_now'   // ← code sets this, not the model
+  alreadyNudged: string[]
+}
+```
+
+**In `converse` mode, discard any draft the model volunteers.** This is the single strongest
+anti-drift move available: the model cannot decide unilaterally to stop asking and start
+writing, because our code controls whether a draft is even permitted.
+
+### The RESPONSE is one JSON object. Never prose.
 
 ```ts
 type AgentTurn = {
   reply: string                    // shown in region B. conversational, short.
-  coverage: {                      // the model's read of what the user has given so far
-    whatHappened: boolean
+                                   // NEVER contains the question — questions live only in followUp.
+  coverage: {                      // keys MATCH rawAnswers keys exactly
+    facts: boolean
     why: boolean
     whatChanged: boolean
     madeItRight: boolean
   }
-  readyToDraft: boolean            // model's opinion. CODE decides (see §5).
+  readyToDraft: boolean            // means "I am drafting now" — see §5. A hint, never a gate.
   followUp: string | null          // ONE question, or null
-  nudge: {                         // at most one, and only for a factor not yet nudged
+  nudge: {
     factor: 'ownership' | 'understanding' | 'change' | 'restitution'
     text: string
   } | null
-  draft: string | null             // populated ONLY when the user asked for a draft
+  assumptions: string[]            // anything the model filled in that the user didn't say directly.
+                                   // SELF-REPORTED transparency. Not verification. See §7.
+  draft: string | null             // populated when the model judges it has enough, OR on draft_now
 }
 ```
 
-**Why structured, not prose:** because the convergence rules, the nudge-once rule, and the
-draft gating are then enforced by **our code**, which cannot drift, instead of by prompt
-instructions, which can. The model's `readyToDraft` is an *input to* our decision, not the
-decision.
+Enforced by a Zod schema through the AI SDK's structured-output mode, which retries
+automatically on malformed output.
 
----
+**`reply` never contains the question.** Questions live only in `followUp`. This matters
+because after the turn cap, code renders `reply` and suppresses `followUp` — which is only
+possible if the question was never embedded in the prose.
 
-## 5. The state machine — convergence is enforced in CODE
+## 5. The state machine — the model drafts when ready. No permission ask.
+
+> ⚠️ **Corrected.** An earlier version of this spec had an `OFFER_DRAFT` state where the model
+> asked "want me to write it up?" and waited for a button. **That is wrong.** The user should
+> not have to grant permission. The model asks a couple of questions and then, when it judges
+> it has enough, **it writes the account in that same turn** and hands off conversationally.
 
 ```
-      ┌──────────┐  user submits any answer
-      │  EMPTY   │──────────────────────────────┐
-      └──────────┘                              ▼
-                                        ┌────────────────┐
-              model asks followUp  ┌───▶│   GATHERING    │
-              (max 3 turns)        └────│  turns: 0..3   │
-                                        └───────┬────────┘
-                        turns === 3  OR  readyToDraft  OR  user clicks "Write it"
-                                                │
-                                                ▼
-                                        ┌────────────────┐
-                                        │  OFFER_DRAFT   │  "Want me to write it up?"
-                                        └───────┬────────┘
-                                        user says yes
-                                                ▼
-                                        ┌────────────────┐
-                                        │    DRAFTED     │  region C populated + provenance run
-                                        └───────┬────────┘
-                                   user edits freely · may keep chatting
-                                                │ Save (blocked if unconfirmed flags)
-                                                ▼
-                                        ┌────────────────┐
-                                        │   COMMITTED    │  → narrative.final, card checkmarks
-                                        └────────────────┘
+   ┌───────────────────────────────────────────────────────────────────────┐
+   │  EMPTY                                                                │
+   │    ├── user types into the account panel directly ──────► DRAFTED     │  ← MANUAL PATH
+   │    │   (no model involvement at all — a complete, valid path)         │     FIRST-CLASS
+   │    └── user answers a prompt / clicks "Help me with this" ─┐          │
+   └────────────────────────────────────────────────────────────┼──────────┘
+                                                                ▼
+                                                      ┌──────────────────┐
+                    code sends directive:'converse'   │    GATHERING     │
+                    model asks ONE followUp      ┌────│   turns 0..3     │
+                                                 └───▶└────────┬─────────┘
+                                                               │
+        model returns readyToDraft:true WITH draft populated   │  OR
+        OR turns === MAX  (code sends directive:'draft_now')   │  OR
+        OR user clicks "Write it now"                          │
+                                                               ▼
+                                                      ┌──────────────────┐
+                                                      │     DRAFTED      │
+                                                      │ account panel is │
+                                                      │ populated +      │
+                                                      │ editable         │
+                                                      └────────┬─────────┘
+                                    user edits directly, or keeps talking to refine
+                                                               │
+                                            Save (requires the affirmation — §7)
+                                                               ▼
+                                                      ┌──────────────────┐
+                                                      │    COMMITTED     │
+                                                      └──────────────────┘
 ```
 
-### The rules that are CODE, not prompt
+**When the model drafts, `reply` hands off conversationally** — something like *"I've put
+together an account from what you told me — it's on the right. Tell me anything you want
+changed."* No question, no permission request.
+
+### The MANUAL PATH is first-class, not a fallback
+
+`EMPTY → user writes in the account panel → Save` is a complete, valid path with **zero model
+involvement.** The PRD is explicit: free text box first, nothing forced. This is also, for
+free, the API-down degradation and the pre-proxy dev mode.
+
+### Rules that live in CODE, not the prompt
 
 ```ts
-const MAX_FOLLOWUP_TURNS = 3      // hard cap. after this, code forces OFFER_DRAFT
-                                  // regardless of what the model returns.
+const MAX_FOLLOWUP_TURNS = 3   // at the cap, code sends directive:'draft_now'. It cannot loop.
 
-const nudgedFactors = new Set()   // component state
-// if turn.nudge && nudgedFactors.has(turn.nudge.factor) → DROP IT, do not render.
-// otherwise render once and add to the set. A factor is nudged at most once, ever.
+const nudgedFactors = new Set()
+// if turn.nudge && nudgedFactors.has(turn.nudge.factor) → DROP before render. Once, ever.
 
-// "Write it now" button is ALWAYS visible from turn 1.
-// A user with three sentences and no patience must be able to get a draft immediately.
-// Gather-but-never-gate.
+// "Write it now" is visible from turn 1 — an escape hatch for someone who won't answer
+// anything. Not the primary path, but always available. Gather-but-never-gate.
+
+// A6 banned-word regex runs over reply / followUp / nudge.text. On hit: retry once, then
+// drop the turn. The prompt forbids outcome language; code enforces it.
+
+// coverage and readyToDraft are HINTS. Nothing gates on them. They may only accelerate
+// the draft, never delay it.
 ```
 
-**This is the anti-sprawl guarantee.** Prompts drift under pressure; a counter does not. The
-model can *want* to keep asking; the code will stop it.
-
----
+> **The prompt shapes behavior; code bounds it. Anything that must be true belongs in code.**
 
 ## 6. The system prompt
 
@@ -311,30 +359,36 @@ far, and `alreadyNudged: [...]` so the model knows which points are closed.
 
 ---
 
-## 7. The provenance check — the defensible layer
+## 7. Accuracy — the system prompt is the mitigation
 
-**After every draft, our code — not the model — maps the draft back to what the user said.**
+> ⚠️ **Corrected.** An earlier version of this spec specified a code-side provenance check that
+> compared draft tokens against the user's input. **Cut it. It cannot work.** People write in
+> fragments and slang ("i was at a party n had a lil bit on me"); the model writes clean prose
+> ("I was at a gathering and had a small amount of a controlled substance"). Token overlap is
+> near-zero, so **every sentence of every draft would false-flag.** Flag fatigue would destroy
+> the feature within two uses.
 
-```
-1. Split the draft into sentences.
-2. Concatenate all user input for this incident (rawAnswers + every user turn) → SOURCE.
-3. For each sentence, extract SPECIFIC tokens: numbers, dates, proper nouns, program names,
-   dollar amounts, durations. (Stopwords and generic connective language are ignored —
-   rephrasing is allowed and expected; that is the assistant's actual job.)
-4. If a specific token does not appear in SOURCE → flag the sentence.
-5. Flagged sentences render inline in region C with a marker and one line:
-      "You didn't mention this — check that it's accurate."
-6. SAVE IS BLOCKED while any flag is unconfirmed. The user must either edit the sentence or
-   explicitly confirm it. One click, no friction theater — but it must be a click.
-```
+Three layers instead, in order of how much weight they actually carry:
 
-**Why this matters more than any feature:** they sign an affidavit affirming the packet is
-their full and accurate account. If the model puts a sentence in their mouth and they sign it,
-the harm is real and it is ours. This is L3 made mechanical instead of hoped. It is also the
-single best thing to show a reviewer — it demonstrates we engineered for the liability rather
-than shipping the demo.
+**1. The system prompt (§6) is the real mitigation.** It carries the entire constraint — only
+the user's information, no invented facts, no invented remorse. Write it carefully; version it;
+test it adversarially (§9). This is where the safety lives.
 
----
+**2. `assumptions: string[]` — model self-report.** The model lists anything it filled in that
+the user didn't say directly. Rendered as a short "worth checking" list beneath the account.
+
+> **Be honest in the docs and the UI: this is model-reported, not verified.** It is
+> transparency, not a guarantee. Do not present it as a check that caught something.
+
+**3. A required affirmation before Save — this is the real gate.** The user must confirm the
+account accurately reflects what happened. Always, every incident, no exception. Plain and
+unavoidable:
+
+> *"This is the account that goes on your forms. Read it and confirm it's accurate — you're
+> signing that this is your own true account."*
+
+They are signing an affidavit either way. The affirmation is what makes that meaningful, and
+it's the only layer that can't be gamed by a clever prompt.
 
 ## 8. The proxy
 

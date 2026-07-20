@@ -123,12 +123,27 @@ function recordValidation(draft: DraftCase): SectionValidation {
   return { complete: issues.length === 0, issues }
 }
 
+function storyValidation(draft: DraftCase): SectionValidation {
+  const issues: ValidationIssue[] = []
+  draft.incidents.forEach((incident, i) => {
+    if (!hasText(incident.narrativeDraft)) {
+      issues.push({
+        field: `incidents.${incident.id}.narrativeDraft`,
+        message: `Incident ${i + 1} still needs its account — TDLR won't process a request with Item 21 left blank.`,
+      })
+    }
+  })
+  return { complete: issues.length === 0, issues }
+}
+
 export function validateSection(sectionId: string, draft: DraftCase): SectionValidation {
   switch (sectionId) {
     case 'info':
       return applicantValidation(draft)
     case 'record':
       return recordValidation(draft)
+    case 'story':
+      return storyValidation(draft)
     default:
       // These stages do not expose required inputs yet. Add their rules with their UI.
       return { complete: true, issues: [] }

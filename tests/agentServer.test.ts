@@ -20,6 +20,7 @@ const request: AgentRequest = {
       { exactOffense: 'Evading Arrest', sentence: '2 years, suspended', disposition: 'conviction' },
     ],
     rawAnswers: { facts: 'I ran when I was pulled over.', why: '', whatChanged: '', madeItRight: '' },
+    currentAccount: '',
   },
   messages: [{ role: 'user', content: 'I ran when I was pulled over.' }],
   directive: 'converse',
@@ -174,5 +175,23 @@ describe('the two prompts (§6)', () => {
     const prompt = buildSystemPrompt({ ...request, directive: 'draft_now' })
     expect(prompt).toContain('YOU ARE NOW WRITING THE FINAL ACCOUNT')
     expect(prompt).not.toContain('HOW TO ASK')
+  })
+
+  it('drafting mode carries the deferred-adjudication language rules', () => {
+    const prompt = buildSystemPrompt({ ...request, directive: 'draft_now' })
+    expect(prompt).toContain('CONVICTIONS VS. DEFERRED ADJUDICATION')
+    expect(prompt).toContain('was NOT a conviction')
+  })
+
+  it('a standing account is injected as the revision substrate, with the L3 guard', () => {
+    const withAccount = buildSystemPrompt({
+      ...request,
+      context: { ...request.context, currentAccount: 'I ran. I paid my fines.' },
+    })
+    expect(withAccount).toContain('THE CURRENT ACCOUNT')
+    expect(withAccount).toContain('I ran. I paid my fines.')
+    // tone requests re-weight THEIR words; missing material is asked for, never invented
+    expect(withAccount).toContain('ask them for it in "followUp"')
+    expect(buildSystemPrompt(request)).not.toContain('THE CURRENT ACCOUNT')
   })
 })

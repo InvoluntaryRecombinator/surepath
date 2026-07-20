@@ -61,7 +61,7 @@ export type ConversationEvent =
   | { type: 'set-affirmed'; value: boolean }
   | { type: 'commit' }
 
-export function initialConversation(existingAccount = ''): ConversationState {
+export function initialConversation(existingAccount = '', affirmed = false): ConversationState {
   const has = existingAccount.trim().length > 0
   return {
     status: has ? 'drafted' : 'empty',
@@ -75,7 +75,10 @@ export function initialConversation(existingAccount = ''): ConversationState {
     messages: [],
     account: existingAccount,
     accountSource: has ? 'manual' : null,
-    affirmed: false,
+    // A stored affirmation survives merely REOPENING the account — re-reading is owed
+    // after an edit (any change still resets it), not after peeking. Without this,
+    // opening a confirmed account silently un-confirmed it in the store.
+    affirmed: has && affirmed,
     pendingFollowUp: null,
     pendingNudge: null,
   }
@@ -101,8 +104,13 @@ function ownershipSettled(state: ConversationState, ownership: Ownership): boole
 }
 
 /** A volunteered draft lands only when the stages gate is satisfied AND ownership is
- *  settled — a deflecting account gets its one check BEFORE the draft, never after. */
+ *  settled — a deflecting account gets its one check BEFORE the draft, never after.
+ *  EXCEPT when an account already exists: then a volunteered draft is a REVISION of a
+ *  standing account (on a return visit the stages read empty — the transcript is gone —
+ *  and gating would make every change request silently vanish). The replace-confirm
+ *  still protects hand-edited text from being overwritten. */
 export function draftAllowedInConverse(state: ConversationState, turn: AgentTurn): boolean {
+  if (state.account.trim().length > 0) return true
   return stagesSatisfyGate(turn.stages, state.skippedStages) && ownershipSettled(state, turn.ownership)
 }
 

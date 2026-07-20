@@ -30,11 +30,15 @@ export type NarrativeContext = {
     disposition: DraftCharge['disposition']
   }[]
   rawAnswers: RawAnswers
+  /** The account as it stands — the revision substrate on a return visit, when the
+   *  transcript (session-only, §2) is gone. Empty string until a draft exists. */
+  currentAccount: string
 }
 
 export function buildNarrativeContext(
   incident: DraftIncident,
   rawAnswers: RawAnswers = incident.narrative.rawAnswers,
+  currentAccount: string = incident.narrative.draft,
 ): NarrativeContext {
   return {
     incidentId: incident.id,
@@ -49,5 +53,6 @@ export function buildNarrativeContext(
       disposition: c.disposition,
     })),
     rawAnswers: { ...rawAnswers },
+    currentAccount,
   }
 }

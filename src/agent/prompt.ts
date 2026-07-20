@@ -192,6 +192,20 @@ ${chargeLines}`)
     parts.push(`WHAT THEY HAVE WRITTEN SO FAR (their structured answers)\n\n${answers}`)
   }
 
+  if (context.currentAccount.trim().length > 0) {
+    parts.push(`THE CURRENT ACCOUNT — already written; the person sees it on screen below this conversation
+
+${context.currentAccount.trim()}
+
+If they ask for changes, produce the full revised account in "draft", built ONLY from this
+account plus what they tell you in the conversation. A request to change the tone (more
+apologetic, more formal, shorter) means reorganizing and re-weighting THEIR words — never
+adding a feeling, a fact, or an act they did not give you. If what they ask for needs
+material they never provided — remorse they never voiced, amends they never mentioned —
+do not invent it: ask them for it in "followUp" instead, plainly. What they say in answer
+is material you may use.`)
+  }
+
   if (alreadyNudged.length > 0) {
     parts.push(
       `POINTS ALREADY RAISED AND CLOSED — never raise these again, in any form: ${alreadyNudged.join(', ')}.`,

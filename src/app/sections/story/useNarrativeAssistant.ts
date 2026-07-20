@@ -30,8 +30,8 @@ export function useNarrativeAssistant(incident: DraftIncident) {
   const { dispatch: storeDispatch, config } = useAppStore()
   const [state, dispatch] = useReducer(
     reduceConversation,
-    incident.narrative.draft,
-    initialConversation,
+    incident.narrative,
+    (n) => initialConversation(n.draft, n.affirmed),
   )
   const [network, setNetwork] = useState<NetworkPhase>('idle')
   const [pendingReplacement, setPendingReplacement] = useState<{
@@ -77,7 +77,9 @@ export function useNarrativeAssistant(incident: DraftIncident) {
         for (;;) {
         const directive = nextDirective(afterState, { writeItNow })
         const request: AgentRequest = {
-          context: buildNarrativeContext(incident),
+          // currentAccount rides from the MACHINE, not the store — the store sync is an
+          // effect and can lag a revision landed earlier in this same loop.
+          context: buildNarrativeContext(incident, incident.narrative.rawAnswers, afterState.account),
           messages: afterState.messages,
           directive,
           alreadyNudged: afterState.nudgedFactors,

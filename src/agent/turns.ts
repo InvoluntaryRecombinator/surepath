@@ -98,6 +98,10 @@ export const AgentRequestSchema = z.object({
       whatChanged: z.string(),
       madeItRight: z.string(),
     }),
+    /** The account as it stands, when one exists. THE revision substrate: the transcript
+     *  is session-only (deliberate — AGENT_SPEC §2), so on a return visit this is the only
+     *  material a change request has. Narrative text, no identifiers — D6-clean. */
+    currentAccount: z.string(),
   }),
   messages: z.array(
     z.object({

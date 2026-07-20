@@ -63,6 +63,7 @@ describe('AgentRequest — code owns directive and the skip list', () => {
       dateCrimeCommitted: '03/14/2019', dateOfConviction: '11/02/2019',
       charges: [{ exactOffense: 'Evading Arrest', sentence: '2 years, suspended', disposition: 'conviction' }],
       rawAnswers: { facts: '', why: '', whatChanged: '', madeItRight: '' },
+      currentAccount: '',
     },
     messages: [],
     alreadyNudged: [],

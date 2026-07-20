@@ -265,8 +265,8 @@ export function StoryWorkbench({
           {a.pendingReplacement && (
             <div className="mt-4 rounded-[8px] border border-line bg-ground px-4 py-3.5">
               <p className="text-[13.5px] leading-relaxed text-ink/85">
-                The assistant wrote a new draft, but you've edited this account by hand.
-                Replace your version?
+                Here's a revised account. Replace the current version? Your current text is
+                kept until you choose.
               </p>
               <div className="mt-2.5 flex gap-2">
                 <Button variant="secondary" onClick={a.acceptReplacement}>

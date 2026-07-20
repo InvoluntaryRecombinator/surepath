@@ -56,6 +56,27 @@ describe('the manual path is first-class', () => {
     expect(s.turnCount).toBe(0)
   })
 
+  it('a stored affirmation survives reopening; any edit still resets it', () => {
+    const reopened = initialConversation('already written', true)
+    expect(reopened.affirmed).toBe(true)
+    const edited = reduceConversation(reopened, { type: 'user-wrote-account', text: 'changed' })
+    expect(edited.affirmed).toBe(false)
+    // affirmed never rides in without an account to affirm
+    expect(initialConversation('', true).affirmed).toBe(false)
+  })
+
+  it('a volunteered draft is a REVISION when an account exists — the interview gates do not apply', () => {
+    // Return visit: transcript gone, stages read empty, ownership unassessed. A change
+    // request must still land, or every revision silently vanishes.
+    const s = run(
+      initialConversation('I ran when I should have stopped. I paid my fines.', true),
+      { type: 'user-sent', text: 'can you make it shorter' },
+      model(turn({ ownership: 'deflecting', followUp: null, draft: 'I ran. I paid my fines.' })),
+    )
+    expect(s.account).toBe('I ran. I paid my fines.')
+    expect(s.affirmed).toBe(false) // a revision is a change — re-read before re-affirming
+  })
+
   it('an existing account resumes as drafted, not empty', () => {
     expect(initialConversation('already written').status).toBe('drafted')
   })

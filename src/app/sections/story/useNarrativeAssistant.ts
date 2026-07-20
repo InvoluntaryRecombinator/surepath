@@ -1,14 +1,13 @@
 /**
- * The orchestrator: machine ↔ proxy ↔ store. Everything bounded lives in the pure modules
- * (machine, turns, prompt guards) — this hook only wires them together and owns the
- * network edge.
+ * The orchestrator: machine ↔ proxy ↔ store. Everything bounded lives in the pure modules —
+ * this hook only wires them together and owns the network edge.
  *
- * Persistence split (AGENT_SPEC §2, decided): draft / assumptions / affirmed / rawAnswers
- * sync to the store (and so to on-device storage). The conversation transcript lives and
- * dies in this hook's state — it never touches disk.
+ * Persistence split (AGENT_SPEC §2, decided): draft / affirmed / rawAnswers sync to the
+ * store (on-device). The transcript and the stages live and die in memory — the stages are
+ * the model's read of a conversation that never touches disk.
  *
- * Failure is a feature here: any non-200, timeout, or unparsable body sets 'unavailable'
- * and the manual path keeps working untouched. A failed call never consumes a turn.
+ * Failure is a feature: any non-200, timeout, or unparsable body sets 'unavailable' and
+ * the manual path keeps working untouched. A failed call never consumes a turn.
  */
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { buildNarrativeContext } from '../../../agent/context'
@@ -34,11 +33,14 @@ export function useNarrativeAssistant(incident: DraftIncident) {
     initialConversation,
   )
   const [network, setNetwork] = useState<NetworkPhase>('idle')
-  const [pendingReplacement, setPendingReplacement] = useState<AgentTurn | null>(null)
+  const [pendingReplacement, setPendingReplacement] = useState<{
+    turn: AgentTurn
+    directive: 'converse' | 'draft_now'
+  } | null>(null)
   const inFlight = useRef(false)
 
-  // ── one-way sync: machine → store (draft, assumptions, affirmation). Never messages. ──
-  const { account, assumptions, affirmed } = state
+  // ── one-way sync: machine → store (draft + affirmation). Never messages, never stages. ──
+  const { account, affirmed } = state
   useEffect(() => {
     storeDispatch({
       type: 'update-incident',
@@ -47,13 +49,12 @@ export function useNarrativeAssistant(incident: DraftIncident) {
         narrative: {
           rawAnswers: incident.narrative.rawAnswers,
           draft: account,
-          assumptions,
           affirmed,
         },
       },
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- rawAnswers flow store→context directly
-  }, [account, assumptions, affirmed, incident.id, storeDispatch])
+  }, [account, affirmed, incident.id, storeDispatch])
 
   const updateRawAnswers = (patch: Partial<RawAnswers>) =>
     storeDispatch({
@@ -70,11 +71,13 @@ export function useNarrativeAssistant(incident: DraftIncident) {
       inFlight.current = true
       setNetwork('working')
       try {
+        const directive = nextDirective(afterState, { writeItNow })
         const request: AgentRequest = {
           context: buildNarrativeContext(incident),
           messages: afterState.messages,
-          directive: nextDirective(afterState, { writeItNow }),
+          directive,
           alreadyNudged: afterState.nudgedFactors,
+          skippedStages: afterState.skippedStages,
         }
         const res = await fetch('/api/narrative', {
           method: 'POST',
@@ -93,9 +96,9 @@ export function useNarrativeAssistant(incident: DraftIncident) {
         }
         if (needsReplacementConfirm(afterState, turn)) {
           // Their edit is not overwritten without an explicit yes (§5, decided).
-          setPendingReplacement(turn)
+          setPendingReplacement({ turn, directive })
         } else {
-          dispatch({ type: 'model-turn', turn })
+          dispatch({ type: 'model-turn', turn, directive })
         }
         setNetwork('idle')
       } catch {
@@ -113,27 +116,39 @@ export function useNarrativeAssistant(incident: DraftIncident) {
     void callProxy(after)
   }
 
+  const skip = () => {
+    const after = reduceConversation(state, { type: 'user-skipped' })
+    dispatch({ type: 'user-skipped' })
+    void callProxy(after)
+  }
+
   const writeItNow = () => {
     void callProxy(state, true)
   }
 
   const acceptReplacement = () => {
-    if (pendingReplacement) dispatch({ type: 'model-turn', turn: pendingReplacement })
+    if (pendingReplacement) dispatch({ type: 'model-turn', ...pendingReplacement })
     setPendingReplacement(null)
   }
 
   const declineReplacement = () => {
     // The reply still lands; only the overwrite is refused.
-    if (pendingReplacement) dispatch({ type: 'model-turn', turn: { ...pendingReplacement, draft: null } })
+    if (pendingReplacement)
+      dispatch({
+        type: 'model-turn',
+        turn: { ...pendingReplacement.turn, draft: null },
+        directive: pendingReplacement.directive,
+      })
     setPendingReplacement(null)
   }
 
   return {
     state,
     network,
-    pendingReplacement,
+    pendingReplacement: pendingReplacement?.turn ?? null,
     canCommit: canCommit(state),
     send,
+    skip,
     writeItNow,
     retry: () => setNetwork('idle'),
     acceptReplacement,

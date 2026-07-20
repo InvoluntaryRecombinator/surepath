@@ -14,6 +14,7 @@
 import { Button } from '../../ui/Button'
 import { ChoiceField, TextField } from '../../ui/Field'
 import { FaqPanel } from '../../ui/FaqPanel'
+import { formatLongDate } from '../lib/format'
 import type { DraftCharge, DraftIncident } from '../draft'
 import { useAppStore } from '../storeContext'
 
@@ -98,7 +99,7 @@ function IncidentCard({ incident, ordinal }: { incident: DraftIncident; ordinal:
   const patch = (p: Partial<DraftIncident>) =>
     dispatch({ type: 'update-incident', id: incident.id, patch: p })
 
-  const summary = [incident.county && `${incident.county} County`, incident.dateOfConviction]
+  const summary = [incident.county && `${incident.county} County`, formatLongDate(incident.dateOfConviction)]
     .filter(Boolean)
     .join(' · ')
 

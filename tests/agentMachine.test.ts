@@ -1,72 +1,131 @@
 /**
- * The machine bounds the model (AGENT_SPEC §5). These tests are the code-enforced rules,
- * one by one: the cap, the once-ever nudge, the manual path, the hint-never-gate stance,
- * the affirmation gate, and the no-rewriting-behind-them guarantee.
+ * The machine bounds the model (AGENT_SPEC §5) — one test per code-enforced rule: the
+ * converse draft gate, the skip waiver, the wholesale stages, the cap, the once-ever
+ * nudge, the manual path, hints-never-gate, the affirmation, and no-rewriting-behind-them.
  */
 import { describe, expect, it } from 'vitest'
 import {
   MAX_FOLLOWUP_TURNS,
   canCommit,
+  draftAllowedInConverse,
   initialConversation,
+  needsReplacementConfirm,
   nextDirective,
   reduceConversation,
   type ConversationState,
 } from '../src/agent/machine'
-import type { AgentTurn } from '../src/agent/turns'
+import type { AgentTurn, Stages } from '../src/agent/turns'
+
+const stages = (over: Partial<Stages> = {}): Stages => ({
+  what: 'empty',
+  why: 'empty',
+  changed: 'empty',
+  right: 'empty',
+  ...over,
+})
 
 const turn = (over: Partial<AgentTurn> = {}): AgentTurn => ({
   reply: 'Okay.',
-  coverage: { facts: true, why: false, whatChanged: false, madeItRight: false },
+  stages: stages(),
   readyToDraft: false,
-  followUp: 'What happened next?',
+  followUp: { question: 'What happened next?', reason: null, stage: 'what' },
   nudge: null,
-  assumptions: [],
   draft: null,
   ...over,
 })
 
-const run = (state: ConversationState, ...events: Parameters<typeof reduceConversation>[1][]) =>
-  events.reduce(reduceConversation, state)
+type Event = Parameters<typeof reduceConversation>[1]
+const model = (t: AgentTurn, directive: 'converse' | 'draft_now' = 'converse'): Event => ({
+  type: 'model-turn',
+  turn: t,
+  directive,
+})
+const run = (state: ConversationState, ...events: Event[]) => events.reduce(reduceConversation, state)
 
 describe('the manual path is first-class', () => {
   it('EMPTY → write → affirm → COMMITTED, zero model involvement', () => {
-    let s = initialConversation()
-    expect(s.status).toBe('empty')
-    s = run(
-      s,
-      { type: 'user-wrote-account', text: 'I ran when I should have stopped. I finished the program in 2020.' },
+    const s = run(
+      initialConversation(),
+      { type: 'user-wrote-account', text: 'I ran when I should have stopped.' },
       { type: 'set-affirmed', value: true },
       { type: 'commit' },
     )
     expect(s.status).toBe('committed')
     expect(s.turnCount).toBe(0)
-    expect(s.messages).toEqual([])
   })
 
-  it('a story-lite account resumes as drafted, not empty', () => {
+  it('an existing account resumes as drafted, not empty', () => {
     expect(initialConversation('already written').status).toBe('drafted')
   })
 })
 
-describe('the cap is a counter, not an instruction', () => {
+describe('the converse draft gate — what + why covered, or skipped', () => {
+  it('strips a volunteered draft while what/why are thin', () => {
+    const s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'stuff happened' },
+      model(turn({ stages: stages({ what: 'thin', why: 'empty' }), draft: 'premature account' })),
+    )
+    expect(s.account).toBe('') // the gate held
+    expect(s.status).toBe('gathering')
+    expect(s.stages.what).toBe('thin') // but the stages still landed, wholesale
+  })
+
+  it('accepts a volunteered draft once what and why are covered', () => {
+    const s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'the full story' },
+      model(turn({ stages: stages({ what: 'covered', why: 'covered' }), draft: 'the account' })),
+    )
+    expect(s.status).toBe('drafted')
+    expect(s.account).toBe('the account')
+    expect(s.accountSource).toBe('model')
+  })
+
+  it('a skip waives the gate for exactly that stage — their no is final', () => {
+    let s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'x' },
+      model(turn({ followUp: { question: 'Why did it happen?', reason: null, stage: 'why' } })),
+    )
+    s = reduceConversation(s, { type: 'user-skipped' })
+    expect(s.skippedStages).toEqual(['why'])
+    expect(s.messages.at(-1)).toEqual({ role: 'user', content: "I'd rather skip that." })
+    expect(draftAllowedInConverse(s, stages({ what: 'covered', why: 'empty' }))).toBe(true)
+    expect(draftAllowedInConverse(s, stages({ what: 'thin', why: 'empty' }))).toBe(false)
+  })
+
+  it('a skipped stage is never asked about again', () => {
+    const s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'x' },
+      model(turn({ followUp: { question: 'Why?', reason: null, stage: 'why' } })),
+      { type: 'user-skipped' },
+      model(turn({ followUp: { question: 'But really, why?', reason: null, stage: 'why' } })),
+    )
+    expect(s.pendingFollowUp).toBeNull() // the re-ask was suppressed before render
+  })
+
+  it('draft_now always accepts, gate or no gate', () => {
+    const s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'just write it' },
+      model(turn({ stages: stages(), draft: 'thin but honest account' }), 'draft_now'),
+    )
+    expect(s.status).toBe('drafted')
+    expect(s.account).toBe('thin but honest account')
+  })
+})
+
+describe('the cap is a backstop, not a hurry-up', () => {
   it(`directive flips to draft_now after ${MAX_FOLLOWUP_TURNS} model turns`, () => {
     let s = initialConversation()
     for (let i = 0; i < MAX_FOLLOWUP_TURNS; i++) {
       expect(nextDirective(s)).toBe('converse')
-      s = run(s, { type: 'user-sent', text: `answer ${i}` }, { type: 'model-turn', turn: turn() })
+      s = run(s, { type: 'user-sent', text: `answer ${i}` }, model(turn()))
     }
-    expect(s.turnCount).toBe(MAX_FOLLOWUP_TURNS)
     expect(nextDirective(s)).toBe('draft_now')
-  })
-
-  it('the follow-up question is suppressed on the capping turn', () => {
-    let s = initialConversation()
-    for (let i = 0; i < MAX_FOLLOWUP_TURNS; i++) {
-      s = run(s, { type: 'user-sent', text: 'a' }, { type: 'model-turn', turn: turn() })
-    }
-    // the third (capping) turn rendered reply but no question
-    expect(s.pendingFollowUp).toBeNull()
-    expect(s.messages.at(-1)?.content).toBe('Okay.')
+    expect(s.pendingFollowUp).toBeNull() // the capping turn's question never rendered
   })
 
   it('"Write it now" forces draft_now from turn one', () => {
@@ -74,110 +133,86 @@ describe('the cap is a counter, not an instruction', () => {
   })
 })
 
-describe('a factor is nudged once, ever', () => {
-  it('drops a repeat nudge before render, allows a different factor', () => {
-    let s = initialConversation()
-    s = run(s, { type: 'user-sent', text: 'x' }, {
-      type: 'model-turn',
-      turn: turn({ nudge: { factor: 'ownership', text: 'Worth mentioning your part.' } }),
-    })
-    expect(s.pendingNudge?.factor).toBe('ownership')
-
-    s = run(s, { type: 'user-sent', text: 'no' }, {
-      type: 'model-turn',
-      turn: turn({ nudge: { factor: 'ownership', text: 'About your part again…' } }),
-    })
-    expect(s.pendingNudge).toBeNull() // their no is final
-
-    s = run(s, { type: 'user-sent', text: 'y' }, {
-      type: 'model-turn',
-      turn: turn({ nudge: { factor: 'change', text: 'Anything changed since?' }, followUp: null }),
-    })
-    expect(s.pendingNudge?.factor).toBe('change')
-    expect(s.nudgedFactors).toEqual(['ownership', 'change'])
+describe('stages are the model’s, wholesale', () => {
+  it('replaces all four every turn — code never merges or increments', () => {
+    let s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'a' },
+      model(turn({ stages: stages({ what: 'covered', why: 'covered', changed: 'covered', right: 'covered' }) })),
+    )
+    s = run(s, { type: 'user-sent', text: 'b' },
+      model(turn({ stages: stages({ what: 'covered', why: 'thin' }) })))
+    // the model downgraded its own read; code took it as-is
+    expect(s.stages).toEqual(stages({ what: 'covered', why: 'thin' }))
   })
 })
 
-describe('drafts and the account panel', () => {
-  it('a model draft populates the account, un-affirmed, and suppresses the question', () => {
-    const s = run(
+describe('a factor is nudged once, ever', () => {
+  it('drops a repeat nudge before render, allows a different factor', () => {
+    let s = run(initialConversation(), { type: 'user-sent', text: 'x' },
+      model(turn({ nudge: { factor: 'change', text: 'Anything changed since?' } })))
+    expect(s.pendingNudge?.factor).toBe('change')
+    s = run(s, { type: 'user-sent', text: 'no' },
+      model(turn({ nudge: { factor: 'change', text: 'About change again…' } })))
+    expect(s.pendingNudge).toBeNull()
+    s = run(s, { type: 'user-sent', text: 'y' },
+      model(turn({ nudge: { factor: 'restitution', text: 'Fines paid?' }, followUp: null })))
+    expect(s.pendingNudge?.factor).toBe('restitution')
+  })
+})
+
+describe('drafts, edits, and the affirmation', () => {
+  const drafted = () =>
+    run(
       initialConversation(),
-      { type: 'user-sent', text: 'the story' },
-      { type: 'model-turn', turn: turn({ draft: 'On March 14 I…', readyToDraft: true, assumptions: ['that the program finished in 2020'] }) },
+      { type: 'user-sent', text: 'story' },
+      model(turn({ stages: stages({ what: 'covered', why: 'covered' }), draft: 'model words', followUp: null })),
     )
-    expect(s.status).toBe('drafted')
-    expect(s.account).toBe('On March 14 I…')
-    expect(s.accountSource).toBe('model')
-    expect(s.assumptions).toEqual(['that the program finished in 2020'])
+
+  it('a draft un-affirms and suppresses the question', () => {
+    const s = drafted()
     expect(s.affirmed).toBe(false)
     expect(s.pendingFollowUp).toBeNull()
   })
 
-  it('a draftless refinement turn NEVER touches the account', () => {
-    const s = run(
-      initialConversation('their edited words'),
-      { type: 'user-sent', text: 'can you tighten it?' },
-      { type: 'model-turn', turn: turn({ draft: null }) },
-    )
-    expect(s.account).toBe('their edited words')
-    expect(s.status).toBe('drafted')
+  it('a draftless refinement turn never touches the account', () => {
+    const s = run(drafted(), { type: 'user-sent', text: 'tighten it?' }, model(turn({ draft: null })))
+    expect(s.account).toBe('model words')
   })
 
-  it('a user edit wins and resets the affirmation — no rewriting behind them', () => {
-    const s = run(
-      initialConversation(),
-      { type: 'user-sent', text: 'story' },
-      { type: 'model-turn', turn: turn({ draft: 'model words' }) },
-      { type: 'set-affirmed', value: true },
-      { type: 'user-wrote-account', text: 'my words, my edit' },
-    )
-    expect(s.account).toBe('my words, my edit')
+  it('a user edit wins and resets the affirmation', () => {
+    const s = run(drafted(), { type: 'set-affirmed', value: true },
+      { type: 'user-wrote-account', text: 'my words' })
+    expect(s.account).toBe('my words')
     expect(s.accountSource).toBe('manual')
     expect(s.affirmed).toBe(false)
   })
-})
 
-describe('the affirmation is the gate (§7)', () => {
-  it('commit is refused without it, works with it, and committed is terminal', () => {
-    let s = run(initialConversation(), { type: 'user-wrote-account', text: 'done' })
+  it('commit requires the affirmation; committed is terminal', () => {
+    let s = drafted()
     expect(canCommit(s)).toBe(false)
-    s = reduceConversation(s, { type: 'commit' })
-    expect(s.status).toBe('drafted') // refused
-
     s = run(s, { type: 'set-affirmed', value: true }, { type: 'commit' })
     expect(s.status).toBe('committed')
-
-    const after = reduceConversation(s, { type: 'user-wrote-account', text: 'sneaky change' })
-    expect(after).toBe(s) // terminal for this sitting
+    expect(reduceConversation(s, { type: 'user-wrote-account', text: 'sneak' })).toBe(s)
   })
 
-  it('hints never gate: readyToDraft/coverage flags change nothing by themselves', () => {
-    const s = run(
-      initialConversation(),
-      { type: 'user-sent', text: 'x' },
-      {
-        type: 'model-turn',
-        turn: turn({ readyToDraft: true, coverage: { facts: true, why: true, whatChanged: true, madeItRight: true } }),
-      },
-    )
-    expect(s.status).toBe('gathering') // no draft, no transition — the hint alone does nothing
+  it('hints never gate: readyToDraft alone transitions nothing', () => {
+    const s = run(initialConversation(), { type: 'user-sent', text: 'x' },
+      model(turn({ readyToDraft: true })))
+    expect(s.status).toBe('gathering')
   })
 })
 
 describe('revision after a manual edit needs an explicit confirm', () => {
-  it('asks only when a model draft would overwrite manual text', async () => {
-    const { needsReplacementConfirm } = await import('../src/agent/machine')
+  it('asks only when a model draft would overwrite manual text', () => {
     const manual = run(initialConversation(), { type: 'user-wrote-account', text: 'my own words' })
     expect(needsReplacementConfirm(manual, turn({ draft: 'model rewrite' }))).toBe(true)
     expect(needsReplacementConfirm(manual, turn({ draft: null }))).toBe(false)
-    expect(needsReplacementConfirm(manual, turn({ draft: 'my own words' }))).toBe(false)
-
     const modelDrafted = run(
       initialConversation(),
       { type: 'user-sent', text: 'x' },
-      { type: 'model-turn', turn: turn({ draft: 'model words' }) },
+      model(turn({ stages: stages({ what: 'covered', why: 'covered' }), draft: 'model words' })),
     )
-    // model replacing its own untouched draft needs no ceremony
     expect(needsReplacementConfirm(modelDrafted, turn({ draft: 'better model words' }))).toBe(false)
   })
 })

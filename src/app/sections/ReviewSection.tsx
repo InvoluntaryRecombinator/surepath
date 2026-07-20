@@ -16,6 +16,7 @@ import { FieldGroup } from '../../ui/FieldGroup'
 import { generateAllPackets, type GeneratedPacket } from '../../documents/assemblePacket'
 import { draftToCase, IncompleteDraftError } from '../convertDraft'
 import { draftCounts } from '../draft'
+import { formatLongDate } from '../lib/format'
 import { useAppStore } from '../storeContext'
 
 type GenState =
@@ -112,8 +113,8 @@ export function ReviewSection() {
         {draft.incidents.map((incident, i) => (
           <div key={incident.id} className="border-b border-line/60 pb-4 last:border-b-0">
             <p className="text-[12.5px] font-semibold uppercase tracking-[0.05em] text-muted">
-              Incident {i + 1} · {incident.dateOfConviction} · {incident.county} County ·{' '}
-              {incident.court}
+              Incident {i + 1} · {formatLongDate(incident.dateOfConviction)} · {incident.county}{' '}
+              County · {incident.court}
             </p>
             <ul className="mt-2 flex flex-col gap-1">
               {incident.charges.map((c) => (

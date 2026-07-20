@@ -15,23 +15,42 @@ import { z } from 'zod'
 export const NUDGE_FACTORS = ['ownership', 'understanding', 'change', 'restitution'] as const
 export type NudgeFactor = (typeof NUDGE_FACTORS)[number]
 
-/** Coverage keys MATCH rawAnswers keys exactly (AGENT_SPEC §4) — one vocabulary, everywhere. */
-export const CoverageSchema = z.object({
-  facts: z.boolean(),
-  why: z.boolean(),
-  whatChanged: z.boolean(),
-  madeItRight: z.boolean(),
+export const STAGE_KEYS = ['what', 'why', 'changed', 'right'] as const
+export type StageKey = (typeof STAGE_KEYS)[number]
+
+/**
+ * 'thin' is the state that matters: an answer that exists but says nothing usable —
+ * "I'm in a program" is thin until it says which program, how long, whether it finished.
+ * The model RE-REPORTS all four from the full conversation every turn; code renders the
+ * strip and gates the draft, but never increments a stage itself.
+ */
+export const StageLevelSchema = z.enum(['empty', 'thin', 'covered'])
+export type StageLevel = z.infer<typeof StageLevelSchema>
+
+export const StagesSchema = z.object({
+  what: StageLevelSchema,
+  why: StageLevelSchema,
+  changed: StageLevelSchema,
+  right: StageLevelSchema,
 })
+export type Stages = z.infer<typeof StagesSchema>
 
 export const AgentTurnSchema = z.object({
-  /** Shown in region B. Conversational, short. NEVER contains the question — questions live
-   *  only in followUp, so code can suppress them after the turn cap without prose surgery. */
+  /** Conversational, short. NEVER contains the question or the draft. */
   reply: z.string(),
-  coverage: CoverageSchema,
+  stages: StagesSchema,
   /** "I am drafting now." A HINT — nothing gates on it; it may only accelerate. (§5) */
   readyToDraft: z.boolean(),
-  /** ONE question, or null. */
-  followUp: z.string().nullable(),
+  /** ONE question at a time: bold question, plain reason underneath (reason optional —
+   *  forcing one would make it nag). `stage` tags what the question probes, so a skip can
+   *  waive exactly that stage; the UI never displays it. */
+  followUp: z
+    .object({
+      question: z.string(),
+      reason: z.string().nullable(),
+      stage: z.enum(STAGE_KEYS).nullable(),
+    })
+    .nullable(),
   /** At most one, and only for a factor not yet nudged — enforced by the machine, not here. */
   nudge: z
     .object({
@@ -39,10 +58,9 @@ export const AgentTurnSchema = z.object({
       text: z.string(),
     })
     .nullable(),
-  /** Model self-report: anything it filled in that the user didn't say directly.
-   *  Transparency, NOT verification — the UI must never present it as a check. (§7) */
-  assumptions: z.array(z.string()),
-  /** Populated when the model judges it has enough, or on directive:'draft_now'. */
+  /** Populated when the model judges it has enough, or on directive:'draft_now'.
+   *  NOTE (§7, deliberate): there is no assumptions self-report. Paraphrase is the job —
+   *  announcing it was theater that eroded the layer that matters, the affirmation. */
   draft: z.string().nullable(),
 })
 
@@ -79,6 +97,8 @@ export const AgentRequestSchema = z.object({
   /** CODE sets this, not the model. 'draft_now' is sent at the turn cap or on "Write it now". */
   directive: z.enum(['converse', 'draft_now']),
   alreadyNudged: z.array(z.enum(NUDGE_FACTORS)),
+  /** Stages the user explicitly skipped — their no is final; never re-asked, gate waived. */
+  skippedStages: z.array(z.enum(STAGE_KEYS)),
 })
 
 export type AgentRequest = z.infer<typeof AgentRequestSchema>
@@ -98,7 +118,12 @@ const BANNED_OUTCOME_LANGUAGE =
 
 /** Every user-visible string on a turn that must pass the language check. */
 function visibleStrings(turn: AgentTurn): string[] {
-  return [turn.reply, turn.followUp ?? '', turn.nudge?.text ?? ''].filter(Boolean)
+  return [
+    turn.reply,
+    turn.followUp?.question ?? '',
+    turn.followUp?.reason ?? '',
+    turn.nudge?.text ?? '',
+  ].filter(Boolean)
 }
 
 /**

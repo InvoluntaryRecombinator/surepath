@@ -30,6 +30,25 @@ export function formatZip(raw: string): string {
   return `${digits.slice(0, 5)}-${digits.slice(5)}`
 }
 
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+
+/**
+ * Display formatting for prose surfaces: "05/01/1992" → "May 1, 1992".
+ * Form values and PDFs keep MM/DD/YYYY — the official forms demand that shape; only what
+ * a human reads in the UI gets the long form. Anything unparsable passes through untouched.
+ */
+export function formatLongDate(mmddyyyy: string): string {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(mmddyyyy.trim())
+  if (!m) return mmddyyyy
+  const month = Number(m[1])
+  const day = Number(m[2])
+  if (month < 1 || month > 12 || day < 1 || day > 31) return mmddyyyy
+  return `${MONTHS[month - 1]} ${day}, ${m[3]}`
+}
+
 export const US_STATES = [
   'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
   'Delaware', 'District of Columbia', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois',

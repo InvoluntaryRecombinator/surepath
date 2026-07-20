@@ -53,7 +53,6 @@ function handEnteredMarcus(): DraftCase {
       narrative: {
         rawAnswers: { facts: '', why: '', whatChanged: '', madeItRight: '' },
         draft: i.narrative.draft,
-        assumptions: [],
         affirmed: true, // the §7 affirmation — a hand-entered case is confirmed before generate
       },
       charges: i.charges.map((c) => ({

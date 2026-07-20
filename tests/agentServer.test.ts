@@ -24,15 +24,15 @@ const request: AgentRequest = {
   messages: [{ role: 'user', content: 'I ran when I was pulled over.' }],
   directive: 'converse',
   alreadyNudged: ['ownership'],
+  skippedStages: ['right'],
 }
 
 const cleanTurn: AgentTurn = {
   reply: 'Understood.',
-  coverage: { facts: true, why: false, whatChanged: false, madeItRight: false },
+  stages: { what: 'thin', why: 'empty', changed: 'empty', right: 'empty' },
   readyToDraft: false,
-  followUp: 'What happened after you stopped?',
+  followUp: { question: 'What happened after you stopped?', reason: null, stage: 'what' },
   nudge: null,
-  assumptions: [],
   draft: null,
 }
 
@@ -66,11 +66,13 @@ describe('the prompt carries the incident, the closed nudges, and the directive'
     expect(prompt).toContain('2 CHARGES')
     expect(prompt).toContain('never raise these again')
     expect(prompt).toContain('ownership')
-    expect(prompt).not.toContain('DRAFT NOW')
+    expect(prompt).toContain('EXPLICITLY SKIPPED')
+    expect(prompt).toContain('right')
+    expect(prompt).not.toContain('DIRECTIVE: DRAFT NOW')
   })
 
   it('draft_now adds the must-draft directive', () => {
-    expect(buildSystemPrompt({ ...request, directive: 'draft_now' })).toContain('DRAFT NOW')
+    expect(buildSystemPrompt({ ...request, directive: 'draft_now' })).toContain('DIRECTIVE: DRAFT NOW')
   })
 })
 

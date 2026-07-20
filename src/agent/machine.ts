@@ -2,43 +2,47 @@
  * The conversation state machine (AGENT_SPEC §5). Pure — a reducer over events, no I/O,
  * no timers, no model. The prompt shapes behavior; THIS bounds it:
  *
- *   - MAX_FOLLOWUP_TURNS is a counter, not an instruction. At the cap the next directive
- *     is 'draft_now' and follow-up questions stop rendering. The model cannot loop.
- *   - A factor is nudged at most once, ever. A repeat nudge is dropped before render.
- *   - The MANUAL PATH is first-class: EMPTY → user writes in the account panel → Save is a
- *     complete, valid path with zero model involvement (and, for free, the API-down mode).
- *   - coverage/readyToDraft are hints. Nothing in here gates on them.
- *   - Save requires the affirmation (§7) — the one layer a clever prompt cannot game.
- *
- * The A6 language check on model strings runs in the ORCHESTRATOR (retry-then-drop),
- * before a turn is dispatched here — by the time an event reaches this reducer it is
- * renderable.
+ *   - MAX_FOLLOWUP_TURNS (14) is a runaway-loop backstop, NOT a hurry-up: nobody sane hits
+ *     it, and the prompt pushes resolution long before. At the cap the next directive is
+ *     'draft_now' and questions stop rendering.
+ *   - THE CONVERSE DRAFT GATE: a volunteered draft is accepted only when `what` and `why`
+ *     are covered — or explicitly skipped. A skip waives the gate for that stage: their no
+ *     is final, and holding a gate after an explicit skip is interviewing someone against
+ *     their will. draft_now (cap or "Write it now") always accepts.
+ *   - `stages` come from the model wholesale each turn — code renders and gates, it NEVER
+ *     increments a stage itself.
+ *   - A factor is nudged at most once, ever. The MANUAL PATH is first-class. Hints never
+ *     gate. Save requires the §7 affirmation. Failures don't consume turns.
  */
-import type { AgentTurn, NudgeFactor } from './turns'
+import type { AgentTurn, NudgeFactor, StageKey, Stages } from './turns'
 
-export const MAX_FOLLOWUP_TURNS = 3
+export const MAX_FOLLOWUP_TURNS = 14
 
 export type ConversationStatus = 'empty' | 'gathering' | 'drafted' | 'committed'
 
 export type Exchange = { role: 'user' | 'assistant'; content: string }
+
+export const emptyStages: Stages = { what: 'empty', why: 'empty', changed: 'empty', right: 'empty' }
 
 export type ConversationState = {
   status: ConversationStatus
   /** Completed model turns. Failures don't count — a network error must not eat a turn. */
   turnCount: number
   nudgedFactors: NudgeFactor[]
+  /** Stages the user explicitly skipped. Never re-asked; the draft gate is waived for them. */
+  skippedStages: StageKey[]
+  /** The model's read of the whole conversation, re-reported every turn. Session-only. */
+  stages: Stages
   /** The wire history — exactly what the user saw, so the model's memory matches theirs. */
   messages: Exchange[]
-  /** Region C. The only thing that ever reaches the packet, and only on commit. */
+  /** The account. The only thing that ever reaches the packet, and only on commit. */
   account: string
   /** Who last touched the account. A user edit always wins — no rewriting behind them. */
   accountSource: 'manual' | 'model' | null
-  /** Model self-report, shown as "worth checking". Transparency, not verification. (§7) */
-  assumptions: string[]
   /** The §7 affirmation. Reset by every change to the account. */
   affirmed: boolean
-  /** The one question currently posed to the user, if any. */
-  pendingFollowUp: string | null
+  /** The one question currently posed, with its optional reason. */
+  pendingFollowUp: { question: string; reason: string | null; stage: StageKey | null } | null
   /** The nudge to render this turn, already deduplicated. */
   pendingNudge: { factor: NudgeFactor; text: string } | null
 }
@@ -46,7 +50,8 @@ export type ConversationState = {
 export type ConversationEvent =
   | { type: 'user-wrote-account'; text: string }
   | { type: 'user-sent'; text: string }
-  | { type: 'model-turn'; turn: AgentTurn }
+  | { type: 'user-skipped' }
+  | { type: 'model-turn'; turn: AgentTurn; directive: 'converse' | 'draft_now' }
   | { type: 'set-affirmed'; value: boolean }
   | { type: 'commit' }
 
@@ -56,10 +61,11 @@ export function initialConversation(existingAccount = ''): ConversationState {
     status: has ? 'drafted' : 'empty',
     turnCount: 0,
     nudgedFactors: [],
+    skippedStages: [],
+    stages: emptyStages,
     messages: [],
     account: existingAccount,
     accountSource: has ? 'manual' : null,
-    assumptions: [],
     affirmed: false,
     pendingFollowUp: null,
     pendingNudge: null,
@@ -74,9 +80,17 @@ export function nextDirective(
   return opts.writeItNow || state.turnCount >= MAX_FOLLOWUP_TURNS ? 'draft_now' : 'converse'
 }
 
+/** The converse gate: what + why covered, unless explicitly skipped. */
+export function draftAllowedInConverse(state: ConversationState, stages: Stages): boolean {
+  const ok = (k: 'what' | 'why') => stages[k] === 'covered' || state.skippedStages.includes(k)
+  return ok('what') && ok('why')
+}
+
 export function canCommit(state: ConversationState): boolean {
   return state.status === 'drafted' && state.account.trim().length > 0 && state.affirmed
 }
+
+const SKIP_TEXT = "I'd rather skip that."
 
 export function reduceConversation(
   state: ConversationState,
@@ -108,6 +122,22 @@ export function reduceConversation(
       }
     }
 
+    case 'user-skipped': {
+      // Their no is final: waive the gate for the probed stage and never re-ask.
+      const stage = state.pendingFollowUp?.stage ?? null
+      return {
+        ...state,
+        skippedStages:
+          stage && !state.skippedStages.includes(stage)
+            ? [...state.skippedStages, stage]
+            : state.skippedStages,
+        status: state.status === 'drafted' ? 'drafted' : 'gathering',
+        messages: [...state.messages, { role: 'user', content: SKIP_TEXT }],
+        pendingFollowUp: null,
+        pendingNudge: null,
+      }
+    }
+
     case 'model-turn': {
       const turn = event.turn
       const turnCount = state.turnCount + 1
@@ -119,15 +149,28 @@ export function reduceConversation(
         ? [...state.nudgedFactors, turn.nudge!.factor]
         : state.nudgedFactors
 
-      // Follow-up: suppressed at the cap, and suppressed when a draft landed — the model
-      // hands off conversationally, it does not keep interviewing past its welcome.
-      const drafted = turn.draft !== null && turn.draft.trim().length > 0
-      const pendingFollowUp =
-        !drafted && turnCount < MAX_FOLLOWUP_TURNS ? turn.followUp : null
+      // The converse gate: a volunteered draft is stripped unless what+why are covered
+      // (or skipped). draft_now always accepts — it exists to force.
+      const hasDraft = turn.draft !== null && turn.draft.trim().length > 0
+      const drafted =
+        hasDraft &&
+        (event.directive === 'draft_now' || draftAllowedInConverse(state, turn.stages))
 
-      // The wire history records exactly what rendered, so the model's memory of the
-      // conversation matches the user's.
-      const shown = [turn.reply, pendingNudge?.text, pendingFollowUp]
+      // A question already skipped never renders again; questions stop at the cap and on
+      // a landed draft.
+      const followUpAllowed =
+        !drafted &&
+        turnCount < MAX_FOLLOWUP_TURNS &&
+        turn.followUp !== null &&
+        !(turn.followUp.stage !== null && state.skippedStages.includes(turn.followUp.stage))
+      const pendingFollowUp = followUpAllowed ? turn.followUp : null
+
+      // The wire history records exactly what rendered.
+      const shown = [
+        turn.reply,
+        pendingNudge?.text,
+        pendingFollowUp ? [pendingFollowUp.question, pendingFollowUp.reason].filter(Boolean).join('\n') : null,
+      ]
         .filter((s): s is string => Boolean(s && s.trim()))
         .join('\n\n')
 
@@ -137,14 +180,12 @@ export function reduceConversation(
         nudgedFactors,
         pendingNudge,
         pendingFollowUp,
+        stages: turn.stages, // wholesale, from the model. Code never increments.
         messages: shown ? [...state.messages, { role: 'assistant', content: shown }] : state.messages,
-        // A draft populates the account and un-affirms; a draftless turn never touches the
-        // account — refining conversation cannot erase what's already written.
         ...(drafted
           ? {
               account: turn.draft!,
               accountSource: 'model' as const,
-              assumptions: turn.assumptions,
               affirmed: false,
               status: 'drafted' as const,
             }

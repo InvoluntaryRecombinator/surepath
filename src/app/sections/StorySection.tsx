@@ -7,12 +7,13 @@
  */
 import { useState } from 'react'
 import { CheckSmall } from '../../ui/icons'
+import { formatLongDate } from '../lib/format'
 import type { DraftIncident } from '../draft'
 import { useAppStore } from '../storeContext'
 import { StoryWorkbench } from './story/StoryWorkbench'
 
 function incidentSummary(i: DraftIncident) {
-  return [i.dateOfConviction, i.county && `${i.county} County`, i.court]
+  return [formatLongDate(i.dateOfConviction), i.county && `${i.county} County`, i.court]
     .filter(Boolean)
     .join(' · ')
 }

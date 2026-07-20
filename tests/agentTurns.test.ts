@@ -1,7 +1,7 @@
 /**
  * The turn contract fails closed, and the A6 check is mechanical. Malformed fixtures here
- * are the shapes a drifting model actually produces: missing keys, wrong enums, prose
- * instead of JSON, nulls where objects belong.
+ * are the shapes a drifting model actually produces: missing keys, wrong enums, the old
+ * vocabulary, prose instead of JSON.
  */
 import { describe, expect, it } from 'vitest'
 import {
@@ -13,11 +13,14 @@ import {
 
 const validTurn: AgentTurn = {
   reply: 'Got it — that helps.',
-  coverage: { facts: true, why: false, whatChanged: false, madeItRight: false },
+  stages: { what: 'covered', why: 'thin', changed: 'empty', right: 'empty' },
   readyToDraft: false,
-  followUp: 'What happened after the officer stopped you?',
+  followUp: {
+    question: 'What was going on for you that night?',
+    reason: "Why it happened is the part boards read closest — 'it just happened' doesn't say much.",
+    stage: 'why',
+  },
   nudge: null,
-  assumptions: [],
   draft: null,
 }
 
@@ -26,58 +29,86 @@ describe('parseAgentTurn — fail closed', () => {
     expect(parseAgentTurn(validTurn)).toEqual(validTurn)
   })
 
+  it('accepts a reason-less, stage-less follow-up — forcing a reason would make it nag', () => {
+    expect(
+      parseAgentTurn({ ...validTurn, followUp: { question: 'And then?', reason: null, stage: null } }),
+    ).not.toBeNull()
+  })
+
   it.each([
     ['prose instead of JSON', 'Sure! Here is my reply…'],
-    ['missing coverage', { ...validTurn, coverage: undefined }],
-    ['coverage with wrong keys (the old whatHappened vocabulary)', { ...validTurn, coverage: { whatHappened: true, why: true, whatChanged: true, madeItRight: true } }],
+    ['missing stages', { ...validTurn, stages: undefined }],
+    ['the old coverage vocabulary', { ...validTurn, stages: undefined, coverage: { facts: true, why: true, whatChanged: true, madeItRight: true } }],
+    ['a stage level outside the enum', { ...validTurn, stages: { ...validTurn.stages, what: 'partial' } }],
+    ['followUp as a bare string (the old shape)', { ...validTurn, followUp: 'What happened next?' }],
     ['unknown nudge factor', { ...validTurn, nudge: { factor: 'remorse', text: 'x' } }],
     ['draft as a number', { ...validTurn, draft: 42 }],
-    ['assumptions missing', { ...validTurn, assumptions: undefined }],
     ['null', null],
   ])('rejects %s', (_name, bad) => {
     expect(parseAgentTurn(bad)).toBeNull()
   })
+
+  it('has no assumptions field — deliberately (§7)', () => {
+    expect('assumptions' in validTurn).toBe(false)
+  })
 })
 
-describe('AgentRequest — the directive belongs to code', () => {
+describe('AgentRequest — code owns directive and the skip list', () => {
+  const base = {
+    context: {
+      incidentId: 'inc-1', county: 'Harris', state: 'Texas', court: '178th District Court',
+      dateCrimeCommitted: '03/14/2019', dateOfConviction: '11/02/2019',
+      charges: [{ exactOffense: 'Evading Arrest', sentence: '2 years, suspended', disposition: 'conviction' }],
+      rawAnswers: { facts: '', why: '', whatChanged: '', madeItRight: '' },
+    },
+    messages: [],
+    alreadyNudged: [],
+    skippedStages: [],
+  }
+
   it('accepts converse and draft_now, nothing else', () => {
-    const base = {
-      context: {
-        incidentId: 'inc-1', county: 'Harris', state: 'Texas', court: '178th District Court',
-        dateCrimeCommitted: '03/14/2019', dateOfConviction: '11/02/2019',
-        charges: [{ exactOffense: 'Evading Arrest', sentence: '2 years, suspended', disposition: 'conviction' }],
-        rawAnswers: { facts: '', why: '', whatChanged: '', madeItRight: '' },
-      },
-      messages: [],
-      alreadyNudged: [],
-    }
     expect(AgentRequestSchema.safeParse({ ...base, directive: 'converse' }).success).toBe(true)
     expect(AgentRequestSchema.safeParse({ ...base, directive: 'draft_now' }).success).toBe(true)
     expect(AgentRequestSchema.safeParse({ ...base, directive: 'draft' }).success).toBe(false)
   })
+
+  it('carries skipped stages, and only real ones', () => {
+    expect(
+      AgentRequestSchema.safeParse({ ...base, directive: 'converse', skippedStages: ['why'] }).success,
+    ).toBe(true)
+    expect(
+      AgentRequestSchema.safeParse({ ...base, directive: 'converse', skippedStages: ['remorse'] }).success,
+    ).toBe(false)
+  })
 })
 
 describe('outcomeLanguageViolations — A6 on the model voice (L1)', () => {
-  it('flags outcome talk in reply, followUp, and nudge text', () => {
+  it('flags outcome talk in reply, question, reason, and nudge text', () => {
     expect(
       outcomeLanguageViolations({ ...validTurn, reply: "With this account you're likely to be approved." }),
     ).toHaveLength(1)
     expect(
-      outcomeLanguageViolations({ ...validTurn, followUp: 'Want me to check if you qualify?' }),
+      outcomeLanguageViolations({
+        ...validTurn,
+        followUp: { question: 'Want me to check if you qualify?', reason: null, stage: null },
+      }),
     ).toHaveLength(1)
     expect(
       outcomeLanguageViolations({
         ...validTurn,
-        nudge: { factor: 'change', text: "Mentioning the program makes this a strong case." },
+        followUp: { question: 'Which program was it?', reason: 'Details make this a strong case.', stage: 'changed' },
+      }),
+    ).toHaveLength(1)
+    expect(
+      outcomeLanguageViolations({
+        ...validTurn,
+        nudge: { factor: 'change', text: 'Mentioning the program makes this a strong case.' },
       }),
     ).toHaveLength(1)
   })
 
   it('passes clean conversational language', () => {
     expect(outcomeLanguageViolations(validTurn)).toEqual([])
-    expect(
-      outcomeLanguageViolations({ ...validTurn, reply: 'TDLR will decide — this is what they publish.' }),
-    ).toEqual([])
   })
 
   it("never polices the DRAFT — the user's own words stay theirs", () => {

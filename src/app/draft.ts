@@ -27,9 +27,8 @@ export type RawAnswers = {
 export const emptyRawAnswers: RawAnswers = { facts: '', why: '', whatChanged: '', madeItRight: '' }
 
 /**
- * The persisted narrative (AGENT_SPEC §2, as decided): rawAnswers, the draft (THE artifact),
- * the model's self-reported assumptions, and the §7 affirmation. The conversation
- * transcript is DELIBERATELY absent — messages[] are session-only, because the interview is
+ * The persisted narrative (AGENT_SPEC §2, as decided): rawAnswers, the draft (THE
+ * artifact), and the §7 affirmation. The conversation transcript is DELIBERATELY absent — messages[] are session-only, because the interview is
  * the most sensitive text in the app and does not sit on a shared computer's disk.
  *
  * Keyed by INCIDENT, never by charge. If you find yourself writing charge.narrative, stop —
@@ -38,15 +37,15 @@ export const emptyRawAnswers: RawAnswers = { facts: '', why: '', whatChanged: ''
 export type DraftNarrative = {
   rawAnswers: RawAnswers
   draft: string
-  assumptions: string[]
-  /** §7: the user confirmed this is their own true account. Reset by ANY change to draft. */
+  /** §7: the user confirmed this is their own true account. Reset by ANY change to draft.
+   *  There is deliberately NO assumptions field — see AGENT_SPEC §7: paraphrase is the
+   *  job, and announcing it was theater that eroded the affirmation. */
   affirmed: boolean
 }
 
 export const emptyNarrative = (): DraftNarrative => ({
   rawAnswers: { ...emptyRawAnswers },
   draft: '',
-  assumptions: [],
   affirmed: false,
 })
 
@@ -170,9 +169,9 @@ export const newIncident = (defaultState: string): DraftIncident => ({
 export function normalizeIncident(raw: DraftIncident & { narrativeDraft?: string }): DraftIncident {
   const legacyDraft = typeof raw.narrativeDraft === 'string' ? raw.narrativeDraft : ''
   const narrative: DraftNarrative = {
-    ...emptyNarrative(),
-    ...(raw.narrative ?? {}),
     rawAnswers: { ...emptyRawAnswers, ...(raw.narrative?.rawAnswers ?? {}) },
+    draft: raw.narrative?.draft ?? '',
+    affirmed: raw.narrative?.affirmed ?? false,
   }
   if (!narrative.draft && legacyDraft) narrative.draft = legacyDraft
   const { narrativeDraft: _legacy, ...rest } = raw

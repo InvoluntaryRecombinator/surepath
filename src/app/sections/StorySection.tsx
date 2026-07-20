@@ -1,21 +1,15 @@
 /**
- * Your story — STORY-LITE. One honest account per incident, written by hand.
- *
- * No API, no model. This is the manual seam the narrative assistant (AGENT_SPEC) later
- * replaces the innards of: the card list, the per-incident writing screen, and the
- * narrativeDraft it saves are all shapes the agent build keeps.
- *
- * Invariants in force: the account is the user's own words, period (L3 — nothing here can
- * add any). The coaching copy is STATIC and CITED — the §53.025(a) factors are quoted from
- * the statute via data/tdlr_links.json, and the general guidance is marked as general (L5).
+ * Your story — the account list. Each card opens the workbench (story/StoryWorkbench),
+ * where the narrative assistant lives; the manual path through it is first-class and the
+ * card gate is unchanged: an account counts when it is written AND affirmed (§7).
  * One story per INCIDENT, never per charge — a person tells the story of a night, not of
- * a statute. No outcome language anywhere (L1).
+ * a statute.
  */
 import { useState } from 'react'
-import { Button } from '../../ui/Button'
-import { CheckSmall, ArrowLeft } from '../../ui/icons'
+import { CheckSmall } from '../../ui/icons'
 import type { DraftIncident } from '../draft'
 import { useAppStore } from '../storeContext'
+import { StoryWorkbench } from './story/StoryWorkbench'
 
 function incidentSummary(i: DraftIncident) {
   return [i.dateOfConviction, i.county && `${i.county} County`, i.court]
@@ -67,144 +61,6 @@ function AccountCard({
   )
 }
 
-function WritingScreen({ incident, onBack }: { incident: DraftIncident; onBack: () => void }) {
-  const { dispatch, config } = useAppStore()
-  const factors = config.storyFactors
-
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={onBack}
-        className="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-accent hover:underline"
-      >
-        <ArrowLeft size={14} />
-        Back to your accounts
-      </button>
-
-      {/* The fact strip — every charge from that night, on screen while they write.
-          That's what makes one honest account possible instead of amputated fragments. */}
-      <div className="mt-5 rounded-[8px] border border-line bg-ground px-5 py-4">
-        <p className="text-[13px] font-semibold uppercase tracking-[0.05em] text-muted">
-          {incidentSummary(incident)}
-        </p>
-        <ul className="mt-2.5 flex flex-wrap gap-1.5">
-          {incident.charges.map((c) => (
-            <li
-              key={c.id}
-              className="rounded-[5px] border border-line bg-field px-2.5 py-1 text-[13px] font-medium text-ink"
-            >
-              {c.exactOffense || 'Untitled charge'}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mt-8 grid grid-cols-1 gap-x-12 xl:grid-cols-[264px_minmax(0,1fr)]">
-        {/* ── guidance — static, cited, and marked for what it is (L5) ── */}
-        <aside className="flex flex-col gap-5">
-          <div>
-            <h2 className="text-[15px] font-semibold text-ink">What {config.agency} asks for</h2>
-            <p className="mt-1.5 text-[13.5px] leading-[1.6] text-muted">
-              What exactly you did, and why — in your own words, not the offense name. One
-              account covering everything from this arrest, together.
-            </p>
-          </div>
-          <div className="rounded-[8px] border border-line bg-ground px-4 py-3.5">
-            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">
-              What the law says boards weigh
-            </h3>
-            <p className="mt-1.5 text-[13px] leading-[1.6] text-ink/80">{factors.quote}</p>
-            <p className="mt-1.5 text-[12px] font-medium text-muted">— {factors.cite}</p>
-          </div>
-          <div>
-            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">
-              Worth covering, if true for you
-            </h3>
-            <ul className="mt-2 flex flex-col gap-1.5 text-[13.5px] leading-[1.55] text-muted">
-              {[
-                'What happened',
-                'Why things went the way they did',
-                'What has changed since',
-                'What you did to make it right',
-              ].map((q) => (
-                <li key={q} className="flex gap-2">
-                  <span className="mt-[8px] h-1 w-1 shrink-0 rounded-full bg-accent/70" aria-hidden="true" />
-                  {q}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-3 text-[12.5px] leading-[1.55] text-muted">
-              In general, licensing boards look for an account that takes responsibility.
-              This is your account to write — there is no required script.
-            </p>
-          </div>
-        </aside>
-
-        {/* ── the account — their words, a real writing surface ── */}
-        <div className="mt-6 flex flex-col xl:mt-0">
-          <label
-            htmlFor={`account-${incident.id}`}
-            className="text-[13px] font-medium tracking-[0.01em] text-muted"
-          >
-            Your account of this incident
-            <span className="ml-0.5 text-state/80" aria-hidden="true">
-              *
-            </span>
-          </label>
-          <textarea
-            id={`account-${incident.id}`}
-            value={incident.narrative.draft}
-            onChange={(e) =>
-              dispatch({
-                type: 'update-incident',
-                id: incident.id,
-                // any change to the draft resets the affirmation — they confirm what they sign (§7)
-                patch: {
-                  narrative: { ...incident.narrative, draft: e.target.value, affirmed: false },
-                },
-              })
-            }
-            placeholder="Start with what happened, in your own words."
-            className="mt-1.5 min-h-[340px] w-full resize-y rounded-[6px] border border-line bg-field p-4 text-[15px] leading-[1.7] text-ink placeholder:text-muted/60 transition-colors duration-150 hover:border-muted/70"
-          />
-          <p className="mt-2 text-[12.5px] text-muted">
-            Saved as you type. This goes onto the continuation sheet attached to this
-            incident's forms, word for word.
-          </p>
-
-          {/* §7 — the affirmation. The one layer a clever prompt cannot game. */}
-          <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-[8px] border border-line bg-ground px-4 py-3.5">
-            <input
-              type="checkbox"
-              checked={incident.narrative.affirmed}
-              disabled={incident.narrative.draft.trim().length === 0}
-              onChange={(e) =>
-                dispatch({
-                  type: 'update-incident',
-                  id: incident.id,
-                  patch: { narrative: { ...incident.narrative, affirmed: e.target.checked } },
-                })
-              }
-              className="mt-1 h-4 w-4 accent-accent"
-            />
-            <span className="text-[13.5px] leading-relaxed text-ink/85">
-              This is the account that goes on your forms. Read it and confirm it's accurate —
-              you're signing that this is your own true account.
-            </span>
-          </label>
-
-          <div className="mt-5 flex justify-end">
-            <Button variant="primary" onClick={onBack}>
-              Done with this account
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export function StorySection() {
   const { state } = useAppStore()
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -214,7 +70,7 @@ export function StorySection() {
   ).length
 
   const editing = incidents.find((i) => i.id === editingId)
-  if (editing) return <WritingScreen incident={editing} onBack={() => setEditingId(null)} />
+  if (editing) return <StoryWorkbench incident={editing} onBack={() => setEditingId(null)} />
 
   if (incidents.length === 0) {
     return (

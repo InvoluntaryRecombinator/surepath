@@ -1,0 +1,146 @@
+/**
+ * The orchestrator: machine ↔ proxy ↔ store. Everything bounded lives in the pure modules
+ * (machine, turns, prompt guards) — this hook only wires them together and owns the
+ * network edge.
+ *
+ * Persistence split (AGENT_SPEC §2, decided): draft / assumptions / affirmed / rawAnswers
+ * sync to the store (and so to on-device storage). The conversation transcript lives and
+ * dies in this hook's state — it never touches disk.
+ *
+ * Failure is a feature here: any non-200, timeout, or unparsable body sets 'unavailable'
+ * and the manual path keeps working untouched. A failed call never consumes a turn.
+ */
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { buildNarrativeContext } from '../../../agent/context'
+import {
+  canCommit,
+  initialConversation,
+  needsReplacementConfirm,
+  nextDirective,
+  reduceConversation,
+  type ConversationState,
+} from '../../../agent/machine'
+import { parseAgentTurn, type AgentRequest, type AgentTurn } from '../../../agent/turns'
+import type { DraftIncident, RawAnswers } from '../../draft'
+import { useAppStore } from '../../storeContext'
+
+export type NetworkPhase = 'idle' | 'working' | 'unavailable'
+
+export function useNarrativeAssistant(incident: DraftIncident) {
+  const { dispatch: storeDispatch } = useAppStore()
+  const [state, dispatch] = useReducer(
+    reduceConversation,
+    incident.narrative.draft,
+    initialConversation,
+  )
+  const [network, setNetwork] = useState<NetworkPhase>('idle')
+  const [pendingReplacement, setPendingReplacement] = useState<AgentTurn | null>(null)
+  const inFlight = useRef(false)
+
+  // ── one-way sync: machine → store (draft, assumptions, affirmation). Never messages. ──
+  const { account, assumptions, affirmed } = state
+  useEffect(() => {
+    storeDispatch({
+      type: 'update-incident',
+      id: incident.id,
+      patch: {
+        narrative: {
+          rawAnswers: incident.narrative.rawAnswers,
+          draft: account,
+          assumptions,
+          affirmed,
+        },
+      },
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rawAnswers flow store→context directly
+  }, [account, assumptions, affirmed, incident.id, storeDispatch])
+
+  const updateRawAnswers = (patch: Partial<RawAnswers>) =>
+    storeDispatch({
+      type: 'update-incident',
+      id: incident.id,
+      patch: {
+        narrative: { ...incident.narrative, rawAnswers: { ...incident.narrative.rawAnswers, ...patch } },
+      },
+    })
+
+  const callProxy = useCallback(
+    async (afterState: ConversationState, writeItNow = false) => {
+      if (inFlight.current) return
+      inFlight.current = true
+      setNetwork('working')
+      try {
+        const request: AgentRequest = {
+          context: buildNarrativeContext(incident),
+          messages: afterState.messages,
+          directive: nextDirective(afterState, { writeItNow }),
+          alreadyNudged: afterState.nudgedFactors,
+        }
+        const res = await fetch('/api/narrative', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(request),
+        })
+        if (!res.ok) {
+          setNetwork('unavailable')
+          return
+        }
+        const body = (await res.json()) as { turn?: unknown }
+        const turn = parseAgentTurn(body.turn)
+        if (!turn) {
+          setNetwork('unavailable')
+          return
+        }
+        if (needsReplacementConfirm(afterState, turn)) {
+          // Their edit is not overwritten without an explicit yes (§5, decided).
+          setPendingReplacement(turn)
+        } else {
+          dispatch({ type: 'model-turn', turn })
+        }
+        setNetwork('idle')
+      } catch {
+        setNetwork('unavailable')
+      } finally {
+        inFlight.current = false
+      }
+    },
+    [incident],
+  )
+
+  const send = (text: string) => {
+    const after = reduceConversation(state, { type: 'user-sent', text })
+    dispatch({ type: 'user-sent', text })
+    void callProxy(after)
+  }
+
+  const writeItNow = () => {
+    void callProxy(state, true)
+  }
+
+  const acceptReplacement = () => {
+    if (pendingReplacement) dispatch({ type: 'model-turn', turn: pendingReplacement })
+    setPendingReplacement(null)
+  }
+
+  const declineReplacement = () => {
+    // The reply still lands; only the overwrite is refused.
+    if (pendingReplacement) dispatch({ type: 'model-turn', turn: { ...pendingReplacement, draft: null } })
+    setPendingReplacement(null)
+  }
+
+  return {
+    state,
+    network,
+    pendingReplacement,
+    canCommit: canCommit(state),
+    send,
+    writeItNow,
+    retry: () => setNetwork('idle'),
+    acceptReplacement,
+    declineReplacement,
+    editAccount: (text: string) => dispatch({ type: 'user-wrote-account', text }),
+    setAffirmed: (value: boolean) => dispatch({ type: 'set-affirmed', value }),
+    commit: () => dispatch({ type: 'commit' }),
+    updateRawAnswers,
+  }
+}

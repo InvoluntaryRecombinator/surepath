@@ -14,7 +14,7 @@
  *   - A factor is nudged at most once, ever. The MANUAL PATH is first-class. Hints never
  *     gate. Save requires the §7 affirmation. Failures don't consume turns.
  */
-import type { AgentTurn, NudgeFactor, StageKey, Stages } from './turns'
+import type { AgentTurn, NudgeFactor, Ownership, StageKey, Stages } from './turns'
 
 export const MAX_FOLLOWUP_TURNS = 14
 
@@ -33,6 +33,8 @@ export type ConversationState = {
   skippedStages: StageKey[]
   /** The model's read of the whole conversation, re-reported every turn. Session-only. */
   stages: Stages
+  /** The model's read of whether the account shows their own part. Session-only. */
+  ownership: Ownership
   /** The wire history — exactly what the user saw, so the model's memory matches theirs. */
   messages: Exchange[]
   /** The account. The only thing that ever reaches the packet, and only on commit. */
@@ -52,6 +54,10 @@ export type ConversationEvent =
   | { type: 'user-sent'; text: string }
   | { type: 'user-skipped' }
   | { type: 'model-turn'; turn: AgentTurn; directive: 'converse' | 'draft_now' }
+  /** The code-authored ownership check (fixed copy from stateConfig — the most delicate
+   *  sentence in the product is never left to temperature). NOT a model call: it does not
+   *  consume a turn. It burns the 'ownership' nudge slot — once ever, either voice. */
+  | { type: 'ownership-check-shown'; text: string }
   | { type: 'set-affirmed'; value: boolean }
   | { type: 'commit' }
 
@@ -63,6 +69,9 @@ export function initialConversation(existingAccount = ''): ConversationState {
     nudgedFactors: [],
     skippedStages: [],
     stages: emptyStages,
+    // 'partial' until the model reports — only ever consulted after the gate opens,
+    // which requires model turns, so the initial value never decides anything.
+    ownership: 'partial',
     messages: [],
     account: existingAccount,
     accountSource: has ? 'manual' : null,
@@ -86,8 +95,33 @@ export function stagesSatisfyGate(stages: Stages, skipped: readonly StageKey[]):
   return ok('what') && ok('why')
 }
 
-export function draftAllowedInConverse(state: ConversationState, stages: Stages): boolean {
-  return stagesSatisfyGate(stages, state.skippedStages)
+/** Ownership is settled when it reads takes_responsibility OR the check already ran. */
+function ownershipSettled(state: ConversationState, ownership: Ownership): boolean {
+  return ownership === 'takes_responsibility' || state.nudgedFactors.includes('ownership')
+}
+
+/** A volunteered draft lands only when the stages gate is satisfied AND ownership is
+ *  settled — a deflecting account gets its one check BEFORE the draft, never after. */
+export function draftAllowedInConverse(state: ConversationState, turn: AgentTurn): boolean {
+  return stagesSatisfyGate(turn.stages, state.skippedStages) && ownershipSettled(state, turn.ownership)
+}
+
+/**
+ * ALL drafting policy, one pure function (the orchestrator consults it after every model
+ * turn — never on "Write it now", which is the user's explicit exit and bypasses both):
+ *   'ownership_check'  — the gate opened but the account deflects and hasn't been checked
+ *   'escalate_draft'   — the gate opened, ownership settled, and the model still didn't
+ *                        draft: the client re-calls with draft_now
+ *   'idle'             — keep conversing
+ */
+export function nextAction(
+  state: ConversationState,
+): 'idle' | 'ownership_check' | 'escalate_draft' {
+  if (state.status !== 'gathering') return 'idle'
+  if (state.turnCount === 0) return 'idle'
+  if (!stagesSatisfyGate(state.stages, state.skippedStages)) return 'idle'
+  if (!ownershipSettled(state, state.ownership)) return 'ownership_check'
+  return 'escalate_draft'
 }
 
 export function canCommit(state: ConversationState): boolean {
@@ -154,11 +188,11 @@ export function reduceConversation(
         : state.nudgedFactors
 
       // The converse gate: a volunteered draft is stripped unless what+why are covered
-      // (or skipped). draft_now always accepts — it exists to force.
+      // (or skipped) AND ownership is settled. draft_now always accepts — it exists to
+      // force, and it is only reachable through explicit exits or post-check escalation.
       const hasDraft = turn.draft !== null && turn.draft.trim().length > 0
       const drafted =
-        hasDraft &&
-        (event.directive === 'draft_now' || draftAllowedInConverse(state, turn.stages))
+        hasDraft && (event.directive === 'draft_now' || draftAllowedInConverse(state, turn))
 
       // A question already skipped never renders again; questions stop at the cap and on
       // a landed draft.
@@ -185,6 +219,7 @@ export function reduceConversation(
         pendingNudge,
         pendingFollowUp,
         stages: turn.stages, // wholesale, from the model. Code never increments.
+        ownership: turn.ownership,
         messages: shown ? [...state.messages, { role: 'assistant', content: shown }] : state.messages,
         ...(drafted
           ? {
@@ -196,6 +231,20 @@ export function reduceConversation(
           : { status: state.status === 'drafted' ? ('drafted' as const) : ('gathering' as const) }),
       }
     }
+
+    case 'ownership-check-shown':
+      return {
+        ...state,
+        // once ever, either voice: the model's own ownership nudge and this check share
+        // the same budget.
+        nudgedFactors: state.nudgedFactors.includes('ownership')
+          ? state.nudgedFactors
+          : [...state.nudgedFactors, 'ownership'],
+        messages: [...state.messages, { role: 'assistant', content: event.text }],
+        pendingFollowUp: null,
+        pendingNudge: null,
+        // turnCount deliberately unchanged — this was not a model call.
+      }
 
     case 'set-affirmed':
       if (state.status !== 'drafted') return state

@@ -152,6 +152,8 @@ export const txConfig: StateConfig = {
     addSingleCharge: 'Add a single conviction',
     addSingleChargeHint: 'One conviction, on its own.',
     narrativeItemLabel: 'Item 21',
+    ownershipCheck:
+      "Before this gets written up — one thing worth taking seriously. Of everything the board weighs, taking responsibility for your own part carries the most weight, and right now this account doesn't show yours. Think about the decisions that were yours that day — what was in your control, and what you'd do differently. Putting that in your own words would make this account considerably stronger.",
   },
 
   forms: {

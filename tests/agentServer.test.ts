@@ -25,11 +25,16 @@ const request: AgentRequest = {
   directive: 'converse',
   alreadyNudged: ['ownership'],
   skippedStages: ['right'],
+  guidance: {
+    factorsQuote: 'The factors TDLR weighs: extent and nature of past criminal activity…',
+    factorsCite: 'Tex. Occ. Code §53.025(a)',
+  },
 }
 
 const cleanTurn: AgentTurn = {
   reply: 'Understood.',
   stages: { what: 'thin', why: 'empty', changed: 'empty', right: 'empty' },
+  ownership: 'partial',
   readyToDraft: false,
   followUp: { question: 'What happened after you stopped?', reason: null, stage: 'what' },
   nudge: null,
@@ -68,11 +73,11 @@ describe('the prompt carries the incident, the closed nudges, and the directive'
     expect(prompt).toContain('ownership')
     expect(prompt).toContain('EXPLICITLY SKIPPED')
     expect(prompt).toContain('right')
-    expect(prompt).not.toContain('DIRECTIVE: DRAFT NOW')
+    expect(prompt).not.toContain('YOU ARE NOW WRITING THE FINAL ACCOUNT')
   })
 
-  it('draft_now adds the must-draft directive', () => {
-    expect(buildSystemPrompt({ ...request, directive: 'draft_now' })).toContain('DIRECTIVE: DRAFT NOW')
+  it('draft_now selects the drafting prompt', () => {
+    expect(buildSystemPrompt({ ...request, directive: 'draft_now' })).toContain('YOU ARE NOW WRITING THE FINAL ACCOUNT')
   })
 })
 
@@ -153,25 +158,21 @@ describe('reply never carries a question when followUp exists (§4)', () => {
   })
 })
 
-describe('converse auto-escalation (§5) — the gate opens, the draft happens', () => {
-  it('re-calls with draft_now when what+why are covered but the model kept interviewing', async () => {
-    const dawdling = {
-      ...cleanTurn,
-      stages: { what: 'covered', why: 'covered', changed: 'thin', right: 'empty' } as const,
-      followUp: { question: 'What about restitution?', reason: null, stage: 'right' as const },
-    }
-    const forced = { ...dawdling, followUp: null, draft: 'The drafted account.' }
-    const generate = vi.fn().mockResolvedValueOnce(dawdling).mockResolvedValueOnce(forced)
-    const res = await handleNarrativeRequest(request, env, generate)
-    expect(generate).toHaveBeenCalledTimes(2)
-    expect(generate.mock.calls[1][0].directive).toBe('draft_now')
-    expect((res.body.turn as typeof forced).draft).toBe('The drafted account.')
+describe('the two prompts (§6)', () => {
+  it('interview mode: stages/ownership machinery, injected factors, no drafting body', () => {
+    const prompt = buildSystemPrompt(request)
+    expect(prompt).toContain('OWNERSHIP — report it every turn')
+    expect(prompt).toContain('Tex. Occ. Code §53.025(a)')
+    expect(prompt).toContain('extent and nature of past criminal activity')
+    expect(prompt).not.toContain('YOU ARE NOW WRITING THE FINAL ACCOUNT')
+    // the typist line is gone; the advocacy line replaced it
+    expect(prompt).not.toContain('You are their typist')
+    expect(prompt).toContain('not a bystander')
   })
 
-  it('does not escalate while the gate is closed', async () => {
-    const gathering = { ...cleanTurn, stages: { what: 'thin', why: 'empty', changed: 'empty', right: 'empty' } as const }
-    const generate = vi.fn().mockResolvedValue(gathering)
-    await handleNarrativeRequest(request, env, generate)
-    expect(generate).toHaveBeenCalledTimes(1)
+  it('draft_now mode: the distinct final-account instruction', () => {
+    const prompt = buildSystemPrompt({ ...request, directive: 'draft_now' })
+    expect(prompt).toContain('YOU ARE NOW WRITING THE FINAL ACCOUNT')
+    expect(prompt).not.toContain('HOW TO ASK')
   })
 })

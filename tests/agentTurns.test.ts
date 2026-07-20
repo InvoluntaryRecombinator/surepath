@@ -14,6 +14,7 @@ import {
 const validTurn: AgentTurn = {
   reply: 'Got it — that helps.',
   stages: { what: 'covered', why: 'thin', changed: 'empty', right: 'empty' },
+  ownership: 'partial',
   readyToDraft: false,
   followUp: {
     question: 'What was going on for you that night?',
@@ -38,6 +39,8 @@ describe('parseAgentTurn — fail closed', () => {
   it.each([
     ['prose instead of JSON', 'Sure! Here is my reply…'],
     ['missing stages', { ...validTurn, stages: undefined }],
+    ['missing ownership', { ...validTurn, ownership: undefined }],
+    ['ownership outside the enum', { ...validTurn, ownership: 'defensive' }],
     ['the old coverage vocabulary', { ...validTurn, stages: undefined, coverage: { facts: true, why: true, whatChanged: true, madeItRight: true } }],
     ['a stage level outside the enum', { ...validTurn, stages: { ...validTurn.stages, what: 'partial' } }],
     ['followUp as a bare string (the old shape)', { ...validTurn, followUp: 'What happened next?' }],
@@ -64,6 +67,7 @@ describe('AgentRequest — code owns directive and the skip list', () => {
     messages: [],
     alreadyNudged: [],
     skippedStages: [],
+    guidance: { factorsQuote: 'the factors', factorsCite: 'Tex. Occ. Code §53.025(a)' },
   }
 
   it('accepts converse and draft_now, nothing else', () => {

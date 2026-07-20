@@ -10,6 +10,7 @@ import {
   draftAllowedInConverse,
   initialConversation,
   needsReplacementConfirm,
+  nextAction,
   nextDirective,
   reduceConversation,
   type ConversationState,
@@ -27,6 +28,7 @@ const stages = (over: Partial<Stages> = {}): Stages => ({
 const turn = (over: Partial<AgentTurn> = {}): AgentTurn => ({
   reply: 'Okay.',
   stages: stages(),
+  ownership: 'takes_responsibility',
   readyToDraft: false,
   followUp: { question: 'What happened next?', reason: null, stage: 'what' },
   nudge: null,
@@ -91,8 +93,8 @@ describe('the converse draft gate — what + why covered, or skipped', () => {
     s = reduceConversation(s, { type: 'user-skipped' })
     expect(s.skippedStages).toEqual(['why'])
     expect(s.messages.at(-1)).toEqual({ role: 'user', content: "I'd rather skip that." })
-    expect(draftAllowedInConverse(s, stages({ what: 'covered', why: 'empty' }))).toBe(true)
-    expect(draftAllowedInConverse(s, stages({ what: 'thin', why: 'empty' }))).toBe(false)
+    expect(draftAllowedInConverse(s, turn({ stages: stages({ what: 'covered', why: 'empty' }) }))).toBe(true)
+    expect(draftAllowedInConverse(s, turn({ stages: stages({ what: 'thin', why: 'empty' }) }))).toBe(false)
   })
 
   it('a skipped stage is never asked about again', () => {
@@ -214,5 +216,92 @@ describe('revision after a manual edit needs an explicit confirm', () => {
       model(turn({ stages: stages({ what: 'covered', why: 'covered' }), draft: 'model words' })),
     )
     expect(needsReplacementConfirm(modelDrafted, turn({ draft: 'better model words' }))).toBe(false)
+  })
+})
+
+
+describe('ownership bounds the draft (the blame-shifting fix)', () => {
+  const covered = () => stages({ what: 'covered', why: 'covered' })
+
+  it('a volunteered draft is stripped while the account deflects, unchecked', () => {
+    const s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'it was my friends stuff, wrong place wrong time' },
+      model(turn({ stages: covered(), ownership: 'deflecting', draft: 'tidy deflecting account' })),
+    )
+    expect(s.account).toBe('')
+    expect(nextAction(s)).toBe('ownership_check')
+  })
+
+  it('the check burns the ownership slot, adds the fixed copy, consumes NO turn', () => {
+    let s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'x' },
+      model(turn({ stages: covered(), ownership: 'deflecting', followUp: null })),
+    )
+    const turnsBefore = s.turnCount
+    s = reduceConversation(s, { type: 'ownership-check-shown', text: 'THE CHECK COPY' })
+    expect(s.nudgedFactors).toContain('ownership')
+    expect(s.messages.at(-1)).toEqual({ role: 'assistant', content: 'THE CHECK COPY' })
+    expect(s.turnCount).toBe(turnsBefore)
+    // once ever: after the check, policy escalates instead of re-checking
+    expect(nextAction(s)).toBe('escalate_draft')
+  })
+
+  it('the reply to the check is a NORMAL model turn — ownership re-assessed, draft reflects it', () => {
+    const s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'wasnt my fault' },
+      model(turn({ stages: covered(), ownership: 'deflecting', followUp: null })),
+      { type: 'ownership-check-shown', text: 'CHECK' },
+      { type: 'user-sent', text: 'i mean, i did choose to get in the car. that was on me' },
+      model(turn({ stages: covered(), ownership: 'takes_responsibility', draft: 'account with their part', followUp: null })),
+    )
+    expect(s.ownership).toBe('takes_responsibility')
+    expect(s.account).toBe('account with their part')
+    expect(s.status).toBe('drafted')
+  })
+
+  it('answering the check with MORE deflection still drafts — never blocks, once ever', () => {
+    let s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'wasnt my fault' },
+      model(turn({ stages: covered(), ownership: 'deflecting', followUp: null })),
+      { type: 'ownership-check-shown', text: 'CHECK' },
+      { type: 'user-sent', text: 'like i said, it was his stuff' },
+    )
+    // gate satisfied + ownership checked → policy escalates; draft_now accepts as ever
+    expect(nextAction(run(s, model(turn({ stages: covered(), ownership: 'deflecting', followUp: null })))).valueOf()).toBe('escalate_draft')
+    s = run(s, model(turn({ stages: covered(), ownership: 'deflecting', draft: 'their story, as told' }), 'draft_now'))
+    expect(s.account).toBe('their story, as told')
+  })
+
+  it("the model's own ownership nudge shares the once-ever budget with the check", () => {
+    const s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'x' },
+      model(turn({ stages: covered(), ownership: 'deflecting', nudge: { factor: 'ownership', text: 'Your part?' }, followUp: null })),
+    )
+    // the model already raised it — code does not raise it again
+    expect(nextAction(s)).toBe('escalate_draft')
+  })
+
+  it('takes_responsibility never triggers the check', () => {
+    const s = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'i did it, here is why' },
+      model(turn({ stages: covered(), ownership: 'takes_responsibility', followUp: null })),
+    )
+    expect(nextAction(s)).toBe('escalate_draft')
+  })
+
+  it('nextAction stays idle before the gate opens and after drafting', () => {
+    expect(nextAction(initialConversation())).toBe('idle')
+    const gathering = run(initialConversation(), { type: 'user-sent', text: 'x' },
+      model(turn({ stages: stages({ what: 'thin' }) })))
+    expect(nextAction(gathering)).toBe('idle')
+    const drafted = run(initialConversation(), { type: 'user-sent', text: 'x' },
+      model(turn({ stages: covered(), draft: 'done', followUp: null })))
+    expect(nextAction(drafted)).toBe('idle')
   })
 })

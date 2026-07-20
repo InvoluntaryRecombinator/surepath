@@ -35,10 +35,21 @@ export const StagesSchema = z.object({
 })
 export type Stages = z.infer<typeof StagesSchema>
 
+/**
+ * Ownership: does the account show the person's own part, or does it deflect? Assessed by
+ * the model from their telling, re-reported every turn like stages. Three values suffice
+ * because code only consults this when the draft gate opens — and the gate requires `why`
+ * covered, so there is always material to judge. Coverage measures presence; THIS measures
+ * the quality boards weigh hardest (§53.025(a): conduct, rehabilitation, responsibility).
+ */
+export const OwnershipSchema = z.enum(['takes_responsibility', 'partial', 'deflecting'])
+export type Ownership = z.infer<typeof OwnershipSchema>
+
 export const AgentTurnSchema = z.object({
   /** Conversational, short. NEVER contains the question or the draft. */
   reply: z.string(),
   stages: StagesSchema,
+  ownership: OwnershipSchema,
   /** "I am drafting now." A HINT — nothing gates on it; it may only accelerate. (§5) */
   readyToDraft: z.boolean(),
   /** ONE question at a time: bold question, plain reason underneath (reason optional —
@@ -99,6 +110,12 @@ export const AgentRequestSchema = z.object({
   alreadyNudged: z.array(z.enum(NUDGE_FACTORS)),
   /** Stages the user explicitly skipped — their no is final; never re-asked, gate waived. */
   skippedStages: z.array(z.enum(STAGE_KEYS)),
+  /** State-published guidance, injected by the CLIENT from stateConfig — the server and
+   *  the prompt are state-agnostic (the chassis rule). Not identifiers; just statute. */
+  guidance: z.object({
+    factorsQuote: z.string(),
+    factorsCite: z.string(),
+  }),
 })
 
 export type AgentRequest = z.infer<typeof AgentRequestSchema>

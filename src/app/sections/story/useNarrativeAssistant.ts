@@ -15,6 +15,7 @@ import {
   canCommit,
   initialConversation,
   needsReplacementConfirm,
+  nextAction,
   nextDirective,
   reduceConversation,
   type ConversationState,
@@ -26,7 +27,7 @@ import { useAppStore } from '../../storeContext'
 export type NetworkPhase = 'idle' | 'working' | 'unavailable'
 
 export function useNarrativeAssistant(incident: DraftIncident) {
-  const { dispatch: storeDispatch } = useAppStore()
+  const { dispatch: storeDispatch, config } = useAppStore()
   const [state, dispatch] = useReducer(
     reduceConversation,
     incident.narrative.draft,
@@ -66,11 +67,14 @@ export function useNarrativeAssistant(incident: DraftIncident) {
     })
 
   const callProxy = useCallback(
-    async (afterState: ConversationState, writeItNow = false) => {
+    async (initialAfterState: ConversationState, initialWriteItNow = false) => {
       if (inFlight.current) return
       inFlight.current = true
       setNetwork('working')
+      let afterState = initialAfterState
+      let writeItNow = initialWriteItNow
       try {
+        for (;;) {
         const directive = nextDirective(afterState, { writeItNow })
         const request: AgentRequest = {
           context: buildNarrativeContext(incident),
@@ -78,6 +82,11 @@ export function useNarrativeAssistant(incident: DraftIncident) {
           directive,
           alreadyNudged: afterState.nudgedFactors,
           skippedStages: afterState.skippedStages,
+          // state-published guidance, injected from config — the server is state-agnostic
+          guidance: {
+            factorsQuote: config.storyFactors.quote,
+            factorsCite: config.storyFactors.cite,
+          },
         }
         const res = await fetch('/api/narrative', {
           method: 'POST',
@@ -97,17 +106,38 @@ export function useNarrativeAssistant(incident: DraftIncident) {
         if (needsReplacementConfirm(afterState, turn)) {
           // Their edit is not overwritten without an explicit yes (§5, decided).
           setPendingReplacement({ turn, directive })
-        } else {
-          dispatch({ type: 'model-turn', turn, directive })
+          setNetwork('idle')
+          return
         }
+        dispatch({ type: 'model-turn', turn, directive })
         setNetwork('idle')
+
+        // ── ALL drafting policy lives in the machine. Consulted only after model turns;
+        //    "Write it now" is the explicit exit and never passes through here twice. ──
+        const applied = reduceConversation(afterState, { type: 'model-turn', turn, directive })
+        const action = nextAction(applied)
+        if (action === 'ownership_check') {
+          // Code-authored, deterministic, once per incident. Not a model call.
+          dispatch({ type: 'ownership-check-shown', text: config.copy.ownershipCheck })
+          return
+        }
+        if (action === 'escalate_draft') {
+          // The gate opened and the model still didn't draft — force it: one more pass
+          // with draft_now. Iteration, not recursion.
+          afterState = applied
+          writeItNow = true
+          setNetwork('working')
+          continue
+        }
+        return
+        }
       } catch {
         setNetwork('unavailable')
       } finally {
         inFlight.current = false
       }
     },
-    [incident],
+    [incident, config],
   )
 
   const send = (text: string) => {

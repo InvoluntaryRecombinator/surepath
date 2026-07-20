@@ -15,7 +15,6 @@
  */
 import { createOpenAI } from '@ai-sdk/openai'
 import { generateObject } from 'ai'
-import { stagesSatisfyGate } from './machine'
 import { buildSystemPrompt, findIdentifierKeys } from './prompt'
 import {
   AgentRequestSchema,
@@ -99,30 +98,6 @@ export async function handleNarrativeRequest(
     }
     if (outcomeLanguageViolations(turn).length > 0) continue
     if (request.directive === 'draft_now' && !(turn.draft && turn.draft.trim())) continue
-    // Code bounds behavior (§5): when the gate is satisfied in converse and the model
-    // still didn't draft — it keeps interviewing optional stages, prompts be damned —
-    // escalate to draft_now ourselves. One extra call, on the turn the gate opens.
-    if (
-      request.directive === 'converse' &&
-      !(turn.draft && turn.draft.trim()) &&
-      stagesSatisfyGate(turn.stages, request.skippedStages)
-    ) {
-      try {
-        const forced = await run(
-          { ...request, directive: 'draft_now' },
-          buildSystemPrompt({ ...request, directive: 'draft_now' }),
-        )
-        if (
-          forced.draft &&
-          forced.draft.trim() &&
-          outcomeLanguageViolations(forced).length === 0
-        ) {
-          turn = { ...forced, nudge: forced.nudge ?? turn.nudge }
-        }
-      } catch {
-        // keep the conversational turn — escalation is best-effort
-      }
-    }
     // Code bounds behavior (§4): reply never carries the draft, and never carries a
     // question — questions live only in followUp, or the user reads them twice.
     if (turn.draft && turn.reply.includes(turn.draft.trim().slice(0, 60))) {

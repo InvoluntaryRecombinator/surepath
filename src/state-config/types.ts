@@ -94,6 +94,11 @@ export type StateConfig = {
     addSingleChargeHint: string
     /** What the narrative box is called on this state's forms (e.g. "Item 21"). */
     narrativeItemLabel: string
+    /** The ownership check — code-authored, fired at most once per incident, BEFORE the
+     *  draft, when the account deflects. Advocate plainly and stop: the exit lives in the
+     *  interface ("Write it now"), never in this sentence. Must read correctly against
+     *  every shape of deflection — blame, minimizing, wrong-place-wrong-time, panic. */
+    ownershipCheck: string
   }
 
   /** The packet service inputs for this state — template names as served from

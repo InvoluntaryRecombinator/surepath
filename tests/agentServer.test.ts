@@ -178,6 +178,9 @@ describe('the two prompts (§6)', () => {
     expect(prompt).toContain('WHEN SOMEONE SAYS THEY FEEL NO REGRET')
     expect(prompt).toContain('Ask twice at most')
     expect(prompt).toContain('Never invent regret they did not express')
+    // the trigger wiring: the sequence outranks stage questions, and a flat no is an answer
+    expect(prompt).toContain('THIS SEQUENCE TAKES PRIORITY')
+    expect(prompt).toContain('A clear no IS an answer')
     expect(buildSystemPrompt({ ...request, directive: 'draft_now' })).not.toContain(
       'DRAWING OUT WHAT\'S MISSING',
     )
@@ -193,6 +196,12 @@ describe('the two prompts (§6)', () => {
     const prompt = buildSystemPrompt({ ...request, directive: 'draft_now' })
     expect(prompt).toContain('CONVICTIONS VS. DEFERRED ADJUDICATION')
     expect(prompt).toContain('was NOT a conviction')
+  })
+
+  it('drafting mode bans the refusal and meta-narration from the signed account', () => {
+    const prompt = buildSystemPrompt({ ...request, directive: 'draft_now' })
+    expect(prompt).toContain('WHAT NEVER GOES IN')
+    expect(prompt).toContain('said to YOU in frustration, not to the board')
   })
 
   it('a standing account is injected as the revision substrate, with the L3 guard', () => {

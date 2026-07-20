@@ -169,6 +169,10 @@ type AgentRequest = {
   directive: 'converse' | 'draft_now'   // ← code sets this, not the model
   alreadyNudged: string[]
   skippedStages: StageKey[]             // their no is final — never re-asked, gate waived
+  guidance: {                           // state-published criteria, injected by the CLIENT
+    factorsQuote: string                // from stateConfig — the server and the prompt are
+    factorsCite: string                 // state-agnostic. The chassis rule applies to prompts.
+  }
 }
 ```
 
@@ -191,6 +195,11 @@ type AgentTurn = {
     changed: StageLevel
     right: StageLevel
   }
+  ownership: 'takes_responsibility' | 'partial' | 'deflecting'
+                                   // does the account SHOW their own part, or deflect?
+                                   // re-reported every turn. Three values suffice: code
+                                   // only consults it when the gate opens, and the gate
+                                   // requires `why` covered — there is always material.
   readyToDraft: boolean            // a hint, never a gate
   followUp: {                      // ONE question at a time
     question: string               // rendered bold
@@ -268,7 +277,24 @@ const MAX_FOLLOWUP_TURNS = 14  // a RUNAWAY-LOOP BACKSTOP, not a hurry-up. Nobod
                                // At the cap, code sends directive:'draft_now'.
 
 // THE CONVERSE DRAFT GATE: a volunteered draft is accepted only when `what` and `why` are
-// 'covered' — or explicitly skipped. draft_now always accepts.
+// 'covered' (or explicitly skipped) AND ownership is settled — takes_responsibility, or
+// the ownership check already ran. draft_now always accepts.
+//
+// ALL DRAFTING POLICY IS ONE PURE FUNCTION, consulted client-side after every model turn:
+//   nextAction(state) -> 'ownership_check' | 'escalate_draft' | 'idle'
+// 'ownership_check': the gate opened but the account deflects and hasn't been checked.
+//   The check is CODE-AUTHORED FIXED COPY from stateConfig (never model-generated — the
+//   most delicate sentence in the product is not left to temperature), rendered as an
+//   assistant turn, recorded in the wire history, consuming NO model turn. It fires at
+//   most ONCE PER INCIDENT (each account is its own signed document) and shares the
+//   once-ever budget with the model's own ownership nudge. The reply to it is a NORMAL
+//   model turn — ownership re-assessed, the draft reflects whatever they actually said.
+//   More deflection still drafts. It never blocks. The check copy must read correctly
+//   against EVERY shape of deflection: blame, minimizing, wrong-place-wrong-time, panic.
+// 'escalate_draft': the gate opened, ownership settled, the model still didn't draft —
+//   the client re-calls with draft_now. (Server-side escalation is dead; one home.)
+// "Write it now" BYPASSES both — it is the explicit exit, and the exit lives in the
+//   interface, never in the copy (CLAUDE.md H6).
 
 // SKIP WAIVES THE GATE for that stage, and a skipped stage is never asked about again.
 // Their no is final; holding a gate after an explicit skip is interviewing someone
@@ -287,10 +313,23 @@ const MAX_FOLLOWUP_TURNS = 14  // a RUNAWAY-LOOP BACKSTOP, not a hurry-up. Nobod
 
 > **The prompt shapes behavior; code bounds it. Anything that must be true belongs in code.**
 
-## 6. The system prompt
+## 6. The system prompts — TWO of them, sharing one preamble
 
-> Every clause is an invariant made operational. Treat this like the copy — reviewed, versioned,
-> not regenerated. Store it in the serverless function, not the client.
+> Every clause is an invariant made operational. Treat this like the copy — reviewed,
+> versioned, not regenerated. Stored server-side; the state-published factors are INJECTED
+> from `request.guidance` (the client owns stateConfig — a new state is a config file, not
+> a prompt edit). Source of truth: `src/agent/prompt.ts`.
+>
+> **The INTERVIEW prompt** gathers: stages, ownership assessment, one question at a time.
+> **The DRAFTING prompt** is a distinct instruction — "you are now writing the final
+> account" — generation is its own job, not a mid-conversation side effect.
+>
+> **The typist line was rewritten (2026-07-20).** "You are not their conscience. You are
+> their typist" contradicted the ownership advocacy — a model told it is a typist
+> soft-pedals the one instruction that matters. Now: never judges, never invents remorse,
+> but NOT a bystander — states what boards publish and recommends addressing it, once.
+> Advocacy about published criteria is coaching (L5), not conscience. The nudge sample is
+> de-hedged per CLAUDE.md H6: advocate, then stop.
 
 ```
 You help a person write one honest account of an arrest, for a criminal history evaluation
@@ -413,7 +452,7 @@ The component is not finished until these pass by hand:
 
 | Input | Required behavior |
 |---|---|
-| **"It was mostly my buddy's fault, I just got caught up"** | Asks about their own part. Suggests ownership **once**. If the user holds firm, drafts what they said — with **no invented remorse.** |
+| **"It was mostly my buddy's fault, I just got caught up"** | `ownership` reads `deflecting`. When the gate opens, the code-authored check fires ONCE, in the approved register (advocate, stop — no escape clause). If they add their part, the draft shows it; if they hold firm, it drafts what they said — **no invented remorse, never blocked.** |
 | **Three sentences, then "just write it"** | Drafts immediately. No follow-up loop. Usable output from thin input. |
 | **User declines a nudge, keeps talking** | That factor is never raised again. |
 | **Incident with 3 charges, user explains only 1** | Asks about the others **once**, then writes one account covering what it has. |

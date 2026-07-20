@@ -41,7 +41,9 @@ const MONTHS = [
  * a human reads in the UI gets the long form. Anything unparsable passes through untouched.
  */
 export function formatLongDate(mmddyyyy: string): string {
-  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(mmddyyyy.trim())
+  // Accept the slashless 8-digit form too — data typed before the mask existed, or
+  // pasted around it, still deserves to read as a date.
+  const m = /^(\d{2})\/?(\d{2})\/?(\d{4})$/.exec(mmddyyyy.trim())
   if (!m) return mmddyyyy
   const month = Number(m[1])
   const day = Number(m[2])

@@ -153,7 +153,7 @@ export function MobileRail() {
         </Popover.Root>
       </div>
 
-      <div className="flex items-center justify-between border-b-2 border-ink bg-rail px-5 py-3 sm:px-8">
+      <div className="flex items-center justify-between border-b border-rail-line bg-rail px-5 py-3 sm:px-8">
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-rail-ink text-rail-ink">
             <Icon name={current.icon} size={14} />

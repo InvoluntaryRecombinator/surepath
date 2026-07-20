@@ -24,19 +24,17 @@ export function Rail() {
   const counterText = formatCounter(counts)
 
   return (
-    <aside className="relative hidden w-[232px] shrink-0 flex-col overflow-y-auto border-r-2 border-ink bg-rail lg:flex">
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-0 w-px bg-field/10"
-      />
-      {/* ── identity ── */}
+    <aside className="hidden w-[248px] shrink-0 flex-col overflow-y-auto bg-rail lg:flex">
+      {/* ── identity — the rail carries what the dead header used to: the product AND the
+          formal name of the legal artifact being assembled. ── */}
       <div className="border-b border-rail-line px-5 pb-5 pt-6">
         <div className="flex items-center gap-2.5">
           <Mark />
           <span className="text-[18px] font-[750] text-rail-ink">SurePath</span>
         </div>
-        <p className="mt-1.5 pl-[34px] text-[12px] font-medium text-rail-muted">
-          {config.railTag}
+        <p className="mt-3 text-[12px] font-medium leading-[1.5] text-rail-muted">
+          {config.processName}
+          <span className="mt-0.5 block text-[11.5px] text-rail-muted/80">{config.railTag}</span>
         </p>
       </div>
 

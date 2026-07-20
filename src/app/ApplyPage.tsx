@@ -11,6 +11,7 @@ import { AboutYouSection } from './sections/AboutYouSection'
 import { RecordSection } from './sections/RecordSection'
 import { StorySection } from './sections/StorySection'
 import { LicensesSection } from './sections/LicensesSection'
+import { ReviewSection } from './sections/ReviewSection'
 import { StubSection } from './sections/StubSection'
 
 function CurrentSection() {
@@ -24,6 +25,8 @@ function CurrentSection() {
       return <StorySection />
     case 'licenses':
       return <LicensesSection />
+    case 'review':
+      return <ReviewSection />
     default:
       return <StubSection />
   }

@@ -113,11 +113,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
                       Back
                     </Button>
                   )}
-                  {isLast ? (
-                    <Button variant="primary" disabled title="The review step is being built.">
-                      Generate my packet
-                    </Button>
-                  ) : (
+                  {/* The last section owns its own primary action (Generate lives inside
+                      Review, at the wall). The cluster keeps Back + the saved whisper. */}
+                  {!isLast && (
                     <Button variant="primary" type="submit">
                       Continue
                       <ArrowRight />

@@ -55,7 +55,7 @@ export function MobileRail() {
               <nav aria-label="Application steps" className="border-y border-line/70 py-2">
                 {config.sections.map((section, i) => {
                   const visited = i <= state.maxReachedIndex
-                  const complete = validateSection(section.id, state.draft).complete
+                  const complete = validateSection(section.id, state.draft, { agency: config.agency }).complete
                   const status =
                     i === currentIdx
                       ? 'current'

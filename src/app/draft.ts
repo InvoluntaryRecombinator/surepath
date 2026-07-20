@@ -82,7 +82,7 @@ export const emptyApplicant: DraftApplicant = {
   gender: '',
   addressStreet: '',
   addressCity: '',
-  addressState: 'Texas',
+  addressState: '', // state default applied from stateConfig at store init — never hardcoded here
   addressZip: '',
   phone: '',
   email: '',

@@ -116,7 +116,9 @@ describe('draftToCase — fails closed on anything incomplete', () => {
   it('throws when a story is missing — a blank Item 21 is a rejected packet', () => {
     const draft = handEnteredMarcus()
     draft.incidents[1].narrativeDraft = '   '
-    expect(() => draftToCase(draft)).toThrow(/Item 21/)
+    // generic without context; the state's own words with it
+    expect(() => draftToCase(draft)).toThrow(/left blank/)
+    expect(() => draftToCase(draft, { agency: 'TDLR', narrativeItemLabel: 'Item 21' })).toThrow(/TDLR.*Item 21/)
   })
 
   it('throws when no license is chosen', () => {

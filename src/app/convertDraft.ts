@@ -9,7 +9,7 @@
  */
 import type { Applicant, Case, Charge, Incident } from '../types/case'
 import type { DraftCase, DraftCharge, DraftIncident } from './draft'
-import { validateSection } from './sectionValidation'
+import { validateSection, type ValidationContext } from './sectionValidation'
 
 export class IncompleteDraftError extends Error {
   issues: string[]
@@ -50,22 +50,13 @@ function toIncident(i: DraftIncident): Incident {
   }
 }
 
-export function draftToCase(draft: DraftCase): Case {
+export function draftToCase(draft: DraftCase, ctx: ValidationContext = {}): Case {
   const issues: string[] = [
-    ...validateSection('info', draft).issues,
-    ...validateSection('record', draft).issues,
-    ...validateSection('story', draft).issues,
+    ...validateSection('info', draft, ctx).issues,
+    ...validateSection('record', draft, ctx).issues,
+    ...validateSection('story', draft, ctx).issues,
+    ...validateSection('licenses', draft, ctx).issues,
   ].map((i) => i.message)
-
-  // License completeness lives here (not in sectionValidation) until the Licenses UI
-  // exists — a Continue gate on a stub screen would strand the user with no way to fix it.
-  if (draft.licenses.length === 0) {
-    issues.push('Choose at least one license type to generate a packet for.')
-  }
-  draft.licenses.forEach((l, i) => {
-    if (!l.program.trim()) issues.push(`License ${i + 1}: missing the program.`)
-    if (!l.specificLicenseType.trim()) issues.push(`License ${i + 1}: missing the license type.`)
-  })
 
   if (issues.length > 0) throw new IncompleteDraftError(issues)
 

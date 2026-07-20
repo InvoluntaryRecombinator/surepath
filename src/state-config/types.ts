@@ -52,8 +52,32 @@ export type StateConfig = {
 
   /** Field defaults this state can safely pre-fill (never a charge-unique field — A12). */
   defaults: {
-    incidentState: string // "Texas" — most convictions entered here happened in-state. Editable.
+    incidentState: string // most convictions entered here happened in-state. Editable.
+    addressState: string // mailing-address dropdown default. Editable.
   }
+
+  /** The fee per license type and the statutory answer window — single-sourced from the
+   *  state's data file, displayed by the UI, never typed in a component. */
+  feeUsd: number
+  turnaroundDays: number
+
+  /** The license catalog: real program names from the agency, verify-flagged in data/. */
+  catalog: { program: string; examples: string[]; demo?: boolean }[]
+
+  /** External links the chassis renders. Attributed, never hardcoded in a component. */
+  links: {
+    agencySite: { label: string; url: string }
+    guidelines: { label: string; url: string }
+  }
+
+  /** H1/H2 — the state's own caveats about its guidelines, displayed prominently. */
+  honestyBanner: string
+
+  /** H3/H4 — the review-wall warnings, in the state's terms. */
+  reviewWarnings: string[]
+
+  /** The §-cited factors quote for the story screen. Static, attributed. (L5) */
+  storyFactors: { quote: string; cite: string }
 
   /** FAQ items surfaced next to the record intake, in the state's own words where possible. */
   recordFaq: FaqItem[]
@@ -68,6 +92,8 @@ export type StateConfig = {
     addIncidentHint: string
     addSingleCharge: string
     addSingleChargeHint: string
+    /** What the narrative box is called on this state's forms (e.g. "Item 21"). */
+    narrativeItemLabel: string
   }
 
   /** The packet service inputs for this state — template names as served from

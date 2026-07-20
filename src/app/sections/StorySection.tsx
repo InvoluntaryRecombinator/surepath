@@ -12,13 +12,10 @@
  * a statute. No outcome language anywhere (L1).
  */
 import { useState } from 'react'
-import links from '../../../data/tdlr_links.json'
 import { Button } from '../../ui/Button'
 import { CheckSmall, ArrowLeft } from '../../ui/icons'
 import type { DraftIncident } from '../draft'
 import { useAppStore } from '../storeContext'
-
-const factors = links.statutes.factors_considered
 
 function incidentSummary(i: DraftIncident) {
   return [i.dateOfConviction, i.county && `${i.county} County`, i.court]
@@ -70,7 +67,8 @@ function AccountCard({
 }
 
 function WritingScreen({ incident, onBack }: { incident: DraftIncident; onBack: () => void }) {
-  const { dispatch } = useAppStore()
+  const { dispatch, config } = useAppStore()
+  const factors = config.storyFactors
 
   return (
     <div>
@@ -105,7 +103,7 @@ function WritingScreen({ incident, onBack }: { incident: DraftIncident; onBack: 
         {/* ── guidance — static, cited, and marked for what it is (L5) ── */}
         <aside className="flex flex-col gap-5">
           <div>
-            <h2 className="text-[15px] font-semibold text-ink">What TDLR asks for</h2>
+            <h2 className="text-[15px] font-semibold text-ink">What {config.agency} asks for</h2>
             <p className="mt-1.5 text-[13.5px] leading-[1.6] text-muted">
               What exactly you did, and why — in your own words, not the offense name. One
               account covering everything from this arrest, together.
@@ -115,7 +113,7 @@ function WritingScreen({ incident, onBack }: { incident: DraftIncident; onBack: 
             <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">
               What the law says boards weigh
             </h3>
-            <p className="mt-1.5 text-[13px] leading-[1.6] text-ink/80">{factors.what}</p>
+            <p className="mt-1.5 text-[13px] leading-[1.6] text-ink/80">{factors.quote}</p>
             <p className="mt-1.5 text-[12px] font-medium text-muted">— {factors.cite}</p>
           </div>
           <div>

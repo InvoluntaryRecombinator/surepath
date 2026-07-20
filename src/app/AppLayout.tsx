@@ -26,7 +26,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const isLast = idx === config.sections.length - 1
   const [attemptedSectionId, setAttemptedSectionId] = useState<string | null>(null)
   const errorSummaryRef = useRef<HTMLDivElement>(null)
-  const validation = validateSection(stage.id, state.draft)
+  const validation = validateSection(stage.id, state.draft, {
+    agency: config.agency,
+    narrativeItemLabel: config.copy.narrativeItemLabel,
+  })
   const showValidation = attemptedSectionId === stage.id && !validation.complete
 
   const go = (i: number) => {

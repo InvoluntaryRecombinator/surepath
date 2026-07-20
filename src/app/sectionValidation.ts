@@ -1,5 +1,9 @@
 import type { DraftCase } from './draft'
 
+/** State-specific message context. Optional: without it, messages stay generic — no agency
+ *  name or form-item label is ever hardcoded here. */
+export type ValidationContext = { agency?: string; narrativeItemLabel?: string }
+
 export type ValidationIssue = {
   field: string
   message: string
@@ -123,27 +127,50 @@ function recordValidation(draft: DraftCase): SectionValidation {
   return { complete: issues.length === 0, issues }
 }
 
-function storyValidation(draft: DraftCase): SectionValidation {
+function storyValidation(draft: DraftCase, ctx: ValidationContext): SectionValidation {
+  const agency = ctx.agency ?? 'the licensing board'
+  const item = ctx.narrativeItemLabel ?? 'the account'
   const issues: ValidationIssue[] = []
   draft.incidents.forEach((incident, i) => {
     if (!hasText(incident.narrativeDraft)) {
       issues.push({
         field: `incidents.${incident.id}.narrativeDraft`,
-        message: `Incident ${i + 1} still needs its account — TDLR won't process a request with Item 21 left blank.`,
+        message: `Incident ${i + 1} still needs its account — ${agency} won't process a request with ${item} left blank.`,
       })
     }
   })
   return { complete: issues.length === 0, issues }
 }
 
-export function validateSection(sectionId: string, draft: DraftCase): SectionValidation {
+function licensesValidation(draft: DraftCase): SectionValidation {
+  const issues: ValidationIssue[] = []
+  if (draft.licenses.length === 0) {
+    issues.push({
+      field: 'licenses',
+      message: 'Choose at least one license type — each one becomes its own packet.',
+    })
+  }
+  draft.licenses.forEach((l, i) => {
+    if (!hasText(l.program)) issues.push({ field: `licenses.${i}.program`, message: `License ${i + 1}: missing the program.` })
+    if (!hasText(l.specificLicenseType)) issues.push({ field: `licenses.${i}.specificLicenseType`, message: `License ${i + 1}: name the specific license type.` })
+  })
+  return { complete: issues.length === 0, issues }
+}
+
+export function validateSection(
+  sectionId: string,
+  draft: DraftCase,
+  ctx: ValidationContext = {},
+): SectionValidation {
   switch (sectionId) {
     case 'info':
       return applicantValidation(draft)
     case 'record':
       return recordValidation(draft)
     case 'story':
-      return storyValidation(draft)
+      return storyValidation(draft, ctx)
+    case 'licenses':
+      return licensesValidation(draft)
     default:
       // These stages do not expose required inputs yet. Add their rules with their UI.
       return { complete: true, issues: [] }

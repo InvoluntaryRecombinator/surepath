@@ -42,7 +42,7 @@ export function Rail() {
       <nav aria-label="Application steps" className="mt-4 px-3">
         {config.sections.map((section, i) => {
           const visited = i <= state.maxReachedIndex
-          const complete = validateSection(section.id, state.draft).complete
+          const complete = validateSection(section.id, state.draft, { agency: config.agency }).complete
           const status =
             i === currentIdx ? 'current' : !visited ? 'ahead' : complete ? 'done' : 'visited'
           const clickable = i <= state.maxReachedIndex && i !== currentIdx

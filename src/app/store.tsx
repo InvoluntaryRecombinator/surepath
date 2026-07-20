@@ -118,8 +118,10 @@ function makeReducer(config: StateConfig) {
 type Stored = { draft: DraftCase; sectionId: string; maxReachedIndex: number; savedAt: string }
 
 function initialState(config: StateConfig, restore = true): AppState {
+  const freshDraft = emptyDraft()
+  freshDraft.applicant.addressState = config.defaults.addressState
   const fresh: AppState = {
-    draft: emptyDraft(),
+    draft: freshDraft,
     sectionId: config.sections[0].id,
     maxReachedIndex: 0,
     resumed: false,

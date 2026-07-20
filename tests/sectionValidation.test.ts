@@ -88,6 +88,11 @@ describe('section completion', () => {
 
   it('treats stages without required UI as pass-through until their fields exist', () => {
     expect(validateSection('trade', emptyDraft()).complete).toBe(true)
-    expect(validateSection('licenses', emptyDraft()).complete).toBe(true)
+    // licenses now has a real rule: at least one, each with a named type
+    expect(validateSection('licenses', emptyDraft()).complete).toBe(false)
+    const withLicense = { ...emptyDraft(), licenses: [{ program: 'Electricians', specificLicenseType: 'Apprentice Electrician' }] }
+    expect(validateSection('licenses', withLicense).complete).toBe(true)
+    const unnamed = { ...emptyDraft(), licenses: [{ program: 'Electricians', specificLicenseType: '' }] }
+    expect(validateSection('licenses', unnamed).complete).toBe(false)
   })
 })

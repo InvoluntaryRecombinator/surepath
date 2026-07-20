@@ -6,9 +6,11 @@
  * item is OURS and is marked as an open question (L8). Deferred adjudications are
  * reported like convictions (D2). There is no lookback window (D1).
  */
+import catalog from '../../data/tx_licenses.json'
+import links from '../../data/tdlr_links.json'
 import type { StateConfig } from './types'
 
-const TDLR_CHEL_URL = 'https://www.tdlr.texas.gov/crimHistoryEval.htm' // data/tdlr_links.json → tdlr.chel_page
+const TDLR_CHEL_URL = links.tdlr.chel_page.url
 
 export const txConfig: StateConfig = {
   code: 'TX',
@@ -78,6 +80,35 @@ export const txConfig: StateConfig = {
 
   defaults: {
     incidentState: 'Texas',
+    addressState: 'Texas',
+  },
+
+  feeUsd: links.tdlr.fee_usd,
+  turnaroundDays: links.tdlr.turnaround_days,
+
+  catalog: catalog.programs,
+
+  links: {
+    agencySite: { label: links.tdlr.chel_page.label, url: links.tdlr.chel_page.url },
+    guidelines: {
+      label: links.tdlr.criminal_conviction_guidelines.label,
+      url: links.tdlr.criminal_conviction_guidelines.url,
+    },
+  },
+
+  honestyBanner:
+    'These guidelines are not an exclusive list — TDLR can consider crimes not listed. TDLR also states that multiple violations of any criminal statute are always reviewed, for any license type. This does not tell you what TDLR will decide. Only TDLR can tell you that.',
+
+  reviewWarnings: [
+    'The letter is advisory. TDLR is not bound by it, and there is no appeal from it. You can apply for the license no matter what it says.',
+    'It is only as good as what you disclosed. TDLR compares your report against state records.',
+    'The real license application runs a full DPS/FBI fingerprint background check. Anything left out here gets found there.',
+    'A new charge between this letter and your real application changes everything.',
+  ],
+
+  storyFactors: {
+    quote: links.statutes.factors_considered.what,
+    cite: links.statutes.factors_considered.cite,
   },
 
   recordFaq: [
@@ -120,6 +151,7 @@ export const txConfig: StateConfig = {
     addIncidentHint: 'One arrest or event — even if it led to several charges.',
     addSingleCharge: 'Add a single conviction',
     addSingleChargeHint: 'One conviction, on its own.',
+    narrativeItemLabel: 'Item 21',
   },
 
   forms: {

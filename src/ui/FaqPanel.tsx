@@ -5,7 +5,7 @@
  */
 import type { FaqItem } from '../state-config/types'
 
-export function FaqPanel({ items, agency }: { items: FaqItem[]; agency: string }) {
+export function FaqPanel({ items }: { items: FaqItem[] }) {
   return (
     <section aria-label="Common questions">
       <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-muted">
@@ -32,12 +32,11 @@ export function FaqPanel({ items, agency }: { items: FaqItem[]; agency: string }
                   rel="noreferrer"
                   className="mt-1.5 inline-block text-[12.5px] font-medium text-accent hover:underline"
                 >
-                  {agency}'s answer, in full, on their site ↗
+                  Read the official guidance ↗
                 </a>
               ) : (
                 <p className="mt-1.5 text-[12.5px] font-medium text-muted">
-                  This one is our note, not {agency}'s — it is an unresolved question. Neither
-                  choice is ours to make for you.
+                  This is our note, not official guidance. The decision is yours to make.
                 </p>
               )}
             </div>

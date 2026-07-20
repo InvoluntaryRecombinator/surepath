@@ -14,7 +14,7 @@ export const txConfig: StateConfig = {
   code: 'TX',
   stateName: 'Texas',
   agency: 'TDLR',
-  railTag: 'Texas · TDLR',
+  railTag: 'Texas licensing request',
   processName: 'Criminal History Evaluation Letter — request packet',
   routeBase: '/texas',
 
@@ -25,8 +25,8 @@ export const txConfig: StateConfig = {
       icon: 'briefcase',
       intro: {
         eyebrow: 'Before you begin',
-        title: 'Check that TDLR licenses your trade',
-        lead: 'The Criminal History Evaluation Letter comes from the Texas Department of Licensing and Regulation, and it covers only the trades TDLR licenses. Nursing, medicine, and several other fields belong to different boards with their own processes. Confirm your trade is TDLR\u2019s before entering anything else.',
+        title: 'Confirm this is the right licensing process',
+        lead: 'This request is only for trades handled by the Texas licensing board. Nursing, medicine, and other professions use different boards. Confirm your trade is covered before entering personal or criminal-history information.',
       },
     },
     {
@@ -36,7 +36,7 @@ export const txConfig: StateConfig = {
       intro: {
         eyebrow: 'Applicant',
         title: 'Your identifying information',
-        lead: 'TDLR uses this section to identify you, to match the history you report against state records, and to mail you their written decision. It is entered onto the official forms exactly as you type it here — use your legal name, and an address and email you check.',
+        lead: 'This identifies you and is used to search your criminal history. The contact details you enter are how the licensing board will reach you about your request.',
       },
     },
     {
@@ -46,10 +46,11 @@ export const txConfig: StateConfig = {
       intro: {
         eyebrow: 'Criminal history',
         title: 'Every conviction and deferred adjudication',
-        lead: 'Working from your criminal history report, list each incident \u2014 one arrest or event \u2014 and every conviction that came from it. Only the facts are needed on this page; the explanation TDLR asks for is written in the next section, one account per incident.',
+        lead: 'Use your criminal history report to list every conviction and deferred adjudication, grouped by the arrest or event they came from. Each record needs the court, dates, exact offense name, and sentence.',
         points: [
-          'TDLR requires every conviction and every deferred adjudication, no matter how old. There is no cutoff year.',
-          'Enter what you know. If a detail like the court name is beyond reach, say so in the field and keep going.',
+          'Include records no matter how old they are. There is no cutoff year.',
+          'A deferred adjudication must be included even though it is not technically a conviction.',
+          'If a detail is missing from your report, use the clerk information below to find it.',
         ],
       },
     },
@@ -60,7 +61,7 @@ export const txConfig: StateConfig = {
       intro: {
         eyebrow: 'Your account',
         title: 'What happened, in your own words',
-        lead: 'TDLR requires a description of what you did and why, for every conviction. It is written once per incident and it stays in your words \u2014 nothing is added that you did not say.',
+        lead: 'Each incident needs an account of what happened and why. Write one account per incident. You will sign the completed forms as true and complete, so the account must stay in your own words.',
       },
     },
     {
@@ -69,8 +70,8 @@ export const txConfig: StateConfig = {
       icon: 'certificate',
       intro: {
         eyebrow: 'License selection',
-        title: 'The licenses TDLR will evaluate',
-        lead: 'Choose the license types you want TDLR to review your history against. Each license type requires its own request packet and its own $10 fee, and TDLR answers each one separately.',
+        title: 'Choose each license you want reviewed',
+        lead: 'Your criminal history is reviewed separately for each license type. Each selection creates a separate request and requires a separate $10 fee.',
       },
     },
     {
@@ -80,7 +81,7 @@ export const txConfig: StateConfig = {
       intro: {
         eyebrow: 'Final check',
         title: 'Confirm your record is complete',
-        lead: 'TDLR does not process incomplete requests, and a conviction left out can make the letter worthless at the real application. Check the count on this page against your criminal history report before generating the packet.',
+        lead: 'Compare the incident and conviction counts here with your criminal history report. A missing record can make the response incomplete or unusable when you later apply for a license.',
       },
     },
   ],
@@ -92,31 +93,31 @@ export const txConfig: StateConfig = {
   recordFaq: [
     {
       q: 'How far back do I go?',
-      a: 'All the way. TDLR says every conviction and every deferred adjudication must be reported no matter how long ago it happened — they need the full history, and there is no ten-year cutoff.',
+      a: 'Include every conviction and deferred adjudication, no matter how long ago it happened. There is no ten-year cutoff.',
       attribution: 'tdlr',
       sourceUrl: TDLR_CHEL_URL,
     },
     {
       q: 'I got deferred adjudication, not a conviction. Do I still list it?',
-      a: 'Yes. TDLR requires deferred adjudications to be reported even though a deferred adjudication is not technically a conviction.',
+      a: 'Yes. A deferred adjudication must be included even though it is not technically a conviction.',
       attribution: 'tdlr',
       sourceUrl: TDLR_CHEL_URL,
     },
     {
       q: "Do I list a DWI? Isn't that a traffic violation?",
-      a: 'List it. TDLR treats a DWI as a criminal offense that must be reported, not a minor traffic violation.',
+      a: 'Yes. A DWI is a criminal offense that must be included, not a minor traffic violation.',
       attribution: 'tdlr',
       sourceUrl: TDLR_CHEL_URL,
     },
     {
       q: "What if I can't remember the court, or an exact date?",
-      a: 'TDLR suggests calling the county clerk (for misdemeanors) or the district clerk (for felonies) in the county where it happened — they can look it up for you.',
+      a: 'Call the county clerk for a misdemeanor or the district clerk for a felony in the county where it happened. The clerk can look up the case details.',
       attribution: 'tdlr',
       sourceUrl: TDLR_CHEL_URL,
     },
     {
       q: 'What about expunged or sealed records?',
-      a: 'We cannot tell you whether an expunged or sealed record has to be disclosed. Expunction and an order of nondisclosure are different things, and the answer is different for each. This is a question for TDLR or a lawyer — ask before you decide, and decide for yourself. We will never leave one out for you, and we will never tell you to leave one out.',
+      a: 'We cannot tell you whether an expunged or sealed record has to be disclosed. Expunction and an order of nondisclosure are different, and the answer may differ for each. Ask the board or a lawyer before you decide.',
       attribution: 'surepath-open-question',
     },
   ],

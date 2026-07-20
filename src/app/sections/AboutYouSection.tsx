@@ -45,7 +45,7 @@ const OWNERSHIP_LABEL: Record<string, string> = Object.fromEntries(
 )
 
 export function AboutYouSection() {
-  const { state, dispatch, config } = useAppStore()
+  const { state, dispatch } = useAppStore()
   const a = state.draft.applicant
   const patch = (p: Partial<DraftApplicant>) => dispatch({ type: 'update-applicant', patch: p })
 
@@ -53,7 +53,7 @@ export function AboutYouSection() {
     <div className="flex flex-col gap-10 xl:gap-12">
       <FieldGroup
         heading="Match your identification"
-        description="Use your name exactly as it appears on your government-issued ID. The packet and your ID need to match."
+        description="Enter your name exactly as it appears on your government-issued ID."
         signatureSlot
       >
         <FieldRow>
@@ -87,19 +87,24 @@ export function AboutYouSection() {
             placeholder="Jr, Sr, III"
           />
         </FieldRow>
+      </FieldGroup>
+
+      <FieldGroup
+        heading="Other names you've been known by"
+        description="Include any name you've used before — a maiden name, a married name, or any other name you've gone by. These are needed to search your history accurately and get a correct eligibility determination."
+      >
         <TextField
-          label="Other names you've been known by"
+          label="Names to include"
           value={a.allKnownNames}
           onChange={(e) => patch({ allKnownNames: e.target.value })}
           placeholder="e.g. Marcus D. Rivera; Marc Rivera"
-          info={
-            <>
-              Maiden names, old married names, aliases, spellings a court might have used —
-              anything your records could be filed under. {config.agency} matches your history
-              against every name, so a name you leave out can make a record look hidden.
-            </>
-          }
         />
+      </FieldGroup>
+
+      <FieldGroup
+        heading="Date of birth and gender"
+        description="Use the date of birth and gender shown on your government-issued ID. The official form provides only Male and Female."
+      >
         <FieldRow>
           <TextField
             label="Date of birth"
@@ -122,20 +127,13 @@ export function AboutYouSection() {
               { value: 'male', label: 'Male' },
               { value: 'female', label: 'Female' },
             ]}
-            info={
-              <>
-                {config.agency}'s form offers exactly these two boxes — this is the state's
-                form, not our choice. Pick the one that matches your government ID so the
-                packet and your ID agree.
-              </>
-            }
           />
         </FieldRow>
       </FieldGroup>
 
       <FieldGroup
-        heading="Use contact details you check"
-        description={`${config.agency} mails their decision here and may contact you during review. A P.O. Box works for the mailing address.`}
+        heading="Where to reach you"
+        description="This is how you'll be reached about your request. Use an address and email you actually check."
       >
         <TextField
           label="Street address"
@@ -202,17 +200,16 @@ export function AboutYouSection() {
         <p className="flex items-center gap-1.5 pt-1 text-[13px] text-muted">
           No Social Security Number field? Right — we never ask for it.
           <InfoBubble label="Why there is no SSN field">
-            {config.agency}'s form has an SSN box, but you'll fill it in <em>by hand, in
-            pen, after you print</em> — the checklist shows you every place it goes. Your
-            SSN never touches SurePath, this computer, or the internet. It exists only in
-            your handwriting, on paper you control.
+            The official form has an SSN box, but you'll fill it in <em>by hand, in pen,
+            after you print</em>. Your SSN never touches SurePath, this computer, or the
+            internet. It exists only in your handwriting, on paper you control.
           </InfoBubble>
         </p>
       </FieldGroup>
 
       <FieldGroup
-        heading="Answer for your status today"
-        description={`${config.agency} asks for supervising-officer details only when you are currently on parole or probation.`}
+        heading="Current supervision"
+        description="Answer yes if you currently report to a parole or probation officer. Community supervision after a deferred adjudication counts as probation. If you answer yes, include the officer's current contact information."
       >
         <DecisionBlock>
           <ChoiceField
@@ -263,12 +260,6 @@ export function AboutYouSection() {
               { value: 'no', label: 'No' },
               { value: 'yes', label: 'Yes' },
             ]}
-            info={
-              <>
-                Community supervision after a deferred adjudication counts as probation here.
-                If you report to an officer, answer yes and give their contact.
-              </>
-            }
           />
           {a.onProbation && (
             <ConditionalFields>
@@ -297,8 +288,8 @@ export function AboutYouSection() {
       </FieldGroup>
 
       <FieldGroup
-        heading="Only if a company is applying"
-        description="This applies when a company you own or direct is seeking its own license. Individual applicants answer no."
+        heading="Company applications only"
+        description="Answer yes only if you own or direct a company that is applying for its own license. If you are applying only for yourself, answer no."
         last
       >
         <DecisionBlock last>
@@ -313,13 +304,6 @@ export function AboutYouSection() {
               { value: 'no', label: 'No' },
               { value: 'yes', label: 'Yes' },
             ]}
-            info={
-              <>
-                A "controlling person" owns or directs a company — an owner, partner, officer,
-                or major shareholder. If you're applying for a license as yourself, the answer
-                is no, and the company questions stay out of your way.
-              </>
-            }
           />
           {a.isControllingPerson && (
             <ConditionalFields>

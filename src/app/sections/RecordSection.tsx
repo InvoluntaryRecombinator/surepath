@@ -63,13 +63,7 @@ function ChargeRow({
         value={charge.exactOffense}
         onChange={(e) => patch({ exactOffense: e.target.value })}
         placeholder="e.g. Possession of a Controlled Substance, Penalty Group 1, less than 1 gram"
-        info={
-          <>
-            The full offense name from the court paperwork — not shorthand like "drug charge."
-            If several charges came from this arrest, each one gets its own entry here, with
-            its own exact name.
-          </>
-        }
+        hint='Use the full name from the court paperwork, not shorthand such as "drug charge."'
       />
 
       <TextField
@@ -80,6 +74,10 @@ function ChargeRow({
         placeholder="e.g. 6 months county jail; $1,500 fine (paid)"
       />
 
+      <p className="text-[13px] leading-[1.55] text-muted">
+        Choose the resolution shown in your court record. A deferred adjudication must still
+        be included even though it is not a conviction.
+      </p>
       <ChoiceField
         label="How it was resolved"
         required
@@ -90,13 +88,6 @@ function ChargeRow({
           { value: 'conviction', label: 'Conviction' },
           { value: 'deferred_adjudication', label: 'Deferred adjudication' },
         ]}
-        info={
-          <>
-            A deferred adjudication is listed exactly like a conviction — {config.agency}{' '}
-            requires it even though it is not technically a conviction. This choice only
-            changes how we label it for you; it is always included.
-          </>
-        }
       />
     </div>
   )
@@ -152,13 +143,7 @@ function IncidentCard({ incident, ordinal }: { incident: DraftIncident; ordinal:
             value={incident.court}
             onChange={(e) => patch({ court: e.target.value })}
             placeholder="e.g. 178th District Court"
-            info={
-              <>
-                Can't recall which court? {config.agency} suggests calling the county clerk
-                (misdemeanors) or the district clerk (felonies) in the county where it
-                happened — they can look it up for you.
-              </>
-            }
+            hint="If you do not know the court, call the county clerk for a misdemeanor or the district clerk for a felony."
           />
         </div>
         <TextField
@@ -234,7 +219,7 @@ export function RecordSection() {
         </div>
       </div>
 
-      <FaqPanel items={config.recordFaq} agency={config.agency} />
+      <FaqPanel items={config.recordFaq} />
     </div>
   )
 }

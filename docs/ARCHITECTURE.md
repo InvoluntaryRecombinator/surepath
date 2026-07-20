@@ -468,8 +468,11 @@ POST { facts, why, whatChanged, madeItRight, offenses[], style }
 - Exists only because API keys cannot live in a frontend bundle.
 - **Receives no name, DOB, SSN, address, phone, or email.** Reject the request if any
   key resembling an identifier is present. Fail closed.
-- **Zero-retention provider configuration.** Record the provider and the config in this
-  file. Verify it against their terms; do not assume.
+- **Provider + retention, recorded (D6):** the Anthropic API via the Vercel AI SDK
+  (`@ai-sdk/anthropic`, `generateObject`, Zod-validated). Anthropic's commercial API
+  terms state inputs/outputs are not used to train models by default. ⚠️ Re-verify this
+  against Anthropic's current commercial terms before the demo, and re-record the date
+  here when confirmed. Provider is swappable in one line in `src/agent/server.ts`.
 - **Log nothing but a status code.** Not the body. Not on error.
 - Stateless. No storage.
 

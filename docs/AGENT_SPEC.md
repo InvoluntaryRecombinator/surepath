@@ -125,54 +125,36 @@ type NarrativeContext = {
 > typing dots, "AI is thinking…", a send button with a paper-plane icon. **Ours is not a
 > support bot bolted onto a page. It is the workspace for the hardest thing on the form.**
 
-Clicking a card in the "Your story" list opens a **full-bleed takeover of the content area** —
-the only screen in the app that earns one. Three regions:
+Clicking a card in the "Your story" list opens the workbench — **one full-width vertical
+column** (revised 2026-07-20; the old three-region/side-panel layout and the four prompt
+boxes are dead — pre-collecting the interview left the model nothing to do but format):
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│  ← Back to your record                                        MARCH 14, 2019     │  A. FACT STRIP
-│  Harris County · 178th District Court                                            │     pinned, never
-│  ┌────────────────────┐ ┌──────────────────┐ ┌──────────────────────────────┐    │     scrolls away
-│  │ Possession, PG1<1g │ │ Evading Arrest   │ │ Assault Causing Bodily Injury│    │     ← ALL charges,
-│  └────────────────────┘ └──────────────────┘ └──────────────────────────────┘    │       visible while
-├───────────────────────────────────────────┬──────────────────────────────────────┤       they write
-│                                           │                                      │
-│  B. THE EXCHANGE                          │  C. THE ACCOUNT                      │
-│  ───────────────                          │  ─────────────                       │
-│                                           │                                      │
-│  What happened that night?                │  (empty until drafted)               │
-│  ┌─────────────────────────────────────┐  │                                      │
-│  │ user writes here                    │  │  then: the draft, EDITABLE,          │
-│  └─────────────────────────────────────┘  │  with provenance marks               │
-│                                           │                                      │
-│  Why did things go the way they did?      │  ┌────────────────────────────────┐  │
-│  ┌─────────────────────────────────────┐  │  │ On March 14, 2019 I was …      │  │
-│  │                                     │  │  │                                │  │
-│  └─────────────────────────────────────┘  │  │ ⚠ I completed anger management │  │
-│                                           │  │   ↑ you didn't mention this    │  │
-│  [ assistant's follow-up appears here,    │  └────────────────────────────────┘  │
-│    in its own voice, visually distinct ]  │                                      │
-│                                           │  [ Save this account ]               │
-└───────────────────────────────────────────┴──────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│ DARK FACT STRIP (sticky) — May 1, 1992 · Harris County · court   │  dates LONG-FORM
+│ [charge chip] [charge chip] [charge chip]                        │  in display prose
+│ ── coverage strip: What happened · Why · What's changed ·        │  (forms/PDFs keep
+│    Making it right — markers straight off the model's stages ──  │   MM/DD/YYYY)
+├──────────────────────────────────────────────────────────────────┤
+│ THE CONVERSATION, full width                                     │
+│ │ agent turns — left accent rule; the current question is BOLD   │
+│ │ with its plain reason underneath                                │
+│ ▒ user turns — tinted blocks ▒                                   │
+│                                                                  │
+│ [ large input ]   Send · Skip this · Write it now from what      │
+│                   I've given                                     │
+│ "Skip the interview — I'll write it myself" (quiet; auto-        │
+│  revealed when the assistant is unavailable)                     │
+├══════════════════════════════════════════════════════════════════┤  ← hard divider —
+│ THE ACCOUNT — nothing here until a draft exists (or the manual   │    NOTHING below
+│ path opens it). Editable · §7 affirmation · Save and continue    │    until drafted
+└──────────────────────────────────────────────────────────────────┘
 ```
 
-**Region A — the fact strip.** Date, county, court, and **every charge as a chip.** Pinned. It
-is on screen the entire time they write. This is *why* incidents exist: they can see all three
-charges and write one true account instead of three amputated ones.
+Still forbidden: bubbles, avatars, timestamps, typing dots, "AI is thinking…", paper-plane
+send buttons. The agent asks ONE question at a time, in the conversation.
 
-**Region B — the exchange.** Not a chat log. It reads as **a written interview**: the
-assistant's questions are typeset as prompts (distinct weight/color, not a bubble), the user's
-answers are their own text blocks. It grows downward. No avatars. No timestamps. No bubbles.
-
-**Region C — the account.** Empty until a draft exists. Then it holds the draft, fully
-editable, with provenance marks (§7). This is the artifact; B is the process. **Nothing enters
-the packet from B — only from C, and only on Save.**
-
-On narrow screens C stacks below B. B never becomes a floating panel.
-
-**Entry point** — the "Your story" card list (already spec'd in `PRD.md` Stage 5): one wide
-thin card per incident, charges listed, checkbox on the left, `n of m accounts done`, Continue
-hard-gated until all are complete.
+**Entry point** — the "Your story" card list (PRD Stage 5) is unchanged.
 
 ---
 
@@ -186,44 +168,46 @@ type AgentRequest = {
   messages: { role: 'user' | 'assistant'; content: string }[]
   directive: 'converse' | 'draft_now'   // ← code sets this, not the model
   alreadyNudged: string[]
+  skippedStages: StageKey[]             // their no is final — never re-asked, gate waived
 }
 ```
 
 **The directive is not "may you draft" — it is "you must draft now."** In `converse` mode the
-model may draft whenever it judges it has enough (§5); `draft_now` is only the ceiling — sent
-at the turn cap or on "Write it now," it REQUIRES a draft in that turn. Code sets the ceiling;
-the model never sets it for itself.
+model may draft whenever the gate allows and it judges it has enough (§5); `draft_now` is the
+ceiling — sent at the turn cap or on "Write it now," it REQUIRES a draft that turn.
 
 ### The RESPONSE is one JSON object. Never prose.
 
 ```ts
+type StageLevel = 'empty' | 'thin' | 'covered'
+// 'thin' is the state that matters: an answer that exists but says nothing usable.
+// "I'm in a program" is thin until it says which program, how long, whether it finished.
+
 type AgentTurn = {
-  reply: string                    // shown in region B. conversational, short.
-                                   // NEVER contains the question — questions live only in followUp.
-  coverage: {                      // keys MATCH rawAnswers keys exactly
-    facts: boolean
-    why: boolean
-    whatChanged: boolean
-    madeItRight: boolean
+  reply: string                    // conversational, short. NEVER the draft, NEVER a question.
+  stages: {                        // RE-REPORTED from the whole conversation, every turn.
+    what: StageLevel               // code renders the strip and gates the draft;
+    why: StageLevel                // code NEVER increments a stage itself.
+    changed: StageLevel
+    right: StageLevel
   }
-  readyToDraft: boolean            // means "I am drafting now" — see §5. A hint, never a gate.
-  followUp: string | null          // ONE question, or null
-  nudge: {
-    factor: 'ownership' | 'understanding' | 'change' | 'restitution'
-    text: string
+  readyToDraft: boolean            // a hint, never a gate
+  followUp: {                      // ONE question at a time
+    question: string               // rendered bold
+    reason: string | null          // plain, underneath — why the specifics matter.
+                                   // optional: forcing one on every question reads as nagging.
+    stage: StageKey | null         // what it probes — so a skip waives exactly that stage.
+                                   // never displayed.
   } | null
-  assumptions: string[]            // anything the model filled in that the user didn't say directly.
-                                   // SELF-REPORTED transparency. Not verification. See §7.
-  draft: string | null             // populated when the model judges it has enough, OR on draft_now
+  nudge: { factor: ...; text: string } | null
+  draft: string | null
 }
 ```
 
+There is deliberately **no `assumptions` field** — see §7.
+
 Enforced by a Zod schema through the AI SDK's structured-output mode, which retries
 automatically on malformed output.
-
-**`reply` never contains the question.** Questions live only in `followUp`. This matters
-because after the turn cap, code renders `reply` and suppresses `followUp` — which is only
-possible if the question was never embedded in the prose.
 
 ## 5. The state machine — the model drafts when ready. No permission ask.
 
@@ -279,19 +263,26 @@ free, the API-down degradation and the pre-proxy dev mode.
 ### Rules that live in CODE, not the prompt
 
 ```ts
-const MAX_FOLLOWUP_TURNS = 3   // at the cap, code sends directive:'draft_now'. It cannot loop.
+const MAX_FOLLOWUP_TURNS = 14  // a RUNAWAY-LOOP BACKSTOP, not a hurry-up. Nobody sane hits
+                               // it; the prompt pushes resolution in a handful of questions.
+                               // At the cap, code sends directive:'draft_now'.
 
-const nudgedFactors = new Set()
-// if turn.nudge && nudgedFactors.has(turn.nudge.factor) → DROP before render. Once, ever.
+// THE CONVERSE DRAFT GATE: a volunteered draft is accepted only when `what` and `why` are
+// 'covered' — or explicitly skipped. draft_now always accepts.
 
-// "Write it now" is visible from turn 1 — an escape hatch for someone who won't answer
-// anything. Not the primary path, but always available. Gather-but-never-gate.
+// SKIP WAIVES THE GATE for that stage, and a skipped stage is never asked about again.
+// Their no is final; holding a gate after an explicit skip is interviewing someone
+// against their will. `changed` and `right` are optional throughout: nudge once each
+// (the nudgedFactors set), then allow.
 
-// A6 banned-word regex runs over reply / followUp / nudge.text. On hit: retry once, then
-// drop the turn. The prompt forbids outcome language; code enforces it.
+// "Write it now" is visible whenever a conversation exists. The manual path
+// ("Skip the interview — I'll write it myself") is complete and model-free.
 
-// coverage and readyToDraft are HINTS. Nothing gates on them. They may only accelerate
-// the draft, never delay it.
+// A6 banned-word regex runs over reply / followUp.question / followUp.reason / nudge.text.
+// On hit: retry once, then drop the turn.
+
+// stages and readyToDraft come from the model wholesale; code renders and gates,
+// never increments.
 ```
 
 > **The prompt shapes behavior; code bounds it. Anything that must be true belongs in code.**
@@ -368,36 +359,35 @@ far, and `alreadyNudged: [...]` so the model knows which points are closed.
 
 ---
 
-## 7. Accuracy — the system prompt is the mitigation
+## 7. Accuracy — the prompt and the affirmation. Nothing else.
 
-> ⚠️ **Corrected.** An earlier version of this spec specified a code-side provenance check that
-> compared draft tokens against the user's input. **Cut it. It cannot work.** People write in
-> fragments and slang ("i was at a party n had a lil bit on me"); the model writes clean prose
-> ("I was at a gathering and had a small amount of a controlled substance"). Token overlap is
-> near-zero, so **every sentence of every draft would false-flag.** Flag fatigue would destroy
-> the feature within two uses.
+> ⚠️ **Two mechanisms were cut from earlier revisions, deliberately. Do not re-add either
+> one thinking you found a gap.**
+>
+> **The code-side provenance/token check** (v1): cut because people write in fragments and
+> slang and the model writes clean prose — token overlap is near zero, every sentence
+> false-flags, and flag fatigue destroys the feature in two uses.
+>
+> **The `assumptions` self-report** (v2, cut 2026-07-20): a machine-generated "here's what
+> I changed about your words" list was **theater**. Paraphrase is the assistant's job — if
+> the model writes "I made a bad decision" where they said "I was being an idiot," that is
+> a better sentence and we do not announce it. Worse, the list eroded trust in the one
+> layer that actually matters: a person reading their own account and affirming it. A
+> transparency display that trains users to skim past it is a net loss for accuracy.
 
-Three layers instead, in order of how much weight they actually carry:
+Two layers carry everything:
 
-**1. The system prompt (§6) is the real mitigation.** It carries the entire constraint — only
-the user's information, no invented facts, no invented remorse. Write it carefully; version it;
-test it adversarially (§9). This is where the safety lives.
+**1. The system prompt (§6).** Only the user's information; no invented facts, feelings,
+motives, remorse, or steps taken. Written carefully, versioned, tested adversarially (§9).
 
-**2. `assumptions: string[]` — model self-report.** The model lists anything it filled in that
-the user didn't say directly. Rendered as a short "worth checking" list beneath the account.
-
-> **Be honest in the docs and the UI: this is model-reported, not verified.** It is
-> transparency, not a guarantee. Do not present it as a check that caught something.
-
-**3. A required affirmation before Save — this is the real gate.** The user must confirm the
-account accurately reflects what happened. Always, every incident, no exception. Plain and
-unavoidable:
+**2. The required affirmation before Save — the real gate.** The user must confirm the
+account accurately reflects what happened. Always, every incident, no exception:
 
 > *"This is the account that goes on your forms. Read it and confirm it's accurate — you're
 > signing that this is your own true account."*
 
-They are signing an affidavit either way. The affirmation is what makes that meaningful, and
-it's the only layer that can't be gamed by a clever prompt.
+They are signing an affidavit either way. The affirmation is what makes that meaningful,
+and it is the only layer that cannot be gamed by a clever prompt.
 
 ## 8. The proxy
 
@@ -427,6 +417,7 @@ The component is not finished until these pass by hand:
 | **Three sentences, then "just write it"** | Drafts immediately. No follow-up loop. Usable output from thin input. |
 | **User declines a nudge, keeps talking** | That factor is never raised again. |
 | **Incident with 3 charges, user explains only 1** | Asks about the others **once**, then writes one account covering what it has. |
-| **Model returns a fact the user never said** | It appears in `assumptions` and renders in the "worth checking" list (model-reported, not verified). Save is gated on the §7 affirmation either way. |
+| **A thin answer: "I'm in a program"** | The stage reads `thin`, not `covered`. The agent probes — which program, how long, finished? — as a bold question with a plain reason. It does not draft past a thin `what`/`why` unless the person skips or forces it. |
+| **User skips a what/why question** | The stage is waived, never re-asked, and drafting proceeds with what's there. |
 | **User edits the draft by hand, then saves** | Their edit is what commits. No re-writing behind them. |
 | **Payload inspection** | No name, DOB, SSN, address, or other incident ever leaves the browser. Asserted by an automated test. |

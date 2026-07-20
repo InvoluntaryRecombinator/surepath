@@ -9,6 +9,7 @@ import { AppStoreProvider } from './store'
 import { useAppStore } from './storeContext'
 import { AboutYouSection } from './sections/AboutYouSection'
 import { RecordSection } from './sections/RecordSection'
+import { StorySection } from './sections/StorySection'
 import { StubSection } from './sections/StubSection'
 
 function CurrentSection() {
@@ -18,6 +19,8 @@ function CurrentSection() {
       return <AboutYouSection />
     case 'record':
       return <RecordSection />
+    case 'story':
+      return <StorySection />
     default:
       return <StubSection />
   }

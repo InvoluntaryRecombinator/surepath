@@ -318,6 +318,12 @@ never invites it.**
 
 ### Stage 5 — Your story (a separate stage — this is the important structural change)
 
+> ⚠️ **Status (2026-07-19).** Shipping as **story-lite**: the card list and a per-incident
+> writing screen with the §53.025(a) factors as static, cited guidance and one plain
+> textarea. No model, no API. The narrative assistant (`docs/AGENT_SPEC.md`) later replaces
+> the writing screen's innards; the card list, the gating, and the saved account survive
+> unchanged.
+
 > **Design note — a correction, and it fixes a real bug.** An earlier revision buried the
 > narrative *inside* the add-an-incident flow. Splitting it out is better for three reasons,
 > and the third one is a defect in the old design:

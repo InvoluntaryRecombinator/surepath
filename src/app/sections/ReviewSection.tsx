@@ -13,6 +13,7 @@
 import { useState } from 'react'
 import { Button } from '../../ui/Button'
 import { FieldGroup } from '../../ui/FieldGroup'
+import { Notice } from '../../ui/Notice'
 import { generateAllPackets, type GeneratedPacket } from '../../documents/assemblePacket'
 import { draftToCase, IncompleteDraftError } from '../convertDraft'
 import { draftCounts } from '../draft'
@@ -165,31 +166,30 @@ export function ReviewSection() {
       </FieldGroup>
 
       {/* ── H3/H4 — the state's warnings, plainly ── */}
-      <aside className="border-l-2 border-accent/60 py-1 pl-5">
-        <ul className="flex max-w-[64ch] flex-col gap-2 text-[13.5px] leading-relaxed text-ink/80">
+      <Notice variant="info">
+        <ul className="flex flex-col gap-2">
           {config.reviewWarnings.map((w) => (
             <li key={w.slice(0, 24)}>{w}</li>
           ))}
         </ul>
-      </aside>
+      </Notice>
 
       {/* ── generate ── */}
       <section className="border-t-2 border-line pt-7">
         {gen.phase === 'incomplete' && (
-          <div role="alert" className="mb-6 border-l-2 border-state py-0.5 pl-4">
-            <p className="text-[14px] font-semibold text-ink">Not ready to generate yet</p>
-            <ul className="mt-1.5 flex max-w-[62ch] flex-col gap-1 text-[13.5px] leading-snug text-muted">
+          <Notice variant="attention" title="Not ready to generate yet" className="mb-6">
+            <ul className="flex flex-col gap-1">
               {gen.issues.slice(0, 5).map((issue) => (
                 <li key={issue}>{issue}</li>
               ))}
               {gen.issues.length > 5 && <li>…and {gen.issues.length - 5} more.</li>}
             </ul>
-          </div>
+          </Notice>
         )}
         {gen.phase === 'failed' && (
-          <p role="alert" className="mb-6 max-w-[62ch] border-l-2 border-state py-0.5 pl-4 text-[13.5px] leading-relaxed text-muted">
+          <Notice variant="attention" className="mb-6">
             {gen.message}
-          </p>
+          </Notice>
         )}
 
         {gen.phase === 'done' ? (

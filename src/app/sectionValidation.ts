@@ -140,7 +140,7 @@ function storyValidation(draft: DraftCase, ctx: ValidationContext): SectionValid
     } else if (!incident.narrative.affirmed) {
       issues.push({
         field: `incidents.${incident.id}.narrative`,
-        message: `Incident ${i + 1}: read the account and confirm it's accurate — it goes on the forms you sign.`,
+        message: `Incident ${i + 1}: open the account and check the confirmation box — it verifies this is your own true account, and it goes on the forms sent to ${agency}.`,
       })
     }
   })

@@ -16,6 +16,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '../../../ui/Button'
 import { ArrowLeft } from '../../../ui/icons'
+import { Notice } from '../../../ui/Notice'
 import type { StageKey, StageLevel } from '../../../agent/turns'
 import { formatLongDate } from '../../lib/format'
 import type { DraftIncident } from '../../draft'
@@ -185,15 +186,13 @@ export function StoryWorkbench({
             <p className="text-[13px] italic text-muted">Working on it…</p>
           )}
           {a.network === 'unavailable' && (
-            <div className="rounded-[8px] bg-ground px-4 py-3">
-              <p className="text-[13.5px] leading-relaxed text-muted">
-                The assistant isn't available right now — your account editor is open below;
-                keep writing yourself.{' '}
-                <button type="button" onClick={a.retry} className="font-medium text-accent hover:underline">
-                  Try again
-                </button>
-              </p>
-            </div>
+            <Notice variant="info">
+              The assistant isn't available right now — your account editor is open below;
+              keep writing yourself.{' '}
+              <button type="button" onClick={a.retry} className="font-medium text-accent hover:underline">
+                Try again
+              </button>
+            </Notice>
           )}
           <div ref={endOfThread} />
         </div>

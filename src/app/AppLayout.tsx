@@ -12,6 +12,7 @@
 import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Button } from '../ui/Button'
 import { ArrowLeft, ArrowRight, CheckSmall } from '../ui/icons'
+import { Notice } from '../ui/Notice'
 import { SectionBriefing } from '../ui/SectionIntro'
 import { useAppStore } from './storeContext'
 import { MobileRail } from './MobileRail'
@@ -67,26 +68,29 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 onInvalidCapture={() => setAttemptedSectionId(stage.id)}
                 onSubmit={continueForward}
               >
-                {showValidation && (
-                  <div
-                    ref={errorSummaryRef}
-                    role="alert"
-                    tabIndex={-1}
-                    className="mb-9 border-l-2 border-state py-0.5 pl-4 outline-none"
-                  >
-                    <p className="text-[14px] font-semibold text-ink">Complete this section</p>
-                    <p className="mt-1 max-w-[62ch] text-[13.5px] leading-[1.55] text-muted">
-                      {validation.issues.length}{' '}
-                      {validation.issues.length === 1 ? 'answer needs' : 'answers need'}{' '}
-                      attention. {validation.issues[0]?.message}
-                    </p>
-                  </div>
-                )}
-
                 {children}
 
+                {/* ── the validation notice lives WITH the button that raised it — a warning
+                       rendered a screen away from the click is a warning nobody sees ──── */}
+                {showValidation && (
+                  <Notice
+                    ref={errorSummaryRef}
+                    tabIndex={-1}
+                    variant="attention"
+                    title="Before you continue"
+                    className="mt-14"
+                  >
+                    {validation.issues[0]?.message}
+                    {validation.issues.length > 1 && (
+                      <> And {validation.issues.length - 1} more like it above.</>
+                    )}
+                  </Notice>
+                )}
+
                 {/* ── actions — at the end of the work, on the content's own edge ──────── */}
-                <div className="mt-14 flex items-center justify-end gap-2.5 border-t border-line/70 pt-7">
+                <div
+                  className={`flex items-center justify-end gap-2.5 border-t border-line/70 pt-7 ${showValidation ? 'mt-5 border-t-0 pt-0' : 'mt-14'}`}
+                >
                   <p className="mr-auto flex items-center gap-1.5 text-[12.5px] text-muted">
                     <span className="text-accent">
                       <CheckSmall size={9} />

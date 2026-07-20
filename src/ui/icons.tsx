@@ -130,6 +130,43 @@ export const ArrowRight = ({ size = 16 }: { size?: number }) => (
   </svg>
 )
 
+/** Notice glyphs — severity is structure, not decoration: each names the kind of message. */
+export const AlertCircle = ({ size = 16, className }: { size?: number; className?: string }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <circle cx="8" cy="8" r="6.4" />
+    <path d="M8 4.8v3.8" />
+    <path d="M8 11.3h.01" />
+  </svg>
+)
+
+export const InfoCircle = ({ size = 16, className }: { size?: number; className?: string }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <circle cx="8" cy="8" r="6.4" />
+    <path d="M8 7.4v3.8" />
+    <path d="M8 4.7h.01" />
+  </svg>
+)
+
 export const Menu = ({ size = 18 }: { size?: number }) => (
   <svg
     width={size}

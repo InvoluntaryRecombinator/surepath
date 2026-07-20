@@ -171,6 +171,18 @@ describe('the two prompts (§6)', () => {
     expect(prompt).toContain('not a bystander')
   })
 
+  it('interview mode draws out what is missing — and never invents it', () => {
+    const prompt = buildSystemPrompt(request)
+    expect(prompt).toContain('DRAWING OUT WHAT\'S MISSING')
+    expect(prompt).toContain('RECOGNIZE WHAT COUNTS')
+    expect(prompt).toContain('WHEN SOMEONE SAYS THEY FEEL NO REGRET')
+    expect(prompt).toContain('Ask twice at most')
+    expect(prompt).toContain('Never invent regret they did not express')
+    expect(buildSystemPrompt({ ...request, directive: 'draft_now' })).not.toContain(
+      'DRAWING OUT WHAT\'S MISSING',
+    )
+  })
+
   it('draft_now mode: the distinct final-account instruction', () => {
     const prompt = buildSystemPrompt({ ...request, directive: 'draft_now' })
     expect(prompt).toContain('YOU ARE NOW WRITING THE FINAL ACCOUNT')

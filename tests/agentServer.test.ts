@@ -136,7 +136,7 @@ describe('reply never carries the draft (§4)', () => {
     const turn = res.body.turn as typeof dup
     expect(turn.draft).toBe(dup.draft)
     expect(turn.reply).not.toContain('Harris County')
-    expect(turn.reply).toContain('on the right')
+    expect(turn.reply).toContain("it's below")
   })
 })
 

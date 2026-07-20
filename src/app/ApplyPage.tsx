@@ -5,6 +5,7 @@
  */
 import type { StateConfig } from '../state-config/types'
 import { AppLayout } from './AppLayout'
+import { FocusModeProvider } from './focusMode'
 import { AppStoreProvider } from './store'
 import { useAppStore } from './storeContext'
 import { AboutYouSection } from './sections/AboutYouSection'
@@ -35,9 +36,11 @@ function CurrentSection() {
 export function ApplyPage({ config }: { config: StateConfig }) {
   return (
     <AppStoreProvider config={config}>
-      <AppLayout>
-        <CurrentSection />
-      </AppLayout>
+      <FocusModeProvider>
+        <AppLayout>
+          <CurrentSection />
+        </AppLayout>
+      </FocusModeProvider>
     </AppStoreProvider>
   )
 }

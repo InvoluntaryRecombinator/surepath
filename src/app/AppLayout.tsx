@@ -14,6 +14,7 @@ import { Button } from '../ui/Button'
 import { ArrowLeft, ArrowRight, CheckSmall } from '../ui/icons'
 import { Notice } from '../ui/Notice'
 import { SectionBriefing } from '../ui/SectionIntro'
+import { useFocusMode } from './focusModeContext'
 import { useAppStore } from './storeContext'
 import { MobileRail } from './MobileRail'
 import { Rail } from './Rail'
@@ -21,6 +22,9 @@ import { validateSection } from './sectionValidation'
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const { state, dispatch, config } = useAppStore()
+  // Focus mode (the story workbench): the focused view owns the panel — no briefing,
+  // no section Back/Continue, no validation notice. Its exits are its own.
+  const focused = useFocusMode()
   const idx = config.sections.findIndex((s) => s.id === state.sectionId)
   const stage = config.sections[idx]
   const isFirst = idx === 0
@@ -60,7 +64,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <main className="min-h-0 flex-1 p-2.5 sm:p-3 lg:p-4">
           <div className="h-full overflow-y-auto rounded-[12px] border border-rail-line bg-surface">
             <div className="mx-auto max-w-[920px] px-6 pb-14 pt-9 sm:px-10 lg:px-12 lg:pt-11">
-              <SectionBriefing section={stage} />
+              {!focused && <SectionBriefing section={stage} />}
 
               <form
                 id="apply-section-form"
@@ -72,7 +76,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
                 {/* ── the validation notice lives WITH the button that raised it — a warning
                        rendered a screen away from the click is a warning nobody sees ──── */}
-                {showValidation && (
+                {!focused && showValidation && (
                   <Notice
                     ref={errorSummaryRef}
                     tabIndex={-1}
@@ -88,6 +92,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 )}
 
                 {/* ── actions — at the end of the work, on the content's own edge ──────── */}
+                {!focused && (
                 <div
                   className={`flex items-center justify-end gap-2.5 border-t border-line/70 pt-7 ${showValidation ? 'mt-5 border-t-0 pt-0' : 'mt-14'}`}
                 >
@@ -112,6 +117,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     </Button>
                   )}
                 </div>
+                )}
               </form>
             </div>
           </div>

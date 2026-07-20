@@ -38,7 +38,7 @@ function narrativeDevApi(env: Record<string, string>): Plugin {
                 ) => Promise<{ status: number; body: Record<string, unknown> }>
               }
               const result = await mod.handleNarrativeRequest(body, {
-                apiKey: env.ANTHROPIC_API_KEY,
+                apiKey: env.OPENAI_API_KEY,
                 modelId: env.NARRATIVE_MODEL,
               })
               res.statusCode = result.status

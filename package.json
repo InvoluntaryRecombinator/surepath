@@ -11,7 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.16",
+    "@ai-sdk/openai": "^4.0.16",
     "@fontsource-variable/public-sans": "^5.2.7",
     "@radix-ui/react-popover": "^1.1.19",
     "@tailwindcss/vite": "^4.3.2",

@@ -468,11 +468,17 @@ POST { facts, why, whatChanged, madeItRight, offenses[], style }
 - Exists only because API keys cannot live in a frontend bundle.
 - **Receives no name, DOB, SSN, address, phone, or email.** Reject the request if any
   key resembling an identifier is present. Fail closed.
-- **Provider + retention, recorded (D6):** the Anthropic API via the Vercel AI SDK
-  (`@ai-sdk/anthropic`, `generateObject`, Zod-validated). Anthropic's commercial API
-  terms state inputs/outputs are not used to train models by default. ⚠️ Re-verify this
-  against Anthropic's current commercial terms before the demo, and re-record the date
-  here when confirmed. Provider is swappable in one line in `src/agent/server.ts`.
+- **Provider + retention, recorded (D6, verified 2026-07-20 against OpenAI's docs):**
+  the OpenAI API via the Vercel AI SDK (`@ai-sdk/openai`, `generateObject`,
+  Zod-validated, default `gpt-4.1-mini`). OpenAI's published policy: *"data sent to the
+  OpenAI API is not used to train or improve OpenAI models"* (default since 2023-03-01);
+  abuse-monitoring logs are *"retained for up to 30 days"*; **true Zero Data Retention
+  exists but requires OpenAI approval.**
+  ⚠️ **This means the default configuration is NOT zero-retention.** Until ZDR is granted,
+  any user-facing copy must say the honest thing: *narrative text is not used for
+  training and is deleted from the provider's abuse logs within 30 days* — never
+  "zero-retention." Apply for ZDR, or keep the softer claim. Re-verify before the demo.
+  Provider is swappable in one line in `src/agent/server.ts`.
 - **Log nothing but a status code.** Not the body. Not on error.
 - Stateless. No storage.
 

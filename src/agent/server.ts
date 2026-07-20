@@ -10,10 +10,10 @@
  *   4. draft_now that comes back draftless → retry once → 502
  * Logs status + latency only. Never the body. (D6)
  *
- * Provider is swappable in one line (NARRATIVE_MODEL / the createAnthropic call). The
- * Anthropic API does not train on API traffic by default — recorded in ARCHITECTURE §9.1.
+ * Provider is swappable in one line (NARRATIVE_MODEL / the createOpenAI call). Retention
+ * posture recorded in ARCHITECTURE §9.1 — re-verify before the demo, never assume.
  */
-import { createAnthropic } from '@ai-sdk/anthropic'
+import { createOpenAI } from '@ai-sdk/openai'
 import { generateObject } from 'ai'
 import { buildSystemPrompt, findIdentifierKeys } from './prompt'
 import {
@@ -26,7 +26,7 @@ import {
 
 export type NarrativeEnv = {
   apiKey: string | undefined
-  /** One line to swap the model; the provider itself swaps in createAnthropic below. */
+  /** One line to swap the model; the provider itself swaps in createOpenAI below. */
   modelId?: string
 }
 
@@ -39,9 +39,12 @@ async function defaultGenerate(
   system: string,
   env: NarrativeEnv,
 ): Promise<AgentTurn> {
-  const anthropic = createAnthropic({ apiKey: env.apiKey })
+  const openai = createOpenAI({ apiKey: env.apiKey })
   const { object } = await generateObject({
-    model: anthropic(env.modelId ?? 'claude-sonnet-5'),
+    // gpt-4.1-mini: mid-tier, low latency, native json_schema structured outputs, and it
+    // honors an explicit temperature (the gpt-5 reasoning family does not, and spends
+    // hidden reasoning tokens while a person waits on a draft).
+    model: openai(env.modelId ?? 'gpt-4.1-mini'),
     schema: AgentTurnSchema,
     system,
     messages:

@@ -25,7 +25,7 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   const result = await handleNarrativeRequest(body, {
-    apiKey: process.env.ANTHROPIC_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY,
     modelId: process.env.NARRATIVE_MODEL,
   })
 

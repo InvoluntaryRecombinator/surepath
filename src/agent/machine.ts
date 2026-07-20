@@ -80,10 +80,14 @@ export function nextDirective(
   return opts.writeItNow || state.turnCount >= MAX_FOLLOWUP_TURNS ? 'draft_now' : 'converse'
 }
 
-/** The converse gate: what + why covered, unless explicitly skipped. */
-export function draftAllowedInConverse(state: ConversationState, stages: Stages): boolean {
-  const ok = (k: 'what' | 'why') => stages[k] === 'covered' || state.skippedStages.includes(k)
+/** The converse gate, pure: what + why covered, unless explicitly skipped. */
+export function stagesSatisfyGate(stages: Stages, skipped: readonly StageKey[]): boolean {
+  const ok = (k: 'what' | 'why') => stages[k] === 'covered' || skipped.includes(k)
   return ok('what') && ok('why')
+}
+
+export function draftAllowedInConverse(state: ConversationState, stages: Stages): boolean {
+  return stagesSatisfyGate(stages, state.skippedStages)
 }
 
 export function canCommit(state: ConversationState): boolean {

@@ -152,3 +152,26 @@ describe('reply never carries a question when followUp exists (§4)', () => {
     expect(turn.followUp?.question).toBe('What happened after you stopped?')
   })
 })
+
+describe('converse auto-escalation (§5) — the gate opens, the draft happens', () => {
+  it('re-calls with draft_now when what+why are covered but the model kept interviewing', async () => {
+    const dawdling = {
+      ...cleanTurn,
+      stages: { what: 'covered', why: 'covered', changed: 'thin', right: 'empty' } as const,
+      followUp: { question: 'What about restitution?', reason: null, stage: 'right' as const },
+    }
+    const forced = { ...dawdling, followUp: null, draft: 'The drafted account.' }
+    const generate = vi.fn().mockResolvedValueOnce(dawdling).mockResolvedValueOnce(forced)
+    const res = await handleNarrativeRequest(request, env, generate)
+    expect(generate).toHaveBeenCalledTimes(2)
+    expect(generate.mock.calls[1][0].directive).toBe('draft_now')
+    expect((res.body.turn as typeof forced).draft).toBe('The drafted account.')
+  })
+
+  it('does not escalate while the gate is closed', async () => {
+    const gathering = { ...cleanTurn, stages: { what: 'thin', why: 'empty', changed: 'empty', right: 'empty' } as const }
+    const generate = vi.fn().mockResolvedValue(gathering)
+    await handleNarrativeRequest(request, env, generate)
+    expect(generate).toHaveBeenCalledTimes(1)
+  })
+})

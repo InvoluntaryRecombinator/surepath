@@ -57,7 +57,10 @@ Case
  └── incidents[]           ← one story each
       ├── county, state, court, dateCrimeCommitted, dateOfConviction
       ├── charges[]        ← 1..N. exactOffense + sentence + disposition
-      └── narrative        ← { rawAnswers, messages[], draft, final, provenance }
+      └── narrative        ← { rawAnswers, draft, assumptions[], affirmed }   ← PERSISTED
+                              messages[] are SESSION-ONLY, deliberately: the transcript is
+                              the most sensitive text in the app and does not sit on a
+                              shared computer's disk. The draft is the artifact; it survives.
 ```
 
 ### What differs between "incident with 3 charges" and "single charge"
@@ -186,9 +189,10 @@ type AgentRequest = {
 }
 ```
 
-**In `converse` mode, discard any draft the model volunteers.** This is the single strongest
-anti-drift move available: the model cannot decide unilaterally to stop asking and start
-writing, because our code controls whether a draft is even permitted.
+**The directive is not "may you draft" — it is "you must draft now."** In `converse` mode the
+model may draft whenever it judges it has enough (§5); `draft_now` is only the ceiling — sent
+at the turn cap or on "Write it now," it REQUIRES a draft in that turn. Code sets the ceiling;
+the model never sets it for itself.
 
 ### The RESPONSE is one JSON object. Never prose.
 
@@ -251,7 +255,9 @@ possible if the question was never embedded in the prose.
                                                       │ populated +      │
                                                       │ editable         │
                                                       └────────┬─────────┘
-                                    user edits directly, or keeps talking to refine
+                        user edits directly, or keeps talking to refine
+                        (a NEW model draft after a manual edit replaces the text only
+                         behind an explicit confirm, and the affirmation resets)
                                                                │
                                             Save (requires the affirmation — §7)
                                                                ▼
@@ -344,14 +350,17 @@ ask about the others once, then write what you have.
 OUTPUT
 
 Reply with one JSON object and nothing else:
-{"reply": string, "coverage": {"whatHappened": bool, "why": bool, "whatChanged": bool,
+{"reply": string, "coverage": {"facts": bool, "why": bool, "whatChanged": bool,
 "madeItRight": bool}, "readyToDraft": bool, "followUp": string|null,
 "nudge": {"factor": "ownership"|"understanding"|"change"|"restitution", "text": string}|null,
-"draft": string|null}
+"assumptions": string[], "draft": string|null}
 
-Populate "draft" ONLY when asked to write it. Write the draft in the person's own voice,
-first person, plain language, at the reading level they wrote in. Do not make them sound like
-a lawyer.
+Write the draft when you judge you have enough to write it honestly — do not ask permission.
+If the directive says draft_now, you MUST populate "draft" in this turn from whatever you
+have. Never put a question in "reply"; questions go only in "followUp". List in "assumptions"
+anything you filled in that the person did not say directly. Write the draft in the person's
+own voice, first person, plain language, at the reading level they wrote in. Do not make them
+sound like a lawyer.
 ```
 
 **Injected per request:** the incident's date/county/court, the charge list, the answers so
@@ -418,6 +427,6 @@ The component is not finished until these pass by hand:
 | **Three sentences, then "just write it"** | Drafts immediately. No follow-up loop. Usable output from thin input. |
 | **User declines a nudge, keeps talking** | That factor is never raised again. |
 | **Incident with 3 charges, user explains only 1** | Asks about the others **once**, then writes one account covering what it has. |
-| **Model returns a fact the user never said** | Sentence is flagged; Save blocked until edited or confirmed. |
+| **Model returns a fact the user never said** | It appears in `assumptions` and renders in the "worth checking" list (model-reported, not verified). Save is gated on the §7 affirmation either way. |
 | **User edits the draft by hand, then saves** | Their edit is what commits. No re-writing behind them. |
 | **Payload inspection** | No name, DOB, SSN, address, or other incident ever leaves the browser. Asserted by an automated test. |

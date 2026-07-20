@@ -190,8 +190,10 @@ describe('the two prompts (§6)', () => {
     })
     expect(withAccount).toContain('THE CURRENT ACCOUNT')
     expect(withAccount).toContain('I ran. I paid my fines.')
-    // tone requests re-weight THEIR words; missing material is asked for, never invented
-    expect(withAccount).toContain('ask them for it in "followUp"')
+    // tone requests re-weight THEIR words; missing material is asked for, never invented —
+    // and the canonical trap (apologetic/remorseful) is named outright
+    expect(withAccount).toContain('The canonical trap')
+    expect(withAccount).toContain('INVENTING, not reorganizing')
     expect(buildSystemPrompt(request)).not.toContain('THE CURRENT ACCOUNT')
   })
 })

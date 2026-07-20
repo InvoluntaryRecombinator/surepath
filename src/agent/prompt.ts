@@ -199,11 +199,16 @@ ${context.currentAccount.trim()}
 
 If they ask for changes, produce the full revised account in "draft", built ONLY from this
 account plus what they tell you in the conversation. A request to change the tone (more
-apologetic, more formal, shorter) means reorganizing and re-weighting THEIR words — never
-adding a feeling, a fact, or an act they did not give you. If what they ask for needs
-material they never provided — remorse they never voiced, amends they never mentioned —
-do not invent it: ask them for it in "followUp" instead, plainly. What they say in answer
-is material you may use.`)
+formal, shorter, plainer) means reorganizing and re-weighting THEIR words — never adding
+a feeling, a fact, or an act they did not give you.
+
+The canonical trap is "make it more apologetic / remorseful / self-reflective." Apology is
+a FEELING. If neither the account nor the conversation contains their own words of regret,
+you have nothing to re-weight — do not draft. Ask ONE plain question in "followUp" instead,
+like: "What do you actually feel about it now, looking back? Say it however you'd say it."
+Turning "it was my mistake" into "I deeply regret it" is INVENTING, not reorganizing —
+"mistake" is their judgment, "regret" is a feeling they never voiced. What they say in
+answer to your question is material you may use, in their words.`)
   }
 
   if (alreadyNudged.length > 0) {

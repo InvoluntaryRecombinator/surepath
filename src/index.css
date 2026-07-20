@@ -14,13 +14,16 @@
 @import '@fontsource-variable/public-sans';
 
 @theme {
-  /* Colors: wipe the default palette, then the eight tokens (+ one derived rail tint). */
+  /* Colors: wipe the default palette, then define the product and chrome materials. */
   --color-*: initial;
-  /* The tonal ladder, stretched so every region reads as its own place:
-       rail (deepest) → ground (the briefing band) → surface (the sheet) → field (white).
-     Muddy = neighbors too close. Crisp = four distinct, quiet steps. */
+  /* The rail is chrome, not another sheet tint. The remaining warm ladder belongs to
+     content: briefing ground → working surface → white fields. */
   --color-ground: #ece3cc; /* mid warm — the briefing band, banners */
-  --color-rail: #ddd1af; /* the rail region. Distinctly deeper; the nav is its own place. */
+  --color-rail: #20251f; /* deep neutral chrome */
+  --color-rail-inset: #292f29; /* active and hover structure inside the chrome */
+  --color-rail-ink: #f4f0e7; /* primary chrome type and completed markers */
+  --color-rail-muted: #aab1a6; /* secondary chrome type and future steps */
+  --color-rail-line: #424a41; /* internal chrome rules */
   --color-surface: #fcf9f1; /* the sheet — crisp near-white with the warmth kept */
   --color-field: #ffffff; /* INPUT FIELDS. crisp white. the contrast that fixes "murky". */
   --color-ink: #26231b; /* primary text */

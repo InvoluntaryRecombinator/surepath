@@ -4,9 +4,8 @@
  *
  * The rail is its own REGION: the deepest tone on screen, so the light active chip
  * reads instantly (inverted contrast — a light chip on a deep rail, not a gray tint).
- * One continuous dashed connector runs the length of the steps; the traveled portion
- * is accent — a record of work done, not decoration. Completed steps are clickable;
- * future ones are not.
+ * Completed steps are clickable; future ones are not. Status lives in marker form and
+ * type weight — there is no connector competing with the icons.
  */
 import { useNavigate } from 'react-router-dom'
 import { draftCounts } from './draft'
@@ -22,38 +21,27 @@ export function Rail() {
   const navigate = useNavigate()
   const counts = draftCounts(state.draft)
   const currentIdx = config.sections.findIndex((s) => s.id === state.sectionId)
-  const n = config.sections.length
-
   const counterText = formatCounter(counts)
 
   return (
-    <aside className="hidden w-[232px] shrink-0 flex-col overflow-y-auto border-r-2 border-line bg-rail lg:flex">
+    <aside className="relative hidden w-[232px] shrink-0 flex-col overflow-y-auto border-r-2 border-ink bg-rail lg:flex">
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 right-0 w-px bg-field/10"
+      />
       {/* ── identity ── */}
-      <div className="px-6 pb-1 pt-7">
+      <div className="border-b border-rail-line px-5 pb-5 pt-6">
         <div className="flex items-center gap-2.5">
           <Mark />
-          <span className="text-[18px] font-[750] text-ink">SurePath</span>
+          <span className="text-[18px] font-[750] text-rail-ink">SurePath</span>
         </div>
-        <p className="mt-1.5 pl-[34px] text-[12px] font-medium text-muted">{config.railTag}</p>
+        <p className="mt-1.5 pl-[34px] text-[12px] font-medium text-rail-muted">
+          {config.railTag}
+        </p>
       </div>
 
-      {/* ── sections. The connector is ONE continuous line behind all the dots. ── */}
-      <nav aria-label="Application steps" className="relative mt-7 px-4">
-        {/* the full run, quiet */}
-        <span
-          aria-hidden="true"
-          className="absolute left-[40px] border-l border-dashed border-ink/20"
-          style={{ top: ROW_H / 2, height: (n - 1) * ROW_H }}
-        />
-        {/* the traveled portion — a record of work done */}
-        {state.maxReachedIndex > 0 && (
-          <span
-            aria-hidden="true"
-            className="absolute left-[40px] border-l border-dashed border-accent/60"
-            style={{ top: ROW_H / 2, height: state.maxReachedIndex * ROW_H }}
-          />
-        )}
-
+      {/* ── sections ── */}
+      <nav aria-label="Application steps" className="mt-4 px-3">
         {config.sections.map((section, i) => {
           const visited = i <= state.maxReachedIndex
           const complete = validateSection(section.id, state.draft).complete
@@ -69,29 +57,29 @@ export function Rail() {
               onClick={() => clickable && dispatch({ type: 'go', sectionId: section.id, index: i })}
               aria-current={status === 'current' ? 'step' : undefined}
               style={{ height: ROW_H }}
-              className={`relative flex w-full items-center gap-3 rounded-[5px] px-2.5 text-left transition-colors duration-150 ${
+              className={`relative flex w-full items-center gap-3 rounded-[2px] border-l-2 px-2.5 text-left transition-colors duration-150 ${
                 status === 'current'
-                  ? 'cursor-default border border-line/70 bg-surface text-ink'
+                  ? 'cursor-default border-rail-ink bg-rail-inset text-rail-ink'
                   : clickable
-                    ? 'cursor-pointer text-ink/85 hover:bg-surface/45'
-                    : 'cursor-default text-muted'
+                    ? 'cursor-pointer border-transparent text-rail-ink/85 hover:bg-rail-inset'
+                    : 'cursor-default border-transparent text-rail-muted'
               }`}
             >
-              <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center">
                 {status === 'done' ? (
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-surface">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rail-ink text-rail">
                     <CheckSmall size={10} />
                   </span>
                 ) : status === 'current' ? (
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-accent bg-field text-accent">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-rail-ink text-rail-ink">
                     <Icon name={section.icon} size={15} />
                   </span>
                 ) : status === 'visited' ? (
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-accent/60 bg-surface/45 text-accent">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-rail-muted text-rail-ink">
                     <Icon name={section.icon} size={15} />
                   </span>
                 ) : (
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-ink/25 bg-rail text-muted">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-rail-line text-rail-muted">
                     <Icon name={section.icon} size={15} />
                   </span>
                 )}
@@ -116,8 +104,8 @@ export function Rail() {
       <div className="flex-1" />
 
       {/* ── the counter — the promise, rendered ── */}
-      <div className="mx-6 border-t border-ink/10 pt-5">
-        <p className="flex flex-col gap-0.5 text-[12px] font-semibold uppercase leading-[1.45] text-ink">
+      <div className="mx-5 border-t border-rail-line pt-5">
+        <p className="flex flex-col gap-0.5 text-[12px] font-semibold uppercase leading-[1.45] text-rail-ink">
           {counterText.split(' · ').map((part) => (
             <span key={part}>{part}</span>
           ))}
@@ -125,13 +113,13 @@ export function Rail() {
       </div>
 
       {/* ── data controls ── */}
-      <div className="flex flex-col gap-2.5 px-6 pb-6 pt-4">
+      <div className="flex flex-col gap-2.5 px-5 pb-6 pt-4">
         <button
           type="button"
           onClick={() =>
             downloadJson(`surepath-progress-${config.code.toLowerCase()}.json`, state.draft)
           }
-          className="h-9 rounded-[4px] border border-line bg-surface text-[13px] font-medium text-ink transition-colors duration-150 hover:border-accent hover:text-accent"
+          className="h-9 rounded-[2px] border border-rail-line bg-transparent text-[13px] font-medium text-rail-ink transition-colors duration-150 hover:border-rail-muted hover:bg-rail-inset"
         >
           Save my progress
         </button>
@@ -144,7 +132,7 @@ export function Rail() {
               navigate(config.routeBase)
             }
           }}
-          className="text-[12px] font-medium text-muted underline underline-offset-2 transition-colors duration-150 hover:text-ink"
+          className="text-[12px] font-medium text-rail-muted underline underline-offset-2 transition-colors duration-150 hover:text-rail-ink"
         >
           Delete my information from this computer
         </button>

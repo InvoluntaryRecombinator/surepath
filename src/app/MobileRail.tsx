@@ -15,13 +15,13 @@ export function MobileRail() {
 
   return (
     <div className="shrink-0 lg:hidden">
-      <div className="flex h-14 items-center border-b border-line/70 px-5 sm:px-8">
+      <div className="flex h-14 items-center border-b border-rail-line bg-rail px-5 sm:px-8">
         <div className="flex items-center gap-2.5">
           <Mark size={20} />
-          <span className="text-[16px] font-[750] text-ink">SurePath</span>
+          <span className="text-[16px] font-[750] text-rail-ink">SurePath</span>
         </div>
-        <p className="ml-auto mr-3 flex items-center gap-1.5 text-[11.5px] font-medium text-muted">
-          <span className="text-accent">
+        <p className="ml-auto mr-3 flex items-center gap-1.5 text-[11.5px] font-medium text-rail-muted">
+          <span className="text-rail-ink">
             <CheckSmall size={8} />
           </span>
           Saved
@@ -33,7 +33,7 @@ export function MobileRail() {
               type="button"
               aria-label="Open application menu"
               title="Application menu"
-              className="flex h-10 w-10 items-center justify-center rounded-[4px] border border-line bg-field text-ink transition-colors duration-150 hover:border-accent hover:text-accent"
+              className="flex h-10 w-10 items-center justify-center rounded-[2px] border border-rail-line bg-transparent text-rail-ink transition-colors duration-150 hover:border-rail-muted hover:bg-rail-inset"
             >
               <Menu />
             </button>
@@ -153,21 +153,21 @@ export function MobileRail() {
         </Popover.Root>
       </div>
 
-      <div className="flex items-center justify-between border-b-2 border-line bg-rail px-5 py-3 sm:px-8">
+      <div className="flex items-center justify-between border-b-2 border-ink bg-rail px-5 py-3 sm:px-8">
         <div className="flex min-w-0 items-center gap-2.5">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-accent bg-field text-accent">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-rail-ink text-rail-ink">
             <Icon name={current.icon} size={14} />
           </span>
           <div className="min-w-0">
-            <p className="text-[11.5px] font-semibold uppercase text-muted">
+            <p className="text-[11.5px] font-semibold uppercase text-rail-muted">
               Step {currentIdx + 1} of {config.sections.length}
             </p>
-            <p className="truncate text-[15px] font-semibold leading-tight text-ink">
+            <p className="truncate text-[15px] font-semibold leading-tight text-rail-ink">
               {current.label}
             </p>
           </div>
         </div>
-        <p className="ml-4 max-w-[150px] shrink-0 text-right text-[11.5px] font-medium uppercase leading-[1.45] text-muted">
+        <p className="ml-4 max-w-[150px] shrink-0 text-right text-[11.5px] font-medium uppercase leading-[1.45] text-rail-muted">
           {formatCounter(counts)}
         </p>
       </div>

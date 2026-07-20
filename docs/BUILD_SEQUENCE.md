@@ -94,12 +94,17 @@ Tasks:
 
 **The stage list:**
 
+> ⚠️ **Correction (2026-07-19).** The flow is **FIVE steps**, not six, and the two
+> interstitials are **not separate screens**. "Your trade" collapsed into the `/texas`
+> intro page — it was a coverage guard (A14), not a selection step; the real selection
+> happens at Licenses. Both interstitials' content ("what this involves", "get your
+> record") also lives on `/texas`, before the user enters the application.
+
 ```
-[1] YOUR TRADE   [2] YOUR INFO   [3] YOUR RECORD   [4] YOUR STORY   [5] LICENSES   [6] REVIEW
-      ↑                                                                                   ↓
-  + un-numbered interstitials:                                                    generate packet
-     · "What this involves"  (after 1 — the anti-abandonment screen)
-     · "Get your record"     (before 2 — the hard stop)
+[1] ABOUT YOU   [2] YOUR RECORD   [3] YOUR STORY   [4] LICENSES   [5] REVIEW & GENERATE
+      ↑                                                                    ↓
+  /texas (marketing) carries the coverage gate (A14) and the           generate packet
+  get-your-record guidance (L9: presented flat, never a lock)
 ```
 
 **Facts first, stories second.** Stage 3 is a transcription groove — do not interrupt it.

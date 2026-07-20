@@ -59,7 +59,7 @@ Texas everywhere and force a refactor later.**
 type StateConfig = {
   code: 'TX';
   label: string;                    // "Texas · TDLR"
-  railSections: SectionDef[];       // TX has 6; another state might have 8, or different ones
+  railSections: SectionDef[];       // TX has 5; another state might have 8, or different ones
   fields: /* which fields each section collects */;
   forms: /* the blank PDFs + field map for THIS state's packet */;
   copy: /* the state-specific strings */;

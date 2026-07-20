@@ -130,6 +130,9 @@ function initialState(config: StateConfig, restore = true): AppState {
     if (!raw) return fresh
     const stored = JSON.parse(raw) as Stored
     if (stored.draft?.version !== 1) return fresh
+    const sectionId = config.sections.some((x) => x.id === stored.sectionId)
+      ? stored.sectionId
+      : config.sections[0].id
     return {
       // Defensive merge: a draft saved by an older build may lack newer fields. Missing
       // keys get empty defaults instead of becoming undefined in controlled inputs.
@@ -138,10 +141,14 @@ function initialState(config: StateConfig, restore = true): AppState {
         ...stored.draft,
         applicant: { ...emptyApplicant, ...stored.draft.applicant },
       },
-      sectionId: config.sections.some((x) => x.id === stored.sectionId)
-        ? stored.sectionId
-        : config.sections[0].id,
-      maxReachedIndex: stored.maxReachedIndex ?? 0,
+      sectionId,
+      // The section list can change between builds (the 'trade' step collapsed into the
+      // /texas intro). A stored index may be off-by-one against the new list or point past
+      // its end — clamp it, and never below the section the user is actually standing on.
+      maxReachedIndex: Math.max(
+        config.sections.findIndex((x) => x.id === sectionId),
+        Math.min(stored.maxReachedIndex ?? 0, config.sections.length - 1),
+      ),
       resumed: true,
     }
   } catch {

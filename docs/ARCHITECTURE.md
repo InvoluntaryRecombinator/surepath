@@ -574,7 +574,7 @@ an agent "helpfully" breaking an invariant.
 | A11 | **No text field is blank** in any generated PDF except the SSN. |
 | A12 | An incident with 4 charges requires **4 distinct exact-offense entries**. No pre-fill. |
 | A13 | **`zeroAllFields()` ran**: re-read every generated PDF; no field holds a value the app did not intend to write. |
-| A14 | Searching a **non-TDLR trade** ("nurse", "doctor") at Stage 1 surfaces the correct board and blocks entry into intake. **No user ever completes the record for the wrong agency.** |
+| A14 | Looking for a **non-TDLR trade** ("nurse", "doctor") on the `/texas` intro page surfaces the correct board **before the user enters the application**; the Licenses stage carries an escape hatch for direct arrivals. **No user ever completes the record for the wrong agency.** |
 
 ---
 

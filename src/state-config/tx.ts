@@ -20,16 +20,6 @@ export const txConfig: StateConfig = {
 
   sections: [
     {
-      id: 'trade',
-      label: 'Your trade',
-      icon: 'briefcase',
-      intro: {
-        eyebrow: 'Before you begin',
-        title: 'Confirm this is the right licensing process',
-        lead: 'This request is only for trades handled by the Texas licensing board. Nursing, medicine, and other professions use different boards. Confirm your trade is covered before entering personal or criminal-history information.',
-      },
-    },
-    {
       id: 'info',
       label: 'About you',
       icon: 'person',

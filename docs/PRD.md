@@ -134,6 +134,12 @@ export), and a **"Clear my data"** button (these users are on shared computers).
 
 ### Stage 1 — Texas overview + **"Is my trade even here?"**
 
+> ⚠️ **Correction (2026-07-19).** This stage is **not a step inside the application**.
+> Everything below — the overview, the trade catalog, the coverage gate (A14) — lives on
+> the `/texas` marketing page, before the user enters the app. The in-app "Your trade"
+> step is removed; license selection happens once, at the Licenses stage, with an escape
+> hatch there for anyone who arrived without passing the gate.
+
 Two jobs. **Expectation-setting**, and — critically — **letting the user find out in
 thirty seconds whether this tool can help them at all.**
 
@@ -197,6 +203,8 @@ CTA → **"First, get your record."**
 
 ### Stage 1.5 — What this actually involves ⚠️ (the anti-abandonment screen)
 
+> ⚠️ **Correction (2026-07-19).** Not a separate screen — this content lives on `/texas`.
+
 **Not a numbered step.** An interstitial. It is not work — it's an honest statement of the
 cost, before anyone types a single character.
 
@@ -235,6 +243,13 @@ completion — the people who start are the people who are actually ready.
 CTA → **"I understand — get my record"** · Secondary → **"Come back later"**
 
 ### Stage 2 — Get your record (the hard stop)
+
+> ⚠️ **Correction (2026-07-19).** "Hard stop" predates **L9** and now overstates it.
+> This is an **unmissable page section on `/texas`**, not a lock: both record paths
+> (fingerprint review, name search) are presented **flat, with no thumb on the scale**,
+> the costs and tradeoffs stated, and "continue anyway" always available. The
+> mitigation is the reframe — *the report is a starting point, not the final word; if
+> you remember a conviction that isn't on it, put it in anyway* — never a gate.
 
 Do not let anyone believe they can guess.
 
@@ -511,7 +526,7 @@ invariants — an agent will violate them while trying to be helpful.
 | **A10** | 3 trades selected | 3 complete packets generated; the checklist says **3 separate $10 money orders**. |
 | **A11** | Any generated packet | **No field is blank** except the SSN. (F6) |
 | **A12** | An incident with 4 charges | The user must type a **distinct exact-offense name** for each; no pre-fill, no default. |
-| **A14** | A user searches a trade TDLR does **not** license (e.g. "nurse", "doctor") | They are told **immediately**, at Stage 1, which board does regulate it and that SurePath doesn't support it — **before any data entry.** They are never walked into an hour of intake for the wrong agency. |
+| **A14** | A user looks for a trade TDLR does **not** license (e.g. "nurse", "doctor") | They are told **immediately, on the `/texas` intro page — before entering the application** — that a different board regulates it and that SurePath doesn't support it. The Licenses stage carries an escape-hatch link for anyone who arrived without passing the gate. They are never walked into an hour of intake for the wrong agency. |
 
 ---
 

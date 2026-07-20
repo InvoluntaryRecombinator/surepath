@@ -10,6 +10,7 @@ import { useAppStore } from './storeContext'
 import { AboutYouSection } from './sections/AboutYouSection'
 import { RecordSection } from './sections/RecordSection'
 import { StorySection } from './sections/StorySection'
+import { LicensesSection } from './sections/LicensesSection'
 import { StubSection } from './sections/StubSection'
 
 function CurrentSection() {
@@ -21,6 +22,8 @@ function CurrentSection() {
       return <RecordSection />
     case 'story':
       return <StorySection />
+    case 'licenses':
+      return <LicensesSection />
     default:
       return <StubSection />
   }

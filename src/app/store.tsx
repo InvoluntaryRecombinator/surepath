@@ -39,6 +39,8 @@ export type Action =
   | { type: 'add-charge'; incidentId: string }
   | { type: 'update-charge'; incidentId: string; chargeId: string; patch: Partial<DraftCharge> }
   | { type: 'remove-charge'; incidentId: string; chargeId: string }
+  | { type: 'add-license'; program: string; specificLicenseType: string }
+  | { type: 'remove-license'; index: number }
   | { type: 'delete-everything' }
   | { type: 'dismiss-resumed' }
 
@@ -106,6 +108,33 @@ function makeReducer(config: StateConfig) {
             ...i,
             charges: i.charges.filter((c) => c.id !== a.chargeId),
           })),
+        }
+      case 'add-license':
+        // One packet, one fee, per entry. Duplicates are meaningless — same packet twice.
+        if (
+          s.draft.licenses.some(
+            (l) => l.program === a.program && l.specificLicenseType === a.specificLicenseType,
+          )
+        ) {
+          return s
+        }
+        return {
+          ...s,
+          draft: {
+            ...s.draft,
+            licenses: [
+              ...s.draft.licenses,
+              { program: a.program, specificLicenseType: a.specificLicenseType },
+            ],
+          },
+        }
+      case 'remove-license':
+        return {
+          ...s,
+          draft: {
+            ...s.draft,
+            licenses: s.draft.licenses.filter((_, i) => i !== a.index),
+          },
         }
       case 'delete-everything':
         return initialState(config, /* restore */ false)

@@ -1,0 +1,49 @@
+{
+  "_meta": {
+    "purpose": "The TDLR program catalog: powers the /texas coverage section and the Licenses stage. Real TDLR program names, typed from tdlr.texas.gov — NOT invented, but NOT yet independently verified against the live site.",
+    "verify": false,
+    "verify_note": "REVIEW BEFORE DEMO: confirm each program name against https://www.tdlr.texas.gov/ and prune anything TDLR has sunset. A wrong program name here walks someone into a packet for a license that does not exist.",
+    "demo_depth": "PRD: curate the demo around Barbering & Cosmetology, Air Conditioning & Refrigeration, and Electricians. Breadth is real; depth is curated.",
+    "no_guidelines_here": "This file is the CATALOG only. Per-license crime categories (data/tdlr_guidelines.json) are deliberately ABSENT — quoting TDLR's guidelines requires parsing their published document, a separate reviewed task. Until then the UI links to TDLR's guidelines page, attributed. Never invent a category."
+  },
+  "programs": [
+    { "program": "Barbering and Cosmetology", "examples": ["Class A Barber", "Cosmetology Operator", "Esthetician", "Manicurist"], "demo": true },
+    { "program": "Air Conditioning and Refrigeration", "examples": ["ACR Technician Registration", "ACR Contractor"], "demo": true },
+    { "program": "Electricians", "examples": ["Apprentice Electrician", "Journeyman Electrician", "Master Electrician"], "demo": true },
+    { "program": "Massage Therapy", "examples": ["Massage Therapist"] },
+    { "program": "Towing, Booting and Vehicle Storage", "examples": ["Tow Truck Operator", "Vehicle Storage Facility Employee"] },
+    { "program": "Auctioneers", "examples": ["Auctioneer"] },
+    { "program": "Driver Education and Safety", "examples": ["Driver Education Instructor"] },
+    { "program": "Hearing Instrument Fitters and Dispensers", "examples": ["Hearing Instrument Fitter and Dispenser"] },
+    { "program": "Midwives", "examples": ["Licensed Midwife"] },
+    { "program": "Dietitians", "examples": ["Licensed Dietitian"] },
+    { "program": "Behavior Analysts", "examples": ["Licensed Behavior Analyst"] },
+    { "program": "Speech-Language Pathologists and Audiologists", "examples": ["Speech-Language Pathologist", "Audiologist"] },
+    { "program": "Athletic Trainers", "examples": ["Licensed Athletic Trainer"] },
+    { "program": "Mold Assessors and Remediators", "examples": ["Mold Remediation Worker"] },
+    { "program": "Water Well Drillers and Pump Installers", "examples": ["Water Well Driller"] },
+    { "program": "Property Tax Consultants", "examples": ["Registered Property Tax Consultant"] },
+    { "program": "Elevators, Escalators and Related Equipment", "examples": ["Elevator Inspector"] },
+    { "program": "Boiler Safety", "examples": ["Boiler Inspector"] },
+    { "program": "Laser Hair Removal", "examples": ["Laser Hair Removal Professional"] },
+    { "program": "Licensed Breeders", "examples": ["Licensed Dog or Cat Breeder"] },
+    { "program": "Used Automotive Parts Recyclers", "examples": ["Used Automotive Parts Employee"] },
+    { "program": "Sanitarians", "examples": ["Registered Sanitarian"] },
+    { "program": "Code Enforcement Officers", "examples": ["Code Enforcement Officer"] },
+    { "program": "Dyslexia Therapy", "examples": ["Licensed Dyslexia Therapist"] }
+  ],
+  "other_boards": {
+    "_note": "Occupations people commonly ask about that TDLR does NOT license. Names only — no URLs until verified. Three-state honesty: covered here / known other board / unknown ('we don't have information on that one — check TDLR's site'). A confident wrong answer is the harm A14 exists to prevent.",
+    "verify": false,
+    "entries": [
+      { "occupation": "Nurse", "board": "Texas Board of Nursing" },
+      { "occupation": "Physician / doctor", "board": "Texas Medical Board" },
+      { "occupation": "Plumber", "board": "Texas State Board of Plumbing Examiners" },
+      { "occupation": "Real estate agent", "board": "Texas Real Estate Commission" },
+      { "occupation": "Teacher", "board": "Texas Education Agency (educator certification)" },
+      { "occupation": "Lawyer", "board": "State Bar of Texas" },
+      { "occupation": "Pharmacist", "board": "Texas State Board of Pharmacy" },
+      { "occupation": "Insurance agent", "board": "Texas Department of Insurance" }
+    ]
+  }
+}

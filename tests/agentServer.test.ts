@@ -139,3 +139,16 @@ describe('reply never carries the draft (§4)', () => {
     expect(turn.reply).toContain('on the right')
   })
 })
+
+describe('reply never carries a question when followUp exists (§4)', () => {
+  it('strips question sentences from reply — they live only in followUp', async () => {
+    const leaky = {
+      ...cleanTurn,
+      reply: 'Thanks for sharing that. Can you tell me more about what happened?',
+    }
+    const res = await handleNarrativeRequest(request, env, async () => leaky)
+    const turn = res.body.turn as typeof leaky
+    expect(turn.reply).toBe('Thanks for sharing that.')
+    expect(turn.followUp?.question).toBe('What happened after you stopped?')
+  })
+})

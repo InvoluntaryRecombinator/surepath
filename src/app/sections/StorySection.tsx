@@ -32,7 +32,8 @@ function AccountCard({
   ordinal: number
   onOpen: () => void
 }) {
-  const written = incident.narrativeDraft.trim().length > 0
+  const written = incident.narrative.draft.trim().length > 0
+  const confirmed = written && incident.narrative.affirmed
   return (
     <button
       type="button"
@@ -41,11 +42,11 @@ function AccountCard({
     >
       <span
         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-          written ? 'bg-accent text-field' : 'border border-line bg-surface'
+          confirmed ? 'bg-accent text-field' : 'border border-line bg-surface'
         }`}
         aria-hidden="true"
       >
-        {written && <CheckSmall size={9} />}
+        {confirmed && <CheckSmall size={9} />}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-[13px] font-semibold uppercase tracking-[0.05em] text-muted">
@@ -56,11 +57,11 @@ function AccountCard({
         </span>
         <span className="mt-0.5 block text-[12.5px] text-muted">
           {incident.charges.length === 1 ? '1 record' : `${incident.charges.length} records`}
-          {written && ' · account written'}
+          {confirmed ? ' · confirmed' : written ? ' · needs your confirmation' : ''}
         </span>
       </span>
       <span className="shrink-0 text-[14px] font-semibold text-accent">
-        {written ? 'Edit' : 'Write this account →'}
+        {confirmed ? 'Edit' : written ? 'Review & confirm →' : 'Write this account →'}
       </span>
     </button>
   )
@@ -153,9 +154,16 @@ function WritingScreen({ incident, onBack }: { incident: DraftIncident; onBack: 
           </label>
           <textarea
             id={`account-${incident.id}`}
-            value={incident.narrativeDraft}
+            value={incident.narrative.draft}
             onChange={(e) =>
-              dispatch({ type: 'update-incident', id: incident.id, patch: { narrativeDraft: e.target.value } })
+              dispatch({
+                type: 'update-incident',
+                id: incident.id,
+                // any change to the draft resets the affirmation — they confirm what they sign (§7)
+                patch: {
+                  narrative: { ...incident.narrative, draft: e.target.value, affirmed: false },
+                },
+              })
             }
             placeholder="Start with what happened, in your own words."
             className="mt-1.5 min-h-[340px] w-full resize-y rounded-[6px] border border-line bg-field p-4 text-[15px] leading-[1.7] text-ink placeholder:text-muted/60 transition-colors duration-150 hover:border-muted/70"
@@ -164,6 +172,28 @@ function WritingScreen({ incident, onBack }: { incident: DraftIncident; onBack: 
             Saved as you type. This goes onto the continuation sheet attached to this
             incident's forms, word for word.
           </p>
+
+          {/* §7 — the affirmation. The one layer a clever prompt cannot game. */}
+          <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-[8px] border border-line bg-ground px-4 py-3.5">
+            <input
+              type="checkbox"
+              checked={incident.narrative.affirmed}
+              disabled={incident.narrative.draft.trim().length === 0}
+              onChange={(e) =>
+                dispatch({
+                  type: 'update-incident',
+                  id: incident.id,
+                  patch: { narrative: { ...incident.narrative, affirmed: e.target.checked } },
+                })
+              }
+              className="mt-1 h-4 w-4 accent-accent"
+            />
+            <span className="text-[13.5px] leading-relaxed text-ink/85">
+              This is the account that goes on your forms. Read it and confirm it's accurate —
+              you're signing that this is your own true account.
+            </span>
+          </label>
+
           <div className="mt-5 flex justify-end">
             <Button variant="primary" onClick={onBack}>
               Done with this account
@@ -179,7 +209,9 @@ export function StorySection() {
   const { state } = useAppStore()
   const [editingId, setEditingId] = useState<string | null>(null)
   const incidents = state.draft.incidents
-  const written = incidents.filter((i) => i.narrativeDraft.trim().length > 0).length
+  const confirmed = incidents.filter(
+    (i) => i.narrative.draft.trim().length > 0 && i.narrative.affirmed,
+  ).length
 
   const editing = incidents.find((i) => i.id === editingId)
   if (editing) return <WritingScreen incident={editing} onBack={() => setEditingId(null)} />
@@ -204,7 +236,8 @@ export function StorySection() {
         />
       ))}
       <p className="mt-2 text-right text-[13px] font-medium text-muted">
-        {written} of {incidents.length} {incidents.length === 1 ? 'account' : 'accounts'} written
+        {confirmed} of {incidents.length} {incidents.length === 1 ? 'account' : 'accounts'}{' '}
+        written and confirmed
       </p>
     </div>
   )

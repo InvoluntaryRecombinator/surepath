@@ -39,10 +39,8 @@ function toIncident(i: DraftIncident): Incident {
     dateCrimeCommitted: i.dateCrimeCommitted.trim(),
     dateOfConviction: i.dateOfConviction.trim(),
     narrative: {
-      // Story-lite writes one honest account per incident. The structured rawAnswers and
-      // provenance flags belong to the assistant build (AGENT_SPEC) and stay empty here.
-      rawAnswers: { facts: '', why: '', whatChanged: '', madeItRight: '' },
-      draft: i.narrativeDraft.trim(),
+      rawAnswers: { ...i.narrative.rawAnswers },
+      draft: i.narrative.draft.trim(),
       edited: true,
       provenance: [],
     },

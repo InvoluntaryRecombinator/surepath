@@ -13,21 +13,9 @@
  * the model must see everything from that night to write one true account instead of
  * amputated fragments.
  */
-import type { DraftCharge, DraftIncident } from '../app/draft'
+import { emptyRawAnswers, type DraftCharge, type DraftIncident, type RawAnswers } from '../app/draft'
 
-export type RawAnswers = {
-  facts: string
-  why: string
-  whatChanged: string
-  madeItRight: string
-}
-
-export const emptyRawAnswers: RawAnswers = {
-  facts: '',
-  why: '',
-  whatChanged: '',
-  madeItRight: '',
-}
+export { emptyRawAnswers, type RawAnswers }
 
 export type NarrativeContext = {
   incidentId: string
@@ -46,7 +34,7 @@ export type NarrativeContext = {
 
 export function buildNarrativeContext(
   incident: DraftIncident,
-  rawAnswers: RawAnswers = emptyRawAnswers,
+  rawAnswers: RawAnswers = incident.narrative.rawAnswers,
 ): NarrativeContext {
   return {
     incidentId: incident.id,

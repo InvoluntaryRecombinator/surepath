@@ -132,10 +132,15 @@ function storyValidation(draft: DraftCase, ctx: ValidationContext): SectionValid
   const item = ctx.narrativeItemLabel ?? 'the account'
   const issues: ValidationIssue[] = []
   draft.incidents.forEach((incident, i) => {
-    if (!hasText(incident.narrativeDraft)) {
+    if (!hasText(incident.narrative.draft)) {
       issues.push({
-        field: `incidents.${incident.id}.narrativeDraft`,
+        field: `incidents.${incident.id}.narrative`,
         message: `Incident ${i + 1} still needs its account — ${agency} won't process a request with ${item} left blank.`,
+      })
+    } else if (!incident.narrative.affirmed) {
+      issues.push({
+        field: `incidents.${incident.id}.narrative`,
+        message: `Incident ${i + 1}: read the account and confirm it's accurate — it goes on the forms you sign.`,
       })
     }
   })

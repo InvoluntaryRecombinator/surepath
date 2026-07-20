@@ -14,6 +14,7 @@ import {
   emptyDraft,
   newCharge,
   newIncident,
+  normalizeIncident,
   type DraftApplicant,
   type DraftCase,
   type DraftCharge,
@@ -171,6 +172,7 @@ function initialState(config: StateConfig, restore = true): AppState {
         ...fresh.draft,
         ...stored.draft,
         applicant: { ...emptyApplicant, ...stored.draft.applicant },
+        incidents: (stored.draft.incidents ?? []).map(normalizeIncident),
       },
       sectionId,
       // The section list can change between builds (the 'trade' step collapsed into the

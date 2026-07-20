@@ -50,7 +50,12 @@ function handEnteredMarcus(): DraftCase {
       court: i.court,
       dateCrimeCommitted: i.dateCrimeCommitted,
       dateOfConviction: i.dateOfConviction,
-      narrativeDraft: i.narrative.draft,
+      narrative: {
+        rawAnswers: { facts: '', why: '', whatChanged: '', madeItRight: '' },
+        draft: i.narrative.draft,
+        assumptions: [],
+        affirmed: true, // the §7 affirmation — a hand-entered case is confirmed before generate
+      },
       charges: i.charges.map((c) => ({
         id: c.id,
         exactOffense: c.exactOffense,
@@ -113,9 +118,15 @@ describe('draftToCase — fails closed on anything incomplete', () => {
     }
   })
 
+  it('throws when an account is unaffirmed — they confirm what they sign (§7)', () => {
+    const draft = handEnteredMarcus()
+    draft.incidents[0].narrative.affirmed = false
+    expect(() => draftToCase(draft)).toThrow(/confirm/)
+  })
+
   it('throws when a story is missing — a blank Item 21 is a rejected packet', () => {
     const draft = handEnteredMarcus()
-    draft.incidents[1].narrativeDraft = '   '
+    draft.incidents[1].narrative.draft = '   '
     // generic without context; the state's own words with it
     expect(() => draftToCase(draft)).toThrow(/left blank/)
     expect(() => draftToCase(draft, { agency: 'TDLR', narrativeItemLabel: 'Item 21' })).toThrow(/TDLR.*Item 21/)

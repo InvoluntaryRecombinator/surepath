@@ -96,3 +96,20 @@ describe('section completion', () => {
     expect(validateSection('licenses', unnamed).complete).toBe(false)
   })
 })
+
+describe('story migration — legacy narrativeDraft normalizes, unaffirmed (§7)', () => {
+  it('normalizeIncident carries the old string into narrative.draft with affirmed=false', async () => {
+    const { normalizeIncident, newIncident } = await import('../src/app/draft')
+    const legacy = {
+      ...newIncident('Texas'),
+      narrativeDraft: 'the old account text',
+    } as Parameters<typeof normalizeIncident>[0] & { narrative?: never }
+    // simulate a stored shape that predates the narrative object entirely
+    const stripped = { ...legacy } as Record<string, unknown>
+    delete stripped.narrative
+    const migrated = normalizeIncident(stripped as Parameters<typeof normalizeIncident>[0])
+    expect(migrated.narrative.draft).toBe('the old account text')
+    expect(migrated.narrative.affirmed).toBe(false) // they never affirmed — §7 re-gates, honestly
+    expect('narrativeDraft' in migrated).toBe(false)
+  })
+})

@@ -16,6 +16,40 @@ export type DraftCharge = {
   disposition: 'conviction' | 'deferred_adjudication' | ''
 }
 
+/** The four structured answers the assistant gathers. Persisted. */
+export type RawAnswers = {
+  facts: string
+  why: string
+  whatChanged: string
+  madeItRight: string
+}
+
+export const emptyRawAnswers: RawAnswers = { facts: '', why: '', whatChanged: '', madeItRight: '' }
+
+/**
+ * The persisted narrative (AGENT_SPEC §2, as decided): rawAnswers, the draft (THE artifact),
+ * the model's self-reported assumptions, and the §7 affirmation. The conversation
+ * transcript is DELIBERATELY absent — messages[] are session-only, because the interview is
+ * the most sensitive text in the app and does not sit on a shared computer's disk.
+ *
+ * Keyed by INCIDENT, never by charge. If you find yourself writing charge.narrative, stop —
+ * you are about to make someone write the same story four times.
+ */
+export type DraftNarrative = {
+  rawAnswers: RawAnswers
+  draft: string
+  assumptions: string[]
+  /** §7: the user confirmed this is their own true account. Reset by ANY change to draft. */
+  affirmed: boolean
+}
+
+export const emptyNarrative = (): DraftNarrative => ({
+  rawAnswers: { ...emptyRawAnswers },
+  draft: '',
+  assumptions: [],
+  affirmed: false,
+})
+
 export type DraftIncident = {
   id: string
   county: string
@@ -24,8 +58,8 @@ export type DraftIncident = {
   dateCrimeCommitted: string // MM/DD/YYYY
   dateOfConviction: string // MM/DD/YYYY
   charges: DraftCharge[]
-  /** One story per incident — authored later, at the story step. */
-  narrativeDraft: string
+  /** One story per incident — authored at the story step. */
+  narrative: DraftNarrative
 }
 
 export type DraftApplicant = {
@@ -125,8 +159,26 @@ export const newIncident = (defaultState: string): DraftIncident => ({
   dateCrimeCommitted: '',
   dateOfConviction: '',
   charges: [newCharge()],
-  narrativeDraft: '',
+  narrative: emptyNarrative(),
 })
+
+/**
+ * Migration: normalize an incident from any older stored shape. The legacy field was
+ * `narrativeDraft: string`; it becomes narrative.draft with affirmed=false — the user never
+ * affirmed under the old scheme, and §7 says they must, so the section honestly re-gates.
+ */
+export function normalizeIncident(raw: DraftIncident & { narrativeDraft?: string }): DraftIncident {
+  const legacyDraft = typeof raw.narrativeDraft === 'string' ? raw.narrativeDraft : ''
+  const narrative: DraftNarrative = {
+    ...emptyNarrative(),
+    ...(raw.narrative ?? {}),
+    rawAnswers: { ...emptyRawAnswers, ...(raw.narrative?.rawAnswers ?? {}) },
+  }
+  if (!narrative.draft && legacyDraft) narrative.draft = legacyDraft
+  const { narrativeDraft: _legacy, ...rest } = raw
+  void _legacy
+  return { ...rest, narrative }
+}
 
 /** Counts for the rail. Records = convictions + deferred adjudications; never filtered. */
 export function draftCounts(d: DraftCase) {

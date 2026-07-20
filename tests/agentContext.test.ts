@@ -14,7 +14,7 @@ const incidentA: DraftIncident = {
   court: '178th District Court',
   dateCrimeCommitted: '03/14/2019',
   dateOfConviction: '11/02/2019',
-  narrativeDraft: '',
+  narrative: { rawAnswers: { facts: '', why: '', whatChanged: '', madeItRight: '' }, draft: '', assumptions: [], affirmed: false },
   charges: [
     { id: 'c-1', exactOffense: 'Possession of a Controlled Substance, PG1 <1g', sentence: '3 years deferred adjudication', disposition: 'deferred_adjudication' },
     { id: 'c-2', exactOffense: 'Evading Arrest or Detention with a Vehicle', sentence: '2 years state jail, suspended', disposition: 'conviction' },

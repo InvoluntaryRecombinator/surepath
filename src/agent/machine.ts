@@ -16,7 +16,7 @@
  */
 import type { AgentTurn, NudgeFactor, Ownership, StageKey, Stages } from './turns'
 
-export const MAX_FOLLOWUP_TURNS = 14
+export const MAX_FOLLOWUP_TURNS = 15
 
 export type ConversationStatus = 'empty' | 'gathering' | 'drafted' | 'committed'
 
@@ -109,10 +109,17 @@ export function draftAllowedInConverse(state: ConversationState, turn: AgentTurn
 /**
  * ALL drafting policy, one pure function (the orchestrator consults it after every model
  * turn — never on "Write it now", which is the user's explicit exit and bypasses both):
- *   'ownership_check'  — the gate opened but the account deflects and hasn't been checked
- *   'escalate_draft'   — the gate opened, ownership settled, and the model still didn't
+ *   'ownership_check'  — the gate is open, the account deflects, it hasn't been checked
+ *   'escalate_draft'   — the gate is open, ownership settled, and the model still didn't
  *                        draft: the client re-calls with draft_now
  *   'idle'             — keep conversing
+ *
+ * NEITHER fires while the model still has a question on the table. The gate opening means
+ * a draft is PERMITTED, not due — the model keeps interviewing the optional stages for as
+ * long as it has questions, and cutting that off mid-question was the worst UX we shipped.
+ * Escalation exists for the model that stops asking AND doesn't draft; the check lands as
+ * the last word before drafting, never on top of a live question. Explicit exits ("Write
+ * it now", the turn cap) are the only other ways out.
  */
 export function nextAction(
   state: ConversationState,
@@ -120,6 +127,7 @@ export function nextAction(
   if (state.status !== 'gathering') return 'idle'
   if (state.turnCount === 0) return 'idle'
   if (!stagesSatisfyGate(state.stages, state.skippedStages)) return 'idle'
+  if (state.pendingFollowUp !== null) return 'idle'
   if (!ownershipSettled(state, state.ownership)) return 'ownership_check'
   return 'escalate_draft'
 }

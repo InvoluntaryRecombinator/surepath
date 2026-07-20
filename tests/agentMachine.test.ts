@@ -227,10 +227,32 @@ describe('ownership bounds the draft (the blame-shifting fix)', () => {
     const s = run(
       initialConversation(),
       { type: 'user-sent', text: 'it was my friends stuff, wrong place wrong time' },
-      model(turn({ stages: covered(), ownership: 'deflecting', draft: 'tidy deflecting account' })),
+      model(
+        turn({ stages: covered(), ownership: 'deflecting', followUp: null, draft: 'tidy deflecting account' }),
+      ),
     )
     expect(s.account).toBe('')
     expect(nextAction(s)).toBe('ownership_check')
+  })
+
+  it('neither check nor escalation fires while the model still has a question on the table', () => {
+    // Gate open, ownership settled — but the model is mid-interview on an optional stage.
+    // Cutting that off was the 5-question cutoff bug; the conversation continues.
+    const asking = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'x' },
+      model(turn({ stages: covered(), ownership: 'takes_responsibility' })),
+    )
+    expect(asking.pendingFollowUp).not.toBeNull()
+    expect(nextAction(asking)).toBe('idle')
+
+    // Same but deflecting: the check also waits for the question to resolve.
+    const deflecting = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'x' },
+      model(turn({ stages: covered(), ownership: 'deflecting' })),
+    )
+    expect(nextAction(deflecting)).toBe('idle')
   })
 
   it('the check burns the ownership slot, adds the fixed copy, consumes NO turn', () => {

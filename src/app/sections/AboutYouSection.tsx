@@ -91,7 +91,7 @@ export function AboutYouSection() {
 
       <FieldGroup
         heading="Other names you've been known by"
-        description="Include any name you've used before — a maiden name, a married name, or any other name you've gone by. These are needed to search your history accurately and get a correct eligibility determination."
+        description="Include any name you've used before — a maiden name, a married name, or any other name you've gone by. These are needed so your history can be searched accurately."
       >
         <TextField
           label="Names to include"

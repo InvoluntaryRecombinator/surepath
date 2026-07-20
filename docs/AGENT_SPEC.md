@@ -125,36 +125,49 @@ type NarrativeContext = {
 > typing dots, "AI is thinking…", a send button with a paper-plane icon. **Ours is not a
 > support bot bolted onto a page. It is the workspace for the hardest thing on the form.**
 
-Clicking a card in the "Your story" list opens the workbench — **one full-width vertical
-column** (revised 2026-07-20; the old three-region/side-panel layout and the four prompt
-boxes are dead — pre-collecting the interview left the model nothing to do but format):
+Clicking a card in the "Your story" list opens the workbench as a **full panel takeover**
+(focus mode — the chassis hides its briefing and Back/Continue; the workbench owns its
+exits) built as **ONE element** (revised again 2026-07-20; the floating black strip over a
+floating conversation read as disconnected pieces):
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│ DARK FACT STRIP (sticky) — May 1, 1992 · Harris County · court   │  dates LONG-FORM
+┌─ THE CARD — one bordered object ─────────────────────────────────┐
+│ dark header band — May 1, 1992 · Harris County · court           │  dates LONG-FORM
 │ [charge chip] [charge chip] [charge chip]                        │  in display prose
-│ ── coverage strip: What happened · Why · What's changed ·        │  (forms/PDFs keep
-│    Making it right — markers straight off the model's stages ──  │   MM/DD/YYYY)
 ├──────────────────────────────────────────────────────────────────┤
-│ THE CONVERSATION, full width                                     │
+│ coverage sub-band, LIGHT ground — What happened · Why · What's   │  ONLY while an
+│ changed · Making it right, straight off the model's stages       │  interview runs*
+├──────────────────────────────────────────────────────────────────┤
+│ THE CONVERSATION                                                 │
 │ │ agent turns — left accent rule; the current question is BOLD   │
-│ │ with its plain reason underneath                                │
+│ │ with its plain reason underneath                               │
 │ ▒ user turns — tinted blocks ▒                                   │
-│                                                                  │
-│ [ large input ]   Send · Skip this · Write it now from what      │
-│                   I've given                                     │
+├──────────────────────────────────────────────────────────────────┤
+│ input footer — Send · Skip this · Write it now (no account yet)  │
 │ "Skip the interview — I'll write it myself" (quiet; auto-        │
 │  revealed when the assistant is unavailable)                     │
+└──────────────────────────────────────────────────────────────────┘
 ├══════════════════════════════════════════════════════════════════┤  ← hard divider —
 │ THE ACCOUNT — nothing here until a draft exists (or the manual   │    NOTHING below
-│ path opens it). Editable · §7 affirmation · Save and continue    │    until drafted
+│ path opens it). AUTO-GROWN to its full text (nobody affirms      │    until drafted
+│ through a six-line keyhole) · §7 affirmation                     │
+│ exits: Back (to the list) · Save and continue                    │
 └──────────────────────────────────────────────────────────────────┘
 ```
+
+\* Four empty circles next to a finished account are structure that lies — on a return
+visit the coverage band is hidden and the conversation opens in the revision register:
+*"Your account is below. Tell me what you'd like changed — or edit it yourself, it's
+yours."*
 
 Still forbidden: bubbles, avatars, timestamps, typing dots, "AI is thinking…", paper-plane
 send buttons. The agent asks ONE question at a time, in the conversation.
 
-**Entry point** — the "Your story" card list (PRD Stage 5) is unchanged.
+**Entry point and exit** — the "Your story" card LIST IS THE HUB. Unfinished cards carry a
+left accent rule and "still to write" / "needs your confirmation"; confirmed cards dim
+behind a filled check. **Save and continue always lands back on the list** — seeing the
+finished set is the closure — and when every account is affirmed a success notice says so;
+the section's own Continue advances to Licenses.
 
 ---
 
@@ -272,9 +285,8 @@ free, the API-down degradation and the pre-proxy dev mode.
 ### Rules that live in CODE, not the prompt
 
 ```ts
-const MAX_FOLLOWUP_TURNS = 14  // a RUNAWAY-LOOP BACKSTOP, not a hurry-up. Nobody sane hits
-                               // it; the prompt pushes resolution in a handful of questions.
-                               // At the cap, code sends directive:'draft_now'.
+const MAX_FOLLOWUP_TURNS = 15  // a RUNAWAY-LOOP BACKSTOP, not a hurry-up. Nobody sane hits
+                               // it. At the cap, code sends directive:'draft_now'.
 
 // THE CONVERSE DRAFT GATE: a volunteered draft is accepted only when `what` and `why` are
 // 'covered' (or explicitly skipped) AND ownership is settled — takes_responsibility, or
@@ -295,14 +307,39 @@ const MAX_FOLLOWUP_TURNS = 14  // a RUNAWAY-LOOP BACKSTOP, not a hurry-up. Nobod
 //   the client re-calls with draft_now. (Server-side escalation is dead; one home.)
 // "Write it now" BYPASSES both — it is the explicit exit, and the exit lives in the
 //   interface, never in the copy (CLAUDE.md H6).
+//
+// NEITHER FIRES WHILE THE MODEL STILL HAS A QUESTION ON THE TABLE (pendingFollowUp !==
+//   null → 'idle'). The gate opening means a draft is PERMITTED, not DUE — the model
+//   keeps interviewing the optional stages for as long as it has questions. The first
+//   shipped version escalated the moment what+why covered, bulldozing the interview at
+//   ~4 turns mid-question; that was the worst UX we shipped. Escalation is for the model
+//   that STOPS asking and doesn't draft; the check lands as the last word before
+//   drafting, never on top of a live question.
+//
+// REVISION MODE: when an account already exists (state.account non-empty — a return
+//   visit, or refining after a landed draft), a volunteered draft is a REVISION and the
+//   stages/ownership gates DO NOT APPLY — on return the transcript is gone and stages
+//   read empty, so gating would make every change request silently vanish. The account
+//   itself rides in the request (context.currentAccount) as the revision substrate; the
+//   replace-confirm protects the standing text either way, and any accepted revision
+//   resets the affirmation. The L3 guard for tone requests lives in the prompt: "more
+//   apologetic" with no words of regret in the material → the model ASKS for what they
+//   feel, in followUp, instead of inventing it. (Live-verified: 'running was my mistake'
+//   must never become 'I deeply regret' without them saying so.)
+//
+// THE AFFIRMATION SURVIVES REOPENING: initialConversation takes the stored affirmed
+//   value. Re-reading is owed after an EDIT (any change still resets it), not after
+//   peeking — without this, opening a confirmed account silently un-confirmed it.
 
 // SKIP WAIVES THE GATE for that stage, and a skipped stage is never asked about again.
 // Their no is final; holding a gate after an explicit skip is interviewing someone
 // against their will. `changed` and `right` are optional throughout: nudge once each
 // (the nudgedFactors set), then allow.
 
-// "Write it now" is visible whenever a conversation exists. The manual path
-// ("Skip the interview — I'll write it myself") is complete and model-free.
+// "Write it now" is visible whenever a conversation exists AND no account does yet
+// (with an account standing, revision is the conversation's job and the button would
+// mean "regenerate", which nobody asked for). The manual path ("Skip the interview —
+// I'll write it myself") is complete and model-free.
 
 // A6 banned-word regex runs over reply / followUp.question / followUp.reason / nudge.text.
 // On hit: retry once, then drop the turn.

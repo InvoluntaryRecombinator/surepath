@@ -163,3 +163,21 @@ describe('the affirmation is the gate (§7)', () => {
     expect(s.status).toBe('gathering') // no draft, no transition — the hint alone does nothing
   })
 })
+
+describe('revision after a manual edit needs an explicit confirm', () => {
+  it('asks only when a model draft would overwrite manual text', async () => {
+    const { needsReplacementConfirm } = await import('../src/agent/machine')
+    const manual = run(initialConversation(), { type: 'user-wrote-account', text: 'my own words' })
+    expect(needsReplacementConfirm(manual, turn({ draft: 'model rewrite' }))).toBe(true)
+    expect(needsReplacementConfirm(manual, turn({ draft: null }))).toBe(false)
+    expect(needsReplacementConfirm(manual, turn({ draft: 'my own words' }))).toBe(false)
+
+    const modelDrafted = run(
+      initialConversation(),
+      { type: 'user-sent', text: 'x' },
+      { type: 'model-turn', turn: turn({ draft: 'model words' }) },
+    )
+    // model replacing its own untouched draft needs no ceremony
+    expect(needsReplacementConfirm(modelDrafted, turn({ draft: 'better model words' }))).toBe(false)
+  })
+})

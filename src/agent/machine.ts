@@ -161,3 +161,19 @@ export function reduceConversation(
       return { ...state, status: 'committed' }
   }
 }
+
+/**
+ * The revision-after-manual-edit rule (AGENT_SPEC §5, as decided): a model draft may
+ * replace a MANUALLY-edited account only behind an explicit confirm. The orchestrator
+ * holds the turn; on decline it dispatches the turn with the draft stripped (the reply
+ * still renders — only the overwrite is refused).
+ */
+export function needsReplacementConfirm(state: ConversationState, turn: AgentTurn): boolean {
+  return (
+    turn.draft !== null &&
+    turn.draft.trim().length > 0 &&
+    state.accountSource === 'manual' &&
+    state.account.trim().length > 0 &&
+    state.account.trim() !== turn.draft.trim()
+  )
+}

@@ -694,6 +694,19 @@ any place we shaded the truth.
 - **H5.** Tell users this takes up to **90 days** and costs **$10 per trade**.
   Do not bury the wait or the cost.
 
+- **H6 — The advocacy copy standard.** Where SurePath coaches on **published criteria**
+  (what boards say they weigh), the copy **states why it matters, recommends plainly, and
+  stops.** Never append the escape hatch — exits live in the interface ("Write it now" is
+  always on screen), and hedging in the same breath as the recommendation cancels the
+  recommendation. **Banned patterns in advocacy copy:** *"totally your call," "no
+  pressure," "you don't have to," "if you want," "this is optional," "or should I write it
+  as is."* Where guidance genuinely doesn't matter, cut the line instead of hedging it.
+  **The carve-out, which is load-bearing:** where an invariant requires neutrality — L8
+  (expunged/sealed records), L9 (how to get the record; any decision that is theirs to
+  make about their own life and money) — the copy stays **flat**, and advocacy is the
+  violation, not the hedge. The rule is: advocate where we coach, stay flat where we must
+  not, and never do both in one sentence.
+
 ---
 
 ## 6. WHEN IN DOUBT

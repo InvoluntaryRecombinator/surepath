@@ -54,14 +54,3 @@ export const States = () => (
     </Link>
   </Page>
 )
-
-export const Texas = () => (
-  <Page
-    title="Texas: ask TDLR before you commit."
-    line="For $10 per trade, the Texas Department of Licensing and Regulation will review your full criminal history and answer within 90 days of a complete request. The letter is advisory — asking forecloses nothing, and you can apply for the license either way. You will need your complete record: every conviction and every deferred adjudication, no matter how old."
-  >
-    <Link to="/texas/apply" className={cta}>
-      Begin my request packet
-    </Link>
-  </Page>
-)

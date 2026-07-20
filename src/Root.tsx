@@ -1,7 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { ApplyPage } from './app/ApplyPage'
 import { MarketingLayout } from './marketing/MarketingLayout'
-import { About, Faq, Landing, States, Texas } from './marketing/pages'
+import { About, Faq, Landing, States } from './marketing/pages'
+import { TexasPage } from './marketing/TexasPage'
 import { txConfig } from './state-config/tx'
 import PacketDevPage from './PacketDevPage'
 import SmokePage from './SmokePage'
@@ -24,7 +25,7 @@ export default function Root() {
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/states" element={<States />} />
-          <Route path="/texas" element={<Texas />} />
+          <Route path="/texas" element={<TexasPage />} />
         </Route>
         <Route path="/texas/apply" element={<ApplyPage config={txConfig} />} />
       </Routes>

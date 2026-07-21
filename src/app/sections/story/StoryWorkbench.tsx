@@ -119,7 +119,17 @@ export function StoryWorkbench({
         {/* header band — chrome material, part of the card */}
         <div className="bg-rail px-6 py-4">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-rail-muted">
-            {[formatLongDate(incident.dateOfConviction), incident.county && `${incident.county} County`, incident.court]
+            {/* both dates, labeled — the account narrates the events date while the court
+                record carries the disposition date; showing one reads as a mismatch */}
+            {[
+              incident.dateCrimeCommitted &&
+              incident.dateCrimeCommitted !== incident.dateOfConviction
+                ? `events ${formatLongDate(incident.dateCrimeCommitted)}`
+                : null,
+              incident.dateOfConviction && `resolved ${formatLongDate(incident.dateOfConviction)}`,
+              incident.county && `${incident.county} County`,
+              incident.court,
+            ]
               .filter(Boolean)
               .join(' · ')}
           </p>

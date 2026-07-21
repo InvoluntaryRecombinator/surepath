@@ -3,7 +3,7 @@
  * no network, no key.
  */
 import { describe, expect, it, vi } from 'vitest'
-import { handleNarrativeRequest } from '../src/agent/server'
+import { draftGuardViolations, handleNarrativeRequest } from '../src/agent/server'
 import { buildSystemPrompt, findIdentifierKeys } from '../src/agent/prompt'
 import type { AgentRequest, AgentTurn } from '../src/agent/turns'
 
@@ -142,20 +142,126 @@ describe('reply never carries the draft (§4)', () => {
     const turn = res.body.turn as typeof dup
     expect(turn.draft).toBe(dup.draft)
     expect(turn.reply).not.toContain('Harris County')
-    expect(turn.reply).toContain("it's below")
+    expect(turn.reply).toContain("it's in the box below")
   })
 })
 
 describe('reply never carries a question when followUp exists (§4)', () => {
-  it('strips question sentences from reply — they live only in followUp', async () => {
+  it('strips question sentences AND narration openers — an empty reply is legal', async () => {
     const leaky = {
       ...cleanTurn,
       reply: 'Thanks for sharing that. Can you tell me more about what happened?',
     }
     const res = await handleNarrativeRequest(request, env, async () => leaky)
     const turn = res.body.turn as typeof leaky
-    expect(turn.reply).toBe('Thanks for sharing that.')
+    // the question is stripped (lives in followUp) and the gratitude opener is stripped
+    // (process narration) — the question then renders alone, which is tighter.
+    expect(turn.reply).toBe('')
     expect(turn.followUp?.question).toBe('What happened after you stopped?')
+  })
+
+  it('keeps a content-responsive reply untouched', async () => {
+    const warm = {
+      ...cleanTurn,
+      reply: 'Eight months and finished — that program is exactly the kind of specific that carries.',
+    }
+    const res = await handleNarrativeRequest(request, env, async () => warm)
+    expect((res.body.turn as typeof warm).reply).toBe(warm.reply)
+  })
+})
+
+describe('the junk-reason gate — a reason names a consequence or it does not render', () => {
+  const withReason = (reason: string) => ({
+    ...cleanTurn,
+    followUp: { question: 'Which program was it?', reason, stage: 'changed' as const },
+  })
+
+  it.each([
+    'Details about the incident help clarify what actually happened.',
+    'This helps the board understand your perspective.',
+    'Boards look for evidence of rehabilitation and conduct after the event.',
+    'Understanding your perspective on why it happened helps the board see the context.',
+  ])('nulls the observed junk shape: %s', async (junk) => {
+    const res = await handleNarrativeRequest(request, env, async () => withReason(junk))
+    expect((res.body.turn as AgentTurn).followUp?.reason).toBeNull()
+  })
+
+  it('keeps a reason that names a concrete consequence', async () => {
+    const real =
+      "The form names the charge, so the account should say it too — leaving it out reads like avoiding it."
+    const res = await handleNarrativeRequest(request, env, async () => withReason(real))
+    expect((res.body.turn as AgentTurn).followUp?.reason).toBe(real)
+  })
+})
+
+describe('the draft guards — mechanical L3 on the signed document', () => {
+  const deferredOnly = {
+    ...request,
+    context: {
+      ...request.context,
+      charges: [
+        {
+          exactOffense: 'Possession of a Controlled Substance, Penalty Group 3, under 28 grams (Hydrocodone)',
+          sentence: '18 months deferred adjudication',
+          disposition: 'deferred_adjudication' as const,
+        },
+      ],
+    },
+    messages: [
+      { role: 'user' as const, content: 'they found stuff in the car, i took the deal my lawyer said take' },
+    ],
+  }
+
+  it('flags a substance pulled from context into the narrative', () => {
+    expect(
+      draftGuardViolations(deferredOnly, 'The officers searched the car and found hydrocodone in the console.'),
+    ).toContain('invented_from_context:hydrocodone')
+  })
+
+  it('allows QUOTING the charge line — describing the charge is not inventing a fact', () => {
+    expect(
+      draftGuardViolations(
+        deferredOnly,
+        'I was charged with possession of a controlled substance, penalty group 3, under 28 grams (hydrocodone). They found items I did not know about.',
+      ),
+    ).toEqual([])
+  })
+
+  it('allows tokens the person actually said', () => {
+    const said = {
+      ...deferredOnly,
+      messages: [{ role: 'user' as const, content: 'it was hydrocodone, a few loose pills' }],
+    }
+    expect(draftGuardViolations(said, 'They found hydrocodone pills in the console.')).toEqual([])
+  })
+
+  it('flags conviction language when no charge is a conviction', () => {
+    expect(draftGuardViolations(deferredOnly, 'After my conviction, I completed supervision.')).toContain(
+      'conviction_language_on_deferred',
+    )
+    // mixed dispositions are exempt — the original request has a real conviction in it
+    expect(draftGuardViolations(request, 'After my conviction, I completed supervision.')).toEqual([])
+  })
+
+  it('a guard violation consumes the retry, then fails closed', async () => {
+    const bad = {
+      ...cleanTurn,
+      followUp: null,
+      draft: 'After my conviction, I moved on.',
+    }
+    const generate = vi.fn().mockResolvedValue(bad)
+    const res = await handleNarrativeRequest({ ...deferredOnly, directive: 'draft_now' }, env, generate)
+    expect(generate).toHaveBeenCalledTimes(2)
+    expect(res.status).toBe(422)
+  })
+
+  it('a violating first attempt recovered by a clean retry returns 200', async () => {
+    const bad = { ...cleanTurn, followUp: null, draft: 'They found hydrocodone on the seat.' }
+    const good = { ...cleanTurn, followUp: null, draft: 'They found items I did not know about.' }
+    const generate = vi.fn().mockResolvedValueOnce(bad).mockResolvedValueOnce(good)
+    const res = await handleNarrativeRequest({ ...deferredOnly, directive: 'draft_now' }, env, generate)
+    expect(res.status).toBe(200)
+    expect((res.body.turn as AgentTurn).draft).toBe(good.draft)
   })
 })
 
@@ -181,6 +287,13 @@ describe('the two prompts (§6)', () => {
     // the trigger wiring: the sequence outranks stage questions, and a flat no is an answer
     expect(prompt).toContain('THIS SEQUENCE TAKES PRIORITY')
     expect(prompt).toContain('A clear no IS an answer')
+    // the patch set: register, real reasons, the offense gate, stage order, story changes
+    expect(prompt).toContain('sitting next to them, not across from them')
+    expect(prompt).toContain('WHAT THE BOARD DOES WITH THE ANSWER')
+    expect(prompt).toContain('"what" CANNOT BE COVERED WITHOUT THE OFFENSE ITSELF')
+    expect(prompt).toContain('WORK THE STAGES IN ORDER')
+    expect(prompt).toContain('WHEN THEIR STORY CHANGES')
+    expect(prompt).toContain("it's in the box below")
     expect(buildSystemPrompt({ ...request, directive: 'draft_now' })).not.toContain(
       'DRAWING OUT WHAT\'S MISSING',
     )

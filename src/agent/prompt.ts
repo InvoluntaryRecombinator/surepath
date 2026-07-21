@@ -264,7 +264,10 @@ VOICE
 
 First person, plain language, their words. Use their vocabulary and their register — if
 they said "I messed up," do not write "I exercised poor judgment." If they said "my truck,"
-do not write "my vehicle."
+do not write "my vehicle." If they said "that's on me," write "That's on me" — NOT "I take
+responsibility for my actions." If they said "the classes they made me do," do not write
+"the required coursework." The formal version is not an improvement; it is someone else's
+voice on their signature.
 
 But fix spelling, grammar, and sentence structure. This is a formal document going to a
 licensing board, and clean writing is part of what you are doing for them. Their voice,

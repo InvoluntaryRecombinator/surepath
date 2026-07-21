@@ -89,17 +89,39 @@ export async function handleNarrativeRequest(
   const run = generate ?? ((r: AgentRequest, s: string) => defaultGenerate(r, s, env))
 
   // 3/4 — generate, with one retry for any of: throw, A6 violation, draftless draft_now,
-  // or a draft that fails the mechanical guards below.
+  // or a draft that fails the mechanical guards below. The retry CARRIES THE CORRECTION —
+  // re-running an identical prompt just repeats the mistake; naming the rejected output
+  // turns fail-closed into self-repair. (Correction text references only charge-line and
+  // rule content, never the person — D6 holds.)
+  let correction = ''
   for (let attempt = 0; attempt < 2; attempt++) {
     let turn: AgentTurn
     try {
-      turn = await run(request, system)
+      turn = await run(request, system + correction)
     } catch {
       continue
     }
-    if (outcomeLanguageViolations(turn).length > 0) continue
-    if (request.directive === 'draft_now' && !(turn.draft && turn.draft.trim())) continue
-    if (turn.draft && draftGuardViolations(request, turn.draft).length > 0) continue
+    if (outcomeLanguageViolations(turn).length > 0) {
+      correction = `\n\nYOUR PREVIOUS ATTEMPT WAS REJECTED by a mechanical check: it contained outcome language (eligible / qualify / chances / likely). Never speak to the outcome. Retry without it.`
+      continue
+    }
+    if (request.directive === 'draft_now' && !(turn.draft && turn.draft.trim())) {
+      correction = `\n\nYOUR PREVIOUS ATTEMPT WAS REJECTED: it returned no draft. This is the document step — populate "draft" with the account, from what they told you.`
+      continue
+    }
+    if (turn.draft) {
+      const violations = draftGuardViolations(request, turn.draft)
+      if (violations.length > 0) {
+        const notes = violations.map((v) =>
+          v.startsWith('invented_from_context:')
+            ? `the draft contained "${v.slice('invented_from_context:'.length)}" — that word appears in the charge line but the person NEVER SAID IT. Remove it; describe only what they actually told you (quoting the full charge name is fine).`
+            : `the draft used "convicted/conviction" but no charge in this incident is a conviction — it was deferred adjudication. Fix the language: "I was placed on deferred adjudication for..."`,
+        )
+        correction = `\n\nYOUR PREVIOUS ATTEMPT WAS REJECTED by a mechanical check: ${notes.join(' Also: ')}`
+        console.log(`[narrative] draft guard: ${violations.map((v) => v.split(':')[0]).join(',')}`)
+        continue
+      }
+    }
     // Code bounds behavior (§4): reply never carries the draft, and never carries a
     // question — questions live only in followUp, or the user reads them twice.
     if (turn.draft && turn.reply.includes(turn.draft.trim().slice(0, 60))) {

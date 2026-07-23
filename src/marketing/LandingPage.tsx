@@ -1,7 +1,36 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { txConfig } from '../state-config/tx'
 import { useStateModal } from './stateModalContext'
 import { ResumeProgress } from './ResumeProgress'
+
+/** The spine's gold fill tracks scroll: sets --spine-fill on the .landing-doc wrapper
+ *  to the fraction of the doc that has passed the viewport's midline. */
+function useSpineProgress() {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    let raf = 0
+    const update = () => {
+      const rect = el.getBoundingClientRect()
+      const advanced = Math.min(Math.max(window.innerHeight * 0.5 - rect.top, 0), rect.height)
+      el.style.setProperty('--spine-fill', `${(advanced / rect.height) * 100}%`)
+    }
+    const schedule = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    return () => {
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      cancelAnimationFrame(raf)
+    }
+  }, [])
+  return ref
+}
 
 function Wrap({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -167,6 +196,7 @@ function ProcessStep({ step, alternate }: { step: (typeof steps)[number]; altern
 
 export function LandingPage() {
   const openStateModal = useStateModal()
+  const spineRef = useSpineProgress()
   return (
     <>
       <header className="relative overflow-hidden bg-ink">
@@ -197,7 +227,7 @@ export function LandingPage() {
         </Wrap>
       </header>
 
-      <div className="landing-doc bg-silica">
+      <div ref={spineRef} className="landing-doc bg-silica">
         <section className="relative py-[clamp(72px,11vh,128px)]">
           <Tick />
           <Wrap>

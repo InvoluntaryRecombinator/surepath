@@ -18,6 +18,7 @@
   --color-brass: #c9a227;
   --color-brass-deep: #ad8515;
   --color-forest: #315c4b;
+  --color-link: #33607a;
   --color-paper: #ffffff;
   --color-paper-border: #232830;
   --color-carbon: #d3d6d6;
@@ -36,7 +37,7 @@
   --color-line: #d3d6d6;
   --color-accent: #c9a227;
   --color-accent-deep: #ad8515;
-  --color-interactive: #16191d;
+  --color-interactive: #3e4a54;
   --color-brand-gold: #c9a227;
   --color-brand-gold-deep: #ad8515;
   --color-state: #a43a31;
@@ -82,14 +83,14 @@ form[data-validation-attempted='true'] fieldset:has(input:invalid) legend {
   color: var(--color-state);
 }
 
-/* Application controls use ink; marketing and save-progress retain brass. */
+/* Application controls use slate; marketing and save-progress retain brass. */
 body:has(#apply-section-form) main {
   --color-accent: var(--color-interactive);
   --color-accent-deep: var(--color-interactive);
 }
 
 #apply-section-form :is(input, select, textarea):focus-visible {
-  border-color: var(--color-line);
+  border-color: var(--color-interactive);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-interactive) 34%, transparent);
 }
 
@@ -122,42 +123,46 @@ body:has(#apply-section-form) main {
   position: relative;
 }
 
+/* the spine — a 4px warm grey rail connecting the sections, its gold fill tracking
+   scroll progress (the --spine-fill var is set from LandingPage; 0% without JS, which
+   degrades to the plain grey rail). Section nodes sit ON the rail as gold stops. */
 .landing-doc::before {
-  background: rgb(62 74 84 / 38%);
+  background: #cdc5b3;
   bottom: 0;
   content: '';
   left: var(--landing-rail);
   pointer-events: none;
   position: absolute;
   top: 0;
-  width: 1px;
+  width: 4px;
   z-index: 20;
 }
 
-.landing-tick {
-  background: rgb(62 74 84 / 55%);
-  height: 1px;
+.landing-doc::after {
+  background: var(--color-brass);
+  content: '';
+  height: var(--spine-fill, 0%);
   left: var(--landing-rail);
+  pointer-events: none;
   position: absolute;
   top: 0;
-  width: 1rem;
+  width: 4px;
   z-index: 21;
 }
 
-.landing-dark-section::after {
-  background: rgb(244 245 243 / 35%);
-  bottom: 0;
-  content: '';
-  left: var(--landing-rail);
-  pointer-events: none;
+.landing-tick {
+  background: var(--color-brass);
+  border: 1.5px solid var(--color-ink);
+  height: 12px;
+  left: calc(var(--landing-rail) - 4px);
   position: absolute;
-  top: 0;
-  width: 1px;
-  z-index: 20;
+  top: -6px;
+  width: 12px;
+  z-index: 22;
 }
 
-.landing-dark-section .landing-tick {
-  background: rgb(244 245 243 / 60%);
+.landing-doc > section:first-child .landing-tick {
+  top: 0;
 }
 
 .save-progress-dialog::backdrop {

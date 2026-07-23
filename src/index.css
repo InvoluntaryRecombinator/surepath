@@ -17,6 +17,7 @@
   --color-silica: #f4f5f3;
   --color-brass: #c9a227;
   --color-brass-deep: #ad8515;
+  --color-forest: #315c4b;
   --color-paper: #ffffff;
   --color-paper-border: #232830;
   --color-carbon: #d3d6d6;
@@ -219,9 +220,10 @@ body:has(#apply-section-form) main {
 .state-modal-panel   { animation: state-modal-in 200ms ease-out; }
 
 .us-map svg { display: block; width: 100%; height: auto; }
-.us-map .state path { fill: #e0e4e6; }
+.us-map .state path { fill: #e7e3da; }  /* warm grey — paper-adjacent, not placeholder chrome */
 .us-map path[class*='-'],
 .us-map .borders path { stroke: #ffffff; stroke-width: 0.8; fill: none; }
-.us-map .separator1 { stroke: #c6cbce; stroke-width: 0.8; fill: none; }
 .us-map .dccircle { display: none; }
+/* continental only — the AK/HI insets float loose in the corner and read as artifacts */
+.us-map .ak, .us-map .hi, .us-map .separator1 { display: none; }
 .us-map path.tx { fill: var(--color-brass); }

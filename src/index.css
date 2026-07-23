@@ -229,10 +229,12 @@ body:has(#apply-section-form) main {
 /* continental only — the AK/HI insets float loose in the corner and read as artifacts */
 .us-map .ak, .us-map .hi, .us-map .separator1 { display: none; }
 .us-map path.tx { fill: var(--color-brass); stroke: var(--color-ink); stroke-width: 1; }
-/* the drawn-not-generated detail: TEXAS in ink caps, hairline leader to the shape */
-.us-map .tx-label line { stroke: var(--color-ink); stroke-width: 0.75; }
+/* the drawn-not-generated detail: TEXAS in ink caps, hairline leader touching the
+   shape's edge. Sized in viewBox units — ~20 renders ≈11px at card width; smaller is
+   illegible, and illegible detail is worse than no detail. */
+.us-map .tx-label line { stroke: var(--color-ink); stroke-width: 1; }
 .us-map .tx-label text {
   fill: var(--color-ink);
-  font: 700 13px 'Public Sans Variable', sans-serif;
-  letter-spacing: 2.5px;
+  font: 700 20px 'Public Sans Variable', sans-serif;
+  letter-spacing: 3.5px;
 }

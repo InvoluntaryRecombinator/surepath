@@ -1,13 +1,17 @@
 /**
- * The state modal — "Find your state" opens this over the landing page. A defined
- * object, not white rectangles on the hero: 2px ink border, hard ink offset shadow,
- * three tonal bands edge to edge —
- *   ink header   · "Choose your state" in the display face, X in the band
- *   cream map    · the flat continental map, larger, with a drawn TEXAS leader label
- *   white control· State select (Texas chosen, others disabled), one sentence, button
+ * The state modal — "Find your state" opens this over the landing page. A floating
+ * card (soft ambient shadow — modals float; buttons stamp), 1px warm grey edge, 4px
+ * radius, three zones:
+ *   cream header · "Choose your state" in ink, X at the title's optical center,
+ *                  3px gold rule along the band's bottom edge
+ *   map          · the flat continental map filling the band with modest margins,
+ *                  drawn TEXAS leader label, the licensing sentence as its caption
+ *   warm control · State select (Texas chosen, others disabled) + Get started,
+ *                  together as the single decision
  *
- * The map is public-domain (Wikimedia "Blank US Map (states only)"); all its styling
- * and the TEXAS label live in index.css (.us-map).
+ * The map is public-domain (Wikimedia "Blank US Map (states only)"); its styling and
+ * the TEXAS label live in index.css (.us-map). Gold on the select is FOCUS ONLY —
+ * gold at rest reads as focus or error.
  */
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
@@ -41,34 +45,39 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
         aria-modal="true"
         aria-label="Choose your state"
         onClick={(e) => e.stopPropagation()}
-        className="state-modal-panel w-[min(520px,94vw)] border-2 border-ink bg-paper shadow-[10px_10px_0_#16191d]"
+        className="state-modal-panel w-[min(560px,94vw)] overflow-hidden rounded-[4px] border border-[#d8d4cc] bg-paper shadow-[0_0_50px_12px_rgba(22,25,29,0.35)]"
       >
-        {/* ── band 1 · header — ink, edge to edge ─────────────────────────────────── */}
-        <div className="flex items-center justify-between bg-ink py-4 pl-6 pr-3">
-          <h2 className="font-display text-[22px] font-extrabold leading-tight text-paper">
-            Choose your state
-          </h2>
-          <button
-            ref={closeRef}
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="flex h-9 w-9 items-center justify-center text-[24px] leading-none text-paper/70 transition-colors duration-150 hover:text-paper"
-          >
-            ×
-          </button>
+        {/* ── header — cream, ink title, gold rule as the designed edge ───────────── */}
+        <div className="border-b-[3px] border-brass bg-[#f5f0e6]">
+          <div className="flex items-center justify-between py-4 pl-6 pr-3">
+            <h2 className="font-display text-[22px] font-extrabold leading-tight text-ink">
+              Choose your state
+            </h2>
+            <button
+              ref={closeRef}
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="flex h-9 w-9 items-center justify-center text-[24px] leading-none text-wet transition-colors duration-150 hover:text-ink"
+            >
+              ×
+            </button>
+          </div>
         </div>
 
-        {/* ── band 2 · the map — warm cream, the map sits IN something ────────────── */}
-        <div className="border-y border-ink bg-[#f5f0e6] px-5 py-5">
+        {/* ── the map — filling its band with modest, even margins ────────────────── */}
+        <div className="bg-[#f5f0e6] px-4 pb-4 pt-4">
           <div aria-hidden="true" className="us-map" dangerouslySetInnerHTML={{ __html: usStates }} />
+          <p className="mt-3 px-2 text-center text-[13.5px] leading-relaxed text-wet">
+            Licensing is state law. Every state has its own board and its own process.
+          </p>
         </div>
 
-        {/* ── band 3 · control — white ────────────────────────────────────────────── */}
-        <div className="px-7 pb-8 pt-6">
+        {/* ── control — a hair warmer than white; select + button, one decision ───── */}
+        <div className="border-t border-[#e6e1d5] bg-[#fbf9f5] px-7 pb-8 pt-6">
           <label
             htmlFor="state-modal-select"
-            className="mb-1.5 block text-[13px] font-semibold text-ink"
+            className="mb-2 block text-[15px] font-bold text-ink"
           >
             State
           </label>
@@ -102,11 +111,7 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
             </svg>
           </div>
 
-          <p className="mt-6 text-[17px] leading-[1.6] text-ink">
-            Licensing is state law. Every state has its own board and its own process.
-          </p>
-
-          <div className="mt-8 flex justify-center">
+          <div className="mt-6 flex justify-center">
             <Link
               to="/texas"
               onClick={onClose}

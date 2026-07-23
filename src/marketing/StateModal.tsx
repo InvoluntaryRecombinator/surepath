@@ -1,17 +1,18 @@
 /**
  * The state modal — "Find your state" opens this over the landing page. A floating
- * card (soft ambient shadow — modals float; buttons stamp), 1px warm grey edge, 4px
- * radius, three zones:
- *   cream header · "Choose your state" in ink, X at the title's optical center,
- *                  3px gold rule along the band's bottom edge
- *   map          · the flat continental map filling the band with modest margins,
- *                  drawn TEXAS leader label, the licensing sentence as its caption
- *   warm control · State select (Texas chosen, others disabled) + Get started,
+ * card (soft ambient shadow — modals float; buttons stamp) behind a 1.5px ink edge,
+ * 4px radius, reading as three distinct steps top to bottom:
+ *   dark header  · warm dark grey (a step off ink), "Choose your state" in white,
+ *                  white X, 3px gold rule along the band's bottom edge
+ *   warm map     · the flat continental map filling the band, the licensing sentence
+ *                  as its caption. The gold fill IS the indicator — no labels.
+ *   near-white   · State select (Texas chosen, others disabled) + Get started,
  *                  together as the single decision
  *
- * The map is public-domain (Wikimedia "Blank US Map (states only)"); its styling and
- * the TEXAS label live in index.css (.us-map). Gold on the select is FOCUS ONLY —
- * gold at rest reads as focus or error.
+ * The map is public-domain (Wikimedia "Blank US Map (states only)"); its styling
+ * lives in index.css (.us-map). The tx path is the mainland only — the barrier-island
+ * subpath left lagoon slivers where gold never met the outline. Gold on the select is
+ * FOCUS ONLY — gold at rest reads as focus or error.
  */
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
@@ -45,12 +46,12 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
         aria-modal="true"
         aria-label="Choose your state"
         onClick={(e) => e.stopPropagation()}
-        className="state-modal-panel w-[min(560px,94vw)] overflow-hidden rounded-[4px] border border-[#d8d4cc] bg-paper shadow-[0_0_50px_12px_rgba(22,25,29,0.35)]"
+        className="state-modal-panel w-[min(560px,94vw)] overflow-hidden rounded-[4px] border-[1.5px] border-ink bg-paper shadow-[0_0_50px_12px_rgba(22,25,29,0.35)]"
       >
-        {/* ── header — cream, ink title, gold rule as the designed edge ───────────── */}
-        <div className="border-b-[3px] border-brass bg-[#f5f0e6]">
+        {/* ── header — warm dark grey (a step off ink), white title, gold rule ────── */}
+        <div className="border-b-[3px] border-brass bg-[#35322b]">
           <div className="flex items-center justify-between py-4 pl-6 pr-3">
-            <h2 className="font-display text-[22px] font-extrabold leading-tight text-ink">
+            <h2 className="font-display text-[22px] font-extrabold leading-tight text-paper">
               Choose your state
             </h2>
             <button
@@ -58,15 +59,15 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="flex h-9 w-9 items-center justify-center text-[24px] leading-none text-wet transition-colors duration-150 hover:text-ink"
+              className="flex h-9 w-9 items-center justify-center text-[24px] leading-none text-paper/75 transition-colors duration-150 hover:text-paper"
             >
               ×
             </button>
           </div>
         </div>
 
-        {/* ── the map — filling its band with modest, even margins ────────────────── */}
-        <div className="bg-[#f5f0e6] px-4 pb-4 pt-4">
+        {/* ── the map — a clearly warmer, darker step than the control band ───────── */}
+        <div className="bg-[#efe8d8] px-4 pb-4 pt-4">
           <div aria-hidden="true" className="us-map" dangerouslySetInnerHTML={{ __html: usStates }} />
           <p className="mt-3 px-2 text-center text-[13.5px] leading-relaxed text-wet">
             Licensing is state law. Every state has its own board and its own process.
@@ -74,7 +75,7 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
         </div>
 
         {/* ── control — a hair warmer than white; select + button, one decision ───── */}
-        <div className="border-t border-[#e6e1d5] bg-[#fbf9f5] px-7 pb-8 pt-6">
+        <div className="border-t border-[#d8d2c2] bg-[#fbf9f5] px-7 pb-7 pt-7">
           <label
             htmlFor="state-modal-select"
             className="mb-2 block text-[15px] font-bold text-ink"
@@ -115,7 +116,7 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
             <Link
               to="/texas"
               onClick={onClose}
-              className="inline-flex h-11 items-center rounded-[2px] border-[1.5px] border-ink bg-brass px-[30px] text-[15px] font-bold tracking-[0.01em] text-ink shadow-action transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-action-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+              className="inline-flex h-11 items-center rounded-[2px] border-[1.5px] border-ink bg-brass px-[52px] text-[15px] font-bold tracking-[0.01em] text-ink shadow-action transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-action-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
             >
               Get started
             </Link>

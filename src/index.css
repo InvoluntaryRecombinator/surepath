@@ -220,21 +220,13 @@ body:has(#apply-section-form) main {
 .state-modal-panel   { animation: state-modal-in 200ms ease-out; }
 
 .us-map svg { display: block; width: 100%; height: auto; }
-/* the map sits in the warm cream band; states one step darker so they read against it,
+/* the map sits in the warm map band; states one step darker so they read against it,
    borders engraved in the band's own tone */
-.us-map .state path { fill: #ded8c9; }
+.us-map .state path { fill: #d9d1bd; }
 .us-map path[class*='-'],
-.us-map .borders path { stroke: #f5f0e6; stroke-width: 0.8; fill: none; }
+.us-map .borders path { stroke: #efe8d8; stroke-width: 0.8; fill: none; }
 .us-map .dccircle { display: none; }
 /* continental only — the AK/HI insets float loose in the corner and read as artifacts */
 .us-map .ak, .us-map .hi, .us-map .separator1 { display: none; }
+/* the actual tx path filled — one mainland shape, gold terminating on the boundary */
 .us-map path.tx { fill: var(--color-brass); stroke: var(--color-ink); stroke-width: 1; }
-/* the drawn-not-generated detail: TEXAS in ink caps, hairline leader touching the
-   shape's edge. Sized in viewBox units — ~20 renders ≈11px at card width; smaller is
-   illegible, and illegible detail is worse than no detail. */
-.us-map .tx-label line { stroke: var(--color-ink); stroke-width: 1; }
-.us-map .tx-label text {
-  fill: var(--color-ink);
-  font: 700 20px 'Public Sans Variable', sans-serif;
-  letter-spacing: 3.5px;
-}

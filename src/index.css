@@ -220,10 +220,19 @@ body:has(#apply-section-form) main {
 .state-modal-panel   { animation: state-modal-in 200ms ease-out; }
 
 .us-map svg { display: block; width: 100%; height: auto; }
-.us-map .state path { fill: #e7e3da; }  /* warm grey — paper-adjacent, not placeholder chrome */
+/* the map sits in the warm cream band; states one step darker so they read against it,
+   borders engraved in the band's own tone */
+.us-map .state path { fill: #ded8c9; }
 .us-map path[class*='-'],
-.us-map .borders path { stroke: #ffffff; stroke-width: 0.8; fill: none; }
+.us-map .borders path { stroke: #f5f0e6; stroke-width: 0.8; fill: none; }
 .us-map .dccircle { display: none; }
 /* continental only — the AK/HI insets float loose in the corner and read as artifacts */
 .us-map .ak, .us-map .hi, .us-map .separator1 { display: none; }
-.us-map path.tx { fill: var(--color-brass); }
+.us-map path.tx { fill: var(--color-brass); stroke: var(--color-ink); stroke-width: 1; }
+/* the drawn-not-generated detail: TEXAS in ink caps, hairline leader to the shape */
+.us-map .tx-label line { stroke: var(--color-ink); stroke-width: 0.75; }
+.us-map .tx-label text {
+  fill: var(--color-ink);
+  font: 700 13px 'Public Sans Variable', sans-serif;
+  letter-spacing: 2.5px;
+}

@@ -61,8 +61,11 @@ export type StateConfig = {
   feeUsd: number
   turnaroundDays: number
 
-  /** The license catalog: real program names from the agency, verify-flagged in data/. */
-  catalog: { program: string; examples: string[]; demo?: boolean }[]
+  /** The flat program list for license selection — the agency's own names, in the
+   *  agency's own order, from data/ (the single source of truth). The checked label
+   *  writes VERBATIM into the license-type field of that packet's form. Checkbox
+   *  selection only: free text produced garbage packets ("dd"). */
+  programs: string[]
 
   /** External links the chassis renders. Attributed, never hardcoded in a component. */
   links: {
@@ -70,10 +73,7 @@ export type StateConfig = {
     guidelines: { label: string; url: string }
   }
 
-  /** H1/H2 — the state's own caveats about its guidelines, displayed prominently. */
-  honestyBanner: string
-
-  /** H3/H4 — the review-wall warnings, in the state's terms. */
+  /** H1–H5 — the state's own caveats, displayed at the review wall. */
   reviewWarnings: string[]
 
   /** The §-cited factors quote for the story screen. Static, attributed. (L5) */

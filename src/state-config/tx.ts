@@ -6,8 +6,8 @@
  * item is OURS and is marked as an open question (L8). Deferred adjudications are
  * reported like convictions (D2). There is no lookback window (D1).
  */
-import catalog from '../../data/tx_licenses.json'
 import links from '../../data/tdlr_links.json'
+import programs from '../../data/tdlr_programs.json'
 import type { StateConfig } from './types'
 
 const TDLR_CHEL_URL = links.tdlr.chel_page.url
@@ -62,8 +62,8 @@ export const txConfig: StateConfig = {
       icon: 'certificate',
       intro: {
         eyebrow: 'License selection',
-        title: 'Choose each license you want reviewed',
-        lead: 'Your criminal history is reviewed separately for each license type. Each selection creates a separate request and requires a separate $10 fee.',
+        title: 'Choose the licenses you want reviewed',
+        lead: 'Each license you pick becomes its own packet with its own $10 fee, mailed separately — TDLR answers each one on its own. Pick as many as you want to explore.',
       },
     },
     {
@@ -86,7 +86,7 @@ export const txConfig: StateConfig = {
   feeUsd: links.tdlr.fee_usd,
   turnaroundDays: links.tdlr.turnaround_days,
 
-  catalog: catalog.programs,
+  programs: programs.programs,
 
   links: {
     agencySite: { label: links.tdlr.chel_page.label, url: links.tdlr.chel_page.url },
@@ -96,10 +96,10 @@ export const txConfig: StateConfig = {
     },
   },
 
-  honestyBanner:
-    'These guidelines are not an exclusive list — TDLR can consider crimes not listed. TDLR also states that multiple violations of any criminal statute are always reviewed, for any license type. This does not tell you what TDLR will decide. Only TDLR can tell you that.',
-
   reviewWarnings: [
+    // H1/H2 — re-homed from the licenses page when it went to a flat list; the state's
+    // caveat about its own guidelines still reaches every user, at the wall.
+    'TDLR\'s published guidelines are not an exclusive list — TDLR can consider crimes not listed, and says multiple violations of any criminal statute are always reviewed, for any license type. Only TDLR can tell you what it will decide.',
     'The letter is advisory. TDLR is not bound by it, and there is no appeal from it. You can apply for the license no matter what it says.',
     'It is only as good as what you disclosed. TDLR compares your report against state records.',
     'The real license application runs a full DPS/FBI fingerprint background check. Anything left out here gets found there.',

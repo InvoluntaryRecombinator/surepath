@@ -184,8 +184,9 @@ export async function generateMailingChecklist(
   write(pen, `Packet for: ${applicantLine(c)}`, { font: pen.mono, size: 10 })
   write(
     pen,
-    `Packet: ${plan.license.specificLicenseType} (${plan.license.program}). ` +
-      `${plan.chargeCount} record(s) across ${plan.incidentCount} incident(s).`,
+    `Packet: ${plan.license.specificLicenseType}${
+      plan.license.program !== plan.license.specificLicenseType ? ` (${plan.license.program})` : ''
+    }. ` + `${plan.chargeCount} record(s) across ${plan.incidentCount} incident(s).`,
     { size: 10, gap: 10 },
   )
   rule(pen)

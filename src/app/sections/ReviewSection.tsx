@@ -154,7 +154,9 @@ export function ReviewSection() {
             {draft.licenses.map((l) => (
               <li key={`${l.program}::${l.specificLicenseType}`} className="text-[14.5px] text-ink">
                 <span className="font-medium">{l.specificLicenseType}</span>
-                <span className="text-muted"> — {l.program}</span>
+                {l.program !== l.specificLicenseType && (
+                  <span className="text-muted"> — {l.program}</span>
+                )}
               </li>
             ))}
             {draft.licenses.length === 0 && (

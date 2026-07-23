@@ -1,36 +1,7 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { txConfig } from '../state-config/tx'
 import { useStateModal } from './stateModalContext'
 import { ResumeProgress } from './ResumeProgress'
-
-/** The spine's gold fill tracks scroll: sets --spine-fill on the .landing-doc wrapper
- *  to the fraction of the doc that has passed the viewport's midline. */
-function useSpineProgress() {
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    let raf = 0
-    const update = () => {
-      const rect = el.getBoundingClientRect()
-      const advanced = Math.min(Math.max(window.innerHeight * 0.5 - rect.top, 0), rect.height)
-      el.style.setProperty('--spine-fill', `${(advanced / rect.height) * 100}%`)
-    }
-    const schedule = () => {
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener('scroll', schedule, { passive: true })
-    window.addEventListener('resize', schedule)
-    return () => {
-      window.removeEventListener('scroll', schedule)
-      window.removeEventListener('resize', schedule)
-      cancelAnimationFrame(raf)
-    }
-  }, [])
-  return ref
-}
 
 function Wrap({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -38,10 +9,6 @@ function Wrap({ children, className = '' }: { children: ReactNode; className?: s
       {children}
     </div>
   )
-}
-
-function Tick() {
-  return <span aria-hidden="true" className="landing-tick" />
 }
 
 function Bar({ width }: { width: string }) {
@@ -162,7 +129,6 @@ const steps = [
 function ProcessStep({ step, alternate }: { step: (typeof steps)[number]; alternate: boolean }) {
   return (
     <section className={`relative overflow-hidden ${step.background}`}>
-      <Tick />
       <span
         aria-hidden="true"
         className={`absolute -top-[0.14em] font-display text-[clamp(160px,24vw,320px)] font-black leading-none text-brass/17 ${alternate ? '-right-[0.06em]' : '-left-[0.06em]'}`}
@@ -196,7 +162,6 @@ function ProcessStep({ step, alternate }: { step: (typeof steps)[number]; altern
 
 export function LandingPage() {
   const openStateModal = useStateModal()
-  const spineRef = useSpineProgress()
   return (
     <>
       <header className="relative overflow-hidden bg-ink">
@@ -206,7 +171,7 @@ export function LandingPage() {
           className="absolute inset-0 h-full w-full object-cover object-[72%_center]"
         />
         <div className="landing-hero-scrim absolute inset-0" aria-hidden="true" />
-        <Wrap className="relative z-10 pb-[clamp(130px,18vh,190px)] pt-[clamp(90px,13vh,150px)]">
+        <Wrap className="relative z-10 pb-[clamp(96px,13vh,140px)] pt-[clamp(90px,13vh,150px)]">
           <h1 className="max-w-[17ch] font-display text-[clamp(38px,5.6vw,66px)] font-extrabold leading-[1.06] tracking-[-0.015em] text-silica">
             Take the next step toward your licensed career with{' '}
             <span className="text-brass">confidence.</span>
@@ -227,34 +192,7 @@ export function LandingPage() {
         </Wrap>
       </header>
 
-      <div ref={spineRef} className="landing-doc bg-silica">
-        <section className="relative py-[clamp(72px,11vh,128px)]">
-          <Tick />
-          <Wrap>
-            <h2 className="mb-[26px] max-w-[24ch] font-display text-[clamp(30px,4.2vw,46px)] font-extrabold leading-[1.12] tracking-[-0.01em] text-ink">
-              It used to work backwards.
-            </h2>
-            <p className="max-w-[62ch] text-[18px] leading-[1.65] text-ink/90">
-              To find out whether your record disqualified you, you had to apply. To apply,
-              you had to already be qualified — the training, the hours, the fees. In practice
-              that meant spending a year and a tuition before learning the answer.
-            </p>
-          </Wrap>
-        </section>
-
-        <section className="relative pb-[clamp(84px,12vh,140px)] pt-6">
-          <Tick />
-          <Wrap>
-            <h2 className="mb-[26px] max-w-[24ch] font-display text-[clamp(30px,4.2vw,46px)] font-extrabold leading-[1.12] tracking-[-0.01em] text-ink">
-              SurePath is how you ask first.
-            </h2>
-            <p className="max-w-[62ch] text-[18px] leading-[1.65] text-ink/90">
-              Plain questions instead of dense forms, and a finished packet ready to send. No
-              account, no lawyer, no decoding.
-            </p>
-          </Wrap>
-        </section>
-
+      <div className="bg-silica">
         <section id="how-it-works" aria-label="How SurePath works" className="scroll-mt-4">
           {steps.map((step, index) => (
             <ProcessStep key={step.number} step={step} alternate={index % 2 === 1} />
@@ -262,7 +200,6 @@ export function LandingPage() {
         </section>
 
         <section className="landing-dark-section relative bg-ink py-[clamp(88px,13vh,150px)]">
-          <Tick />
           <Wrap>
             <h2 className="mb-[22px] font-display text-[30px] font-extrabold text-silica">
               We don’t decide anything.
@@ -275,7 +212,6 @@ export function LandingPage() {
         </section>
 
         <section className="relative py-[clamp(72px,10vh,112px)]">
-          <Tick />
           <Wrap className="grid grid-cols-2 gap-[clamp(40px,6vw,80px)]">
             <div>
               <h3 className="mb-3 font-display text-[20px] font-extrabold text-ink">
@@ -299,7 +235,6 @@ export function LandingPage() {
         </section>
 
         <section className="relative bg-concrete-4 py-[clamp(72px,10vh,110px)]">
-          <Tick />
           <Wrap>
             <ResumeProgress config={txConfig} />
           </Wrap>

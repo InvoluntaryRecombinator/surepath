@@ -118,53 +118,6 @@ body:has(#apply-section-form) main {
     linear-gradient(to right, var(--color-ink) 8%, rgb(22 25 29 / 0%) 92%);
 }
 
-.landing-doc {
-  --landing-rail: calc((100% - min(68.75rem, 100%)) / 2 + 1.25rem);
-  position: relative;
-}
-
-/* the spine — a 4px warm grey rail connecting the sections, its gold fill tracking
-   scroll progress (the --spine-fill var is set from LandingPage; 0% without JS, which
-   degrades to the plain grey rail). Section nodes sit ON the rail as gold stops. */
-.landing-doc::before {
-  background: #cdc5b3;
-  bottom: 0;
-  content: '';
-  left: var(--landing-rail);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  width: 4px;
-  z-index: 20;
-}
-
-.landing-doc::after {
-  background: var(--color-brass);
-  content: '';
-  height: var(--spine-fill, 0%);
-  left: var(--landing-rail);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  width: 4px;
-  z-index: 21;
-}
-
-.landing-tick {
-  background: var(--color-brass);
-  border: 1.5px solid var(--color-ink);
-  height: 12px;
-  left: calc(var(--landing-rail) - 4px);
-  position: absolute;
-  top: -6px;
-  width: 12px;
-  z-index: 22;
-}
-
-.landing-doc > section:first-child .landing-tick {
-  top: 0;
-}
-
 .save-progress-dialog::backdrop {
   background: rgb(18 20 23 / 78%);
 }

@@ -9,14 +9,14 @@
  */
 import { useNavigate } from 'react-router-dom'
 import { draftCounts } from './draft'
-import { DELETE_CONFIRM, downloadJson, formatCounter } from './railShared'
+import { DELETE_CONFIRM, formatCounter } from './railShared'
 import { validateSection } from './sectionValidation'
 import { eraseStoredData, useAppStore } from './storeContext'
 import { CheckSmall, Icon } from '../ui/icons'
 
 const ROW_H = 50 // px — one nav row. The connector geometry derives from this.
 
-export function Rail() {
+export function Rail({ onSaveProgress }: { onSaveProgress: () => void }) {
   const { state, dispatch, config } = useAppStore()
   const navigate = useNavigate()
   const counts = draftCounts(state.draft)
@@ -111,10 +111,8 @@ export function Rail() {
       <div className="flex flex-col gap-2.5 px-5 pb-6 pt-4">
         <button
           type="button"
-          onClick={() =>
-            downloadJson(`surepath-progress-${config.code.toLowerCase()}.json`, state.draft)
-          }
-          className="h-9 rounded-[2px] border border-rail-line bg-transparent text-[13px] font-medium text-rail-ink transition-colors duration-150 hover:border-rail-muted hover:bg-rail-inset"
+          onClick={onSaveProgress}
+          className="save-progress-action save-progress-action-on-dark h-10 rounded-[3px] bg-brand-gold px-3 text-[13px] font-bold text-rail hover:bg-brand-gold-deep"
         >
           Save my progress
         </button>

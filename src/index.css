@@ -1,62 +1,75 @@
-/*
- * SurePath design tokens — DESIGN_SYSTEM.md §3 (v3): white fields on a soft warm ground.
- *
- * Contrast must be present at every layer, subtle but always there:
- *   rail ↔ ground · ground ↔ surface · surface ↔ WHITE FIELD (the strongest —
- *   the one that kills "murky"). A flat single-tone screen is the failure.
- *
- * The ban list is enforced HERE, at the theme level:
- *   - the entire default Tailwind palette is cleared — `bg-blue-500` does not exist
- *   - every shadow utility is cleared — a drop shadow cannot be typed
- *   - MONO IS DEAD (§4). One friendly sans. There is no --font-mono.
- */
+/* SurePath's shared visual system.
+ * The reference remains read-only and never enters the application bundle. */
 @import 'tailwindcss';
 @import '@fontsource-variable/public-sans';
+@import '@fontsource-variable/libre-franklin';
+@import '@fontsource/courier-prime/400.css';
+@import '@fontsource/courier-prime/700.css';
 
 @theme {
-  /* Colors: wipe the default palette, then two MATERIALS and one accent.
-     Chrome (graphite) is what the app is made of — the rail and the page ground.
-     Paper is what the work sits on — one light panel, genuinely inset, with a real edge.
-     The two are different materials, not two tints of one. */
   --color-*: initial;
-  --color-rail: #202226; /* graphite chrome — the rail AND the app page ground */
-  --color-rail-inset: #2a2d33; /* active/hover structure inside the chrome */
-  --color-rail-ink: #ecebe6; /* primary chrome type and markers */
-  --color-rail-muted: #a2a19a; /* secondary chrome type, future steps */
-  --color-rail-line: #393c42; /* internal chrome rules + the panel's edge against chrome */
-  --color-surface: #faf9f6; /* PAPER — the content panel, marketing surfaces */
-  --color-ground: #f0eeea; /* a quiet tint WITHIN the light world: banners, in-panel insets, marketing body */
-  --color-field: #ffffff; /* input fields. crisp white on paper. */
-  --color-ink: #23252a; /* primary text */
-  --color-muted: #6f6c64; /* labels, hints */
-  --color-line: #d9d6cd; /* borders, dividers in the light world */
-  --color-accent: #4a5bd4; /* indigo — luminous against graphite, confident on paper */
-  --color-accent-deep: #3a49b3; /* pressed/hovered. A shade, not a second hue. */
-  --color-state: #b3372c; /* HARD requirements only. Never a stylistic accent. */
+  --color-ink: #16191d;
+  --color-wet: #3e4a54;
+  --color-concrete: #e2e6e8;
+  --color-concrete-2: #e9eced;
+  --color-concrete-3: #f0f2f2;
+  --color-concrete-4: #f7f8f8;
+  --color-silica: #f4f5f3;
+  --color-brass: #c9a227;
+  --color-brass-deep: #ad8515;
+  --color-paper: #ffffff;
+  --color-paper-border: #232830;
+  --color-carbon: #d3d6d6;
+  --color-spine: #969ea3;
 
-  /* Shadows: none exist. A focus ring is not a shadow; it lives in CSS below. */
-  --shadow-*: initial;
-  --inset-shadow-*: initial;
-  --drop-shadow-*: initial;
+  /* Existing semantic names now resolve to the same system across every route. */
+  --color-rail: #16191d;
+  --color-rail-inset: #232830;
+  --color-rail-ink: #f4f5f3;
+  --color-rail-muted: #aeb6bc;
+  --color-rail-line: #3e4a54;
+  --color-surface: #f4f5f3;
+  --color-ground: #e9eced;
+  --color-field: #ffffff;
+  --color-muted: #3e4a54;
+  --color-line: #d3d6d6;
+  --color-accent: #c9a227;
+  --color-accent-deep: #ad8515;
+  --color-interactive: #16191d;
+  --color-brand-gold: #c9a227;
+  --color-brand-gold-deep: #ad8515;
+  --color-state: #a43a31;
 
-  /* One warm, legible sans. Everywhere. Labels vs values differ by weight/color/size,
-     never by a second face. */
+  --shadow-action: 3px 3px 0 #16191d;
+  --shadow-action-hover: 5px 5px 0 #16191d;
+  --shadow-paper: 8px 8px 0 rgb(62 74 84 / 18%);
+
+  --container-landing: 68.75rem;
+  --spacing-landing-gutter: 3.5rem;
+  --spacing-landing-section: 7rem;
+
+  --font-display: 'Libre Franklin Variable', 'Helvetica Neue', Arial, sans-serif;
   --font-sans: 'Public Sans Variable', system-ui, sans-serif;
+  --font-mono: 'Courier Prime', 'Courier New', monospace;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--color-ground);
+  background: var(--color-silica);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 18px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* The focus ring — required everywhere, an accessibility floor. A RING: no offset, no blur. */
 :focus-visible {
   outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 22%, transparent);
+  border-color: var(--color-brass);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brass) 34%, transparent);
 }
 
 form[data-validation-attempted='true'] input:invalid,
@@ -68,8 +81,112 @@ form[data-validation-attempted='true'] fieldset:has(input:invalid) legend {
   color: var(--color-state);
 }
 
+/* Application controls use ink; marketing and save-progress retain brass. */
+body:has(#apply-section-form) main {
+  --color-accent: var(--color-interactive);
+  --color-accent-deep: var(--color-interactive);
+}
+
+#apply-section-form :is(input, select, textarea):focus-visible {
+  border-color: var(--color-line);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-interactive) 34%, transparent);
+}
+
+#apply-section-form button.bg-transparent.text-accent {
+  background-color: var(--color-interactive);
+  color: var(--color-field);
+}
+
+#apply-section-form a,
+#apply-section-form button.text-accent:not(.bg-transparent),
+#apply-section-form button.underline {
+  color: var(--color-interactive);
+  text-decoration-line: underline;
+  text-underline-offset: 4px;
+}
+
 ::selection {
   background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+.landing-hero-scrim {
+  background:
+    linear-gradient(to top, var(--color-silica) 0%, transparent 15%),
+    linear-gradient(to right, var(--color-ink) 8%, rgb(22 25 29 / 0%) 92%);
+}
+
+.landing-doc {
+  --landing-rail: calc((100% - min(68.75rem, 100%)) / 2 + 1.25rem);
+  position: relative;
+}
+
+.landing-doc::before {
+  background: rgb(62 74 84 / 38%);
+  bottom: 0;
+  content: '';
+  left: var(--landing-rail);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 1px;
+  z-index: 20;
+}
+
+.landing-tick {
+  background: rgb(62 74 84 / 55%);
+  height: 1px;
+  left: var(--landing-rail);
+  position: absolute;
+  top: 0;
+  width: 1rem;
+  z-index: 21;
+}
+
+.landing-dark-section::after {
+  background: rgb(244 245 243 / 35%);
+  bottom: 0;
+  content: '';
+  left: var(--landing-rail);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 1px;
+  z-index: 20;
+}
+
+.landing-dark-section .landing-tick {
+  background: rgb(244 245 243 / 60%);
+}
+
+.save-progress-dialog::backdrop {
+  background: rgb(18 20 23 / 78%);
+}
+
+.save-progress-action {
+  border: 1px solid var(--color-ink);
+  box-shadow: 2px 2px 0 var(--color-ink);
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.save-progress-action:hover:not(:disabled) {
+  box-shadow: 3px 3px 0 var(--color-ink);
+  transform: translate(-1px, -1px);
+}
+
+.save-progress-action:active:not(:disabled) {
+  box-shadow: none;
+  transform: translate(1px, 1px);
+}
+
+.save-progress-action-on-dark {
+  box-shadow: 2px 2px 0 rgb(244 245 243 / 50%);
+}
+
+.save-progress-action-on-dark:hover:not(:disabled) {
+  box-shadow: 3px 3px 0 rgb(244 245 243 / 65%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -79,4 +196,32 @@ form[data-validation-attempted='true'] fieldset:has(input:invalid) legend {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+}
+
+/* ── the state modal ─────────────────────────────────────────────────────────────────
+ * One lit object on a dimmed page. Ink deeper than the chrome, sharp corners, hard
+ * offset shadow — the landing page's language at full contrast. The map dominates:
+ * every state a barely-there hairline, Texas the only saturated shape on screen. */
+@keyframes state-modal-in {
+  from { opacity: 0; transform: scale(0.965); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes state-modal-dim {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.state-modal-overlay { animation: state-modal-dim 200ms ease-out; }
+.state-modal-panel   { animation: state-modal-in 200ms ease-out; }
+
+.us-map svg { display: block; width: 100%; height: auto; }
+.us-map .state path { fill: #1a1e23; }              /* context, not content */
+.us-map path[class*='-'],
+.us-map .borders path { stroke: rgb(150 158 163 / 0.28); stroke-width: 0.6; fill: none; }
+.us-map .separator1 { stroke: rgb(150 158 163 / 0.28); stroke-width: 0.6; fill: none; }
+.us-map .dccircle { display: none; }                 /* a lit dot would compete with Texas */
+.us-map path.tx {
+  fill: var(--color-brass);
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  filter: drop-shadow(12px 12px 0 #000);             /* hard offset — no blur, no glow */
 }

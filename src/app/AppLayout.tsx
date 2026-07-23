@@ -18,6 +18,7 @@ import { useFocusMode } from './focusModeContext'
 import { useAppStore } from './storeContext'
 import { MobileRail } from './MobileRail'
 import { Rail } from './Rail'
+import { SaveProgressDialog } from './SaveProgressDialog'
 import { validateSection } from './sectionValidation'
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -30,6 +31,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const isFirst = idx === 0
   const isLast = idx === config.sections.length - 1
   const [attemptedSectionId, setAttemptedSectionId] = useState<string | null>(null)
+  const [saveProgressOpen, setSaveProgressOpen] = useState(false)
   const errorSummaryRef = useRef<HTMLDivElement>(null)
   const validation = validateSection(stage.id, state.draft, {
     agency: config.agency,
@@ -55,10 +57,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
   return (
     /* fixed inset-0: the app owns the viewport. Only the panel scrolls. */
     <div className="fixed inset-0 flex flex-col bg-rail lg:flex-row">
-      <Rail />
+      <Rail onSaveProgress={() => setSaveProgressOpen(true)} />
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <MobileRail />
+        <MobileRail onSaveProgress={() => setSaveProgressOpen(true)} />
 
         {/* ── THE PANEL — one paper object on graphite ground, real margins, real edge ── */}
         <main className="min-h-0 flex-1 p-2.5 sm:p-3 lg:p-4">
@@ -123,6 +125,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </main>
       </div>
+      <SaveProgressDialog open={saveProgressOpen} onOpenChange={setSaveProgressOpen} />
     </div>
   )
 }

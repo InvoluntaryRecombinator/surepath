@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SurePath — Find out where you stand before you train</title>
+<meta name="description" content="Many state licensing boards will review your record and tell you where you stand — in writing, before you spend a year and a tuition finding out. SurePath turns the request into plain questions and a submission-ready packet.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700;800;900&family=Public+Sans:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16191D;          /* Docket ink */
+  --wet:#3E4A54;          /* Wet concrete */
+  --band-a:#E2E6E8;       /* Poured concrete */
+  --silica:#F4F5F3;       /* Silica */
+  --brass:#C9A227;        /* Brass — locked accent */
+  --blue:#33607A;         /* Duty blue — links & focus only */
+  --paper-border:#232830;
+  --carbon:rgba(62,74,84,.18);
+  --spine:rgba(62,74,84,.38);
+  --tick:rgba(62,74,84,.55);
+  --rail:calc((100% - min(1100px, 100%)) / 2 + 20px);
+  --display:'Libre Franklin','Helvetica Neue',Arial,sans-serif;
+  --body:'Public Sans','Helvetica Neue',Arial,sans-serif;
+  --mono:'Courier Prime','Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--silica);
+  color:#222930;
+  font-family:var(--body);
+  font-size:18px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+p{max-width:66ch}
+em{font-style:italic}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.hero :focus-visible{outline-color:#C9CFD4}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.wrap{max-width:1100px;margin:0 auto;padding-left:56px;padding-right:24px}
+
+/* ---------- motion ---------- */
+.js [data-animate]{opacity:0;transform:translateY(16px);transition:opacity .5s ease-out,transform .5s ease-out}
+.js [data-animate].in{opacity:1;transform:none}
+.js .vig[data-animate]{transition-delay:.12s}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js [data-animate]{opacity:1;transform:none;transition:none}
+  .js .vig[data-animate]{transition-delay:0s}
+  .goldrule{transform:none !important;transition:none !important}
+  .chev{opacity:1 !important;transition:none !important}
+  dialog[open],dialog[open]::backdrop{animation:none !important}
+  .state,.btn-solid,.btn-gold{transition:none}
+}
+
+/* ---------- nav ---------- */
+.nav{background:var(--silica);border-bottom:1px solid rgba(62,74,84,.18)}
+.nav .wrap{max-width:none}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding-top:10px;padding-bottom:10px;padding-left:24px}
+.nav-logo{display:inline-flex}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{font-weight:600;font-size:15px;color:var(--ink);text-decoration:none}
+.nav-links a:hover{text-decoration:underline}
+.btn-solid{
+  display:inline-block;background:var(--brass);color:var(--ink);border:1.5px solid var(--ink);
+  border-radius:2px;font-family:var(--body);font-weight:700;font-size:15px;letter-spacing:.01em;
+  padding:11px 22px;cursor:pointer;text-decoration:none;
+  box-shadow:3px 3px 0 var(--ink);
+  transition:transform .12s ease-out,box-shadow .12s ease-out;
+}
+.btn-solid:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}
+.btn-solid:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;background:var(--ink);overflow:hidden}
+.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:72% center}
+.hero-scrim{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(to top,   var(--silica) 0%, rgba(244,245,243,0) 15%),
+    linear-gradient(to right, var(--ink) 8%,   rgba(22,25,29,0) 92%);
+}
+.hero-inner{position:relative;z-index:2;padding-top:clamp(90px,13vh,150px);padding-bottom:clamp(130px,18vh,190px)}
+.hero h1{
+  font-family:var(--display);font-weight:800;letter-spacing:-.015em;
+  font-size:clamp(38px,5.6vw,66px);line-height:1.06;color:var(--silica);max-width:17ch;
+}
+.hero h1 .gold{color:var(--brass)}
+.hero-sub{margin-top:26px;font-size:19px;color:#C9CFD4;max-width:50ch}
+.btn-ghost{
+  display:inline-block;margin-top:34px;background:transparent;color:var(--silica);
+  border:1.5px solid rgba(244,245,243,.75);border-radius:2px;
+  font-family:var(--body);font-weight:600;font-size:16px;padding:13px 26px;
+  text-decoration:none;cursor:pointer;
+}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+.trades{
+  margin-top:30px;font-weight:600;font-size:11.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:#AEB6BC;max-width:none;white-space:nowrap;
+}
+
+/* ---------- the spine ---------- */
+.doc{position:relative}
+.doc::before{
+  content:"";position:absolute;top:0;bottom:0;left:var(--rail);
+  width:1px;background:var(--spine);z-index:3;pointer-events:none;
+}
+.tickmark{position:absolute;top:0;left:var(--rail);width:16px;height:1px;background:var(--tick);z-index:3}
+
+/* ---------- prose sections ---------- */
+.prose{position:relative;padding-top:clamp(72px,11vh,128px);padding-bottom:clamp(72px,11vh,128px)}
+.prose h2{
+  font-family:var(--display);font-weight:800;letter-spacing:-.01em;color:var(--ink);
+  font-size:clamp(30px,4.2vw,46px);line-height:1.12;margin-bottom:26px;max-width:24ch;
+}
+.prose p{margin-bottom:1.15em;max-width:62ch}
+.prose p:last-child{margin-bottom:0}
+.pivot{padding-top:clamp(48px,7vh,80px);padding-bottom:clamp(84px,12vh,140px)}
+
+/* ---------- steps ---------- */
+.step{position:relative;overflow:hidden}
+.step-01{background:var(--band-a)}
+.step-02{background:#E9ECED}
+.step-03{background:#F0F2F2}
+.step-04{background:#F7F8F8}
+.step-inner{
+  position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;
+  gap:clamp(40px,7vw,110px);padding-top:clamp(80px,11vh,120px);padding-bottom:clamp(80px,11vh,120px);
+}
+.step-alt .step-inner{flex-direction:row-reverse}
+.step-text{max-width:58ch;flex:1 1 420px}
+.ghost{
+  position:absolute;top:-.14em;z-index:1;
+  font-family:var(--display);font-weight:900;line-height:1;
+  font-size:clamp(160px,24vw,320px);color:var(--brass);opacity:.17;
+  pointer-events:none;user-select:none;
+}
+.ghost-l{left:-.06em}
+.ghost-r{right:-.06em}
+.step-head{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.chip{
+  background:var(--ink);color:var(--brass);border-radius:2px 2px 0 0;
+  font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.08em;
+  padding:6px 11px 5px;
+}
+.step-head h3{
+  font-family:var(--display);font-weight:800;letter-spacing:-.01em;color:var(--ink);
+  font-size:clamp(24px,3vw,32px);line-height:1.15;
+}
+.step-text p{max-width:52ch}
+.step-note{margin-top:16px;font-size:17px;color:var(--wet);max-width:52ch}
+
+/* ---------- vignette family ---------- */
+.vig{flex:0 1 380px}
+.paper{
+  background:#fff;border:1.5px solid var(--paper-border);border-radius:2px;
+  box-shadow:8px 8px 0 var(--carbon);position:relative;
+}
+.flabel{
+  font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--wet);
+}
+.fbar{display:block;height:8px;background:var(--paper-border);border-radius:1px}
+.fblank{
+  display:block;height:20px;border:1px solid rgba(62,74,84,.45);
+  background:repeating-linear-gradient(45deg,rgba(62,74,84,.25) 0 3px,transparent 3px 7px);
+}
+/* 01 — record sheet */
+.sheet-record{width:min(380px,100%);padding:28px 24px 24px}
+.sheet-tab{
+  position:absolute;top:-13px;left:14px;background:#fff;border:1.5px solid var(--paper-border);
+  border-radius:2px;font-family:var(--mono);font-weight:700;font-size:10px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--ink);padding:4px 8px 3px;
+}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:20px 22px}
+.field{display:flex;flex-direction:column;gap:8px;min-width:0}
+/* 02 — folders */
+.vig-folders{position:relative;height:190px;width:min(360px,100%)}
+.folder{position:absolute;height:122px;border-radius:2px}
+.folder-back{
+  left:0;top:16px;width:62%;background:var(--silica);
+  border:1.5px solid rgba(35,40,48,.45);
+}
+.folder-front{
+  right:0;top:52px;width:64%;display:flex;align-items:center;gap:12px;padding:0 18px;
+}
+.ftab{
+  position:absolute;top:-12px;left:12px;width:58px;height:12px;
+  border:1.5px solid rgba(35,40,48,.45);border-bottom:none;border-radius:2px 2px 0 0;
+  background:var(--silica);
+}
+.ftab-front{border-color:var(--paper-border);background:#fff}
+.checkbox{width:14px;height:14px;background:var(--ink);position:relative;flex:none}
+.mark{
+  position:absolute;left:2px;top:3px;width:8px;height:4px;
+  border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg);
+}
+.folder-front .fbar{flex:1 1 auto}
+/* 03 — question sheet */
+.sheet-q{width:min(280px,100%);padding:24px 22px 28px;display:flex;flex-direction:column;gap:18px}
+.progress{display:flex;gap:5px}
+.seg{width:11px;height:11px;border:1.5px solid var(--paper-border)}
+.seg-done{background:var(--paper-border)}
+.answer{height:34px;border-bottom:1.5px solid var(--paper-border)}
+/* 04 — packet stack */
+.vig-packet{position:relative;width:min(340px,100%)}
+.sheet-ghost{position:absolute;inset:0;background:#fff;border:1.5px solid rgba(35,40,48,.5);border-radius:2px}
+.sg-2{transform:translate(16px,16px);border-color:rgba(35,40,48,.3)}
+.sg-1{transform:translate(8px,8px)}
+.sheet-top{padding:26px 22px 28px;box-shadow:none}
+.headrule{display:block;width:42%;height:3px;background:var(--ink);margin-bottom:20px}
+.stamp{position:absolute;top:16px;right:16px;width:30px;height:34px;border:1.5px dashed rgba(62,74,84,.6)}
+.clrow{display:flex;align-items:center;gap:10px;margin-top:13px}
+.clbox{width:13px;height:13px;border:1.5px solid var(--paper-border);position:relative;flex:none;background:#fff}
+.clbox .mark{border-left-color:var(--ink);border-bottom-color:var(--ink)}
+.clrow .fbar{flex:1 1 auto}
+
+/* ---------- quiet + two-up ---------- */
+.quiet{position:relative;background:var(--ink);padding-top:clamp(88px,13vh,150px);padding-bottom:clamp(88px,13vh,150px)}
+.quiet::after{
+  content:"";position:absolute;top:0;bottom:0;left:var(--rail);
+  width:1px;background:rgba(244,245,243,.35);z-index:4;pointer-events:none;
+}
+.quiet .tickmark{background:rgba(244,245,243,.6);z-index:5}
+.quiet h2{
+  font-family:var(--display);font-weight:800;color:var(--silica);
+  font-size:clamp(24px,2.8vw,30px);margin-bottom:22px;
+}
+.quiet p{margin-bottom:1.15em;max-width:58ch;font-size:18px;color:#C9CFD4}
+.quiet p:last-child{margin-bottom:0}
+.twoup{position:relative;padding-top:clamp(40px,6vh,64px);padding-bottom:clamp(96px,14vh,150px)}
+.twoup-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,80px)}
+.twoup h3{
+  font-family:var(--display);font-weight:800;color:var(--ink);
+  font-size:20px;margin-bottom:12px;
+}
+.twoup p{font-size:17px;color:#2B333B}
+
+/* ---------- closing ---------- */
+.closing{background:#fff;border-top:1px solid rgba(62,74,84,.14)}
+.closing-inner{
+  position:relative;text-align:center;
+  padding-top:clamp(88px,13vh,150px);padding-bottom:clamp(88px,13vh,150px);
+  padding-left:24px;
+}
+.closing h2{
+  font-family:var(--display);font-weight:800;letter-spacing:-.015em;color:var(--ink);
+  font-size:clamp(36px,5.5vw,60px);line-height:1.05;margin-bottom:44px;
+}
+.closing p{margin-left:auto;margin-right:auto}
+.btn-gold{
+  display:inline-block;background:var(--brass);color:var(--ink);border:1.5px solid var(--ink);
+  border-radius:2px;font-family:var(--body);font-weight:700;font-size:17px;letter-spacing:.01em;
+  padding:17px 46px;cursor:pointer;
+  box-shadow:4px 4px 0 var(--ink);
+  transition:transform .12s ease-out,box-shadow .12s ease-out;
+}
+.btn-gold:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 var(--ink)}
+.btn-gold:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.closing-small{margin-top:24px;font-size:15px;color:var(--wet)}
+
+/* ---------- footer ---------- */
+.footer{background:var(--ink);padding:76px 24px 68px;text-align:center}
+.footer-stack{display:flex;flex-direction:column;align-items:center;gap:34px}
+.btn-contact{
+  display:inline-block;background:transparent;color:var(--silica);
+  border:1.5px solid rgba(244,245,243,.7);border-radius:2px;
+  font-family:var(--body);font-weight:600;font-size:16px;
+  padding:13px 34px;text-decoration:none;
+}
+.btn-contact:hover{background:rgba(255,255,255,.08)}
+.footer-small{font-size:14.5px;color:#9AA3AB;max-width:62ch;margin:0 auto}
+.footer :focus-visible{outline-color:#C9CFD4}
+
+/* ---------- modal ---------- */
+dialog.states-modal{
+  border:1.5px solid var(--paper-border);border-radius:2px;padding:0;
+  background:#fff;color:#222930;
+  width:min(680px,calc(100vw - 40px));max-height:min(85vh,100%);
+  box-shadow:10px 10px 0 rgba(62,74,84,.22);
+  margin:auto;
+}
+dialog.states-modal::backdrop{background:rgba(22,25,29,.62)}
+dialog[open].states-modal{animation:sheetIn .18s ease-out}
+dialog[open].states-modal::backdrop{animation:scrimIn .18s ease-out}
+@keyframes sheetIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes scrimIn{from{opacity:0}to{opacity:1}}
+.modal-frame{display:flex;flex-direction:column;max-height:inherit}
+.modal-head{
+  flex:none;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+  padding:30px 20px 14px 56px;
+}
+.modal-head h2{
+  font-family:var(--display);font-weight:800;color:var(--ink);
+  font-size:clamp(24px,3vw,30px);line-height:1.1;
+}
+.modal-head h2:focus{outline:none}
+.modal-close{
+  flex:none;width:44px;height:44px;background:none;border:none;cursor:pointer;
+  position:relative;border-radius:2px;
+}
+.modal-close::before,.modal-close::after{
+  content:"";position:absolute;left:12px;top:21px;width:20px;height:2px;background:var(--ink);
+}
+.modal-close::before{transform:rotate(45deg)}
+.modal-close::after{transform:rotate(-45deg)}
+.modal-scroll{overflow:auto;position:relative;padding:8px 40px 36px 56px}
+.modal-scroll::before{
+  content:"";position:absolute;top:0;bottom:24px;left:24px;width:1px;background:var(--spine);
+}
+.modal-scroll p{font-size:17px;margin-bottom:1.1em;max-width:60ch}
+.mtick{width:16px;height:1px;background:var(--tick);margin:26px 0 26px -32px}
+.states{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px}
+.state{
+  width:100%;text-align:left;background:#fff;border:1.5px solid var(--paper-border);
+  border-radius:2px;padding:12px 14px;cursor:pointer;
+  font-family:var(--body);font-weight:600;font-size:16px;color:var(--ink);
+  box-shadow:3px 3px 0 rgba(62,74,84,.16);
+  transition:transform .12s ease-out,box-shadow .12s ease-out;
+}
+.state:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 rgba(62,74,84,.22)}
+.state:active{transform:translate(1px,1px);box-shadow:1px 1px 0 rgba(62,74,84,.22)}
+.states-coming{margin-top:22px;font-size:15px;color:var(--wet)}
+html.modal-open,html.modal-open body{overflow:hidden}
+/* fallback for browsers without native <dialog> */
+dialog.states-modal:not([open]){display:none}
+dialog.states-modal.fallback[open]{
+  display:block;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:101;
+}
+.fallback-scrim{position:fixed;inset:0;background:rgba(22,25,29,.62);z-index:100}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .step-inner,.step-alt .step-inner{flex-direction:column;align-items:flex-start}
+  .vig{flex:none;margin-top:8px}
+  .ghost{font-size:clamp(120px,26vw,180px)}
+  .twoup-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .wrap{padding-left:48px;padding-right:20px}
+  :root{--rail:16px}
+  .nav-links{gap:16px}
+  .nav-inner{padding-left:20px}
+  .nav .wrap{padding-left:20px}
+  .nav-logo img{width:136px;height:40px}
+  .footer-stack img{width:200px;height:59px}
+  .mtick{margin-left:-32px}
+  .modal-head{padding-left:44px}
+  .modal-scroll{padding-left:44px;padding-right:22px}
+  .modal-scroll::before{left:20px}
+  .hero-inner{padding-left:48px}
+  .trades{white-space:normal}
+}
+</style>
+</head>
+<body id="top">
+
+<nav class="nav" aria-label="Main">
+  <div class="wrap nav-inner">
+    <a class="nav-logo" href="#top" aria-label="SurePath — top of page">
+      <img src="assets/surepath_arrow_s_logo-2.svg" alt="SurePath" width="197" height="58">
+    </a>
+    <div class="nav-links">
+      <a href="#steps">How it works</a>
+      <a href="/about">About</a>
+      <button type="button" class="btn-solid" data-open-states>Find your state</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <img class="hero-photo" src="assets/Gemini_Generated_Image_j15ws2j15ws2j15w.jpg"
+       alt="Worn work boots climbing a concrete stairwell toward daylight." width="3168" height="1344">
+  <div class="hero-scrim" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <h1>Take the next step toward your licensed career with <span class="gold">confidence.</span></h1>
+    <p class="hero-sub">Many state licensing boards will review your record and tell you where you stand — in writing, before you spend a year and a tuition finding out.</p>
+    <a class="btn-ghost" href="#steps">See how it works</a>
+    <p class="trades">Electrical · Cosmetology · HVAC · Inspection · Healthcare</p>
+  </div>
+</header>
+
+<div class="doc">
+
+  <section class="prose">
+    <div class="tickmark" aria-hidden="true"></div>
+    <div class="wrap" data-animate>
+      <h2>It used to work backwards.</h2>
+      <p>To find out whether your record disqualified you, you had to apply. To apply, you had to already be qualified — the training, the hours, the fees. In practice that meant spending a year and a tuition to learn the answer was no.</p>
+      <p>Nobody could tell you in advance. Not the school, not your officer, not a search at two in the morning.</p>
+    </div>
+  </section>
+
+  <section class="prose" style="padding-top:0">
+    <div class="tickmark" aria-hidden="true"></div>
+    <div class="wrap" data-animate>
+      <h2>States started answering the question first.</h2>
+      <p>A number of states have recognized this and passed laws letting people with criminal records request a determination from certain licensing boards <em>before</em> putting their time and money on the line.</p>
+      <p>The processes are real. They are also buried in lengthy forms and scattered instructions, which is why almost nobody uses them.</p>
+    </div>
+  </section>
+
+  <section class="prose pivot">
+    <div class="tickmark" aria-hidden="true"></div>
+    <div class="wrap" data-animate>
+      <h2>SurePath is how you ask.</h2>
+      <p>Plain questions instead of dense forms, and a finished packet ready to send. No account, no lawyer, no decoding.</p>
+    </div>
+  </section>
+
+  <section id="steps" aria-labelledby="steps-title" style="scroll-margin-top:16px">
+    <h2 class="sr-only" id="steps-title">How it works</h2>
+
+    <div class="step step-01">
+      <span class="ghost ghost-l" aria-hidden="true">01</span>
+      <div class="wrap step-inner">
+        <div class="step-text" data-animate>
+          <div class="step-head">
+            <span class="chip" aria-hidden="true">01</span>
+            <h3>Gather your record</h3>
+          </div>
+          <p>Every conviction, the offense, the sentence you received, and the court or county that handled it. It's worth requesting a full copy of your record before you start.</p>
+          <p class="step-note">List everything. The license application later runs a full fingerprint check, and anything left out here shows up there — which can produce a different answer than the one you got.</p>
+        </div>
+        <div class="vig" data-animate aria-hidden="true">
+          <div class="paper sheet-record">
+            <span class="sheet-tab">Record</span>
+            <div class="fields">
+              <div class="field"><span class="flabel">Offense</span><span class="fbar" style="width:72%"></span></div>
+              <div class="field"><span class="flabel">Sentence</span><span class="fblank"></span></div>
+              <div class="field"><span class="flabel">County</span><span class="fbar" style="width:56%"></span></div>
+              <div class="field"><span class="flabel">Year</span><span class="fbar" style="width:32%"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step step-02 step-alt">
+      <span class="ghost ghost-r" aria-hidden="true">02</span>
+      <div class="wrap step-inner">
+        <div class="step-text" data-animate>
+          <div class="step-head">
+            <span class="chip" aria-hidden="true">02</span>
+            <h3>Choose your state and trade</h3>
+          </div>
+          <p>Pick where you want to work. You'll see which licensed occupations there offer a determination in advance. You can add more than one.</p>
+        </div>
+        <div class="vig vig-folders" data-animate aria-hidden="true">
+          <div class="folder folder-back"><span class="ftab"></span></div>
+          <div class="folder folder-front paper">
+            <span class="ftab ftab-front"></span>
+            <span class="checkbox"><span class="mark"></span></span>
+            <span class="fbar" style="width:60%"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step step-03">
+      <span class="ghost ghost-l" aria-hidden="true">03</span>
+      <div class="wrap step-inner">
+        <div class="step-text" data-animate>
+          <div class="step-head">
+            <span class="chip" aria-hidden="true">03</span>
+            <h3>Answer the questions</h3>
+          </div>
+          <p>Identifying information, then your record — and for some incidents, a short account of what happened. You can stop and come back at any point.</p>
+        </div>
+        <div class="vig" data-animate aria-hidden="true">
+          <div class="paper sheet-q">
+            <div class="progress">
+              <span class="seg seg-done"></span><span class="seg seg-done"></span><span class="seg seg-done"></span>
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+            </div>
+            <span class="fbar" style="width:100%"></span>
+            <span class="fbar" style="width:74%"></span>
+            <div class="answer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step step-04 step-alt">
+      <span class="ghost ghost-r" aria-hidden="true">04</span>
+      <div class="wrap step-inner">
+        <div class="step-text" data-animate>
+          <div class="step-head">
+            <span class="chip" aria-hidden="true">04</span>
+            <h3>Get your packet</h3>
+          </div>
+          <p>SurePath fills out the forms and assembles everything into one packet, with a checklist and instructions for mailing it. Sign it, stamp it, send it.</p>
+        </div>
+        <div class="vig vig-packet" data-animate aria-hidden="true">
+          <div class="sheet-ghost sg-2"></div>
+          <div class="sheet-ghost sg-1"></div>
+          <div class="paper sheet-top">
+            <span class="headrule"></span>
+            <span class="stamp"></span>
+            <div class="clrow"><span class="clbox"><span class="mark"></span></span><span class="fbar" style="width:70%"></span></div>
+            <div class="clrow"><span class="clbox"><span class="mark"></span></span><span class="fbar" style="width:54%"></span></div>
+            <div class="clrow"><span class="clbox"><span class="mark"></span></span><span class="fbar" style="width:62%"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="quiet">
+    <div class="tickmark" aria-hidden="true"></div>
+    <div class="wrap" data-animate>
+      <h2>We don't decide anything.</h2>
+      <p>Licensing is handled at the state level, and the board in your state makes the final call on how your record affects your eligibility. That is exactly who this process asks. You are not getting our guess — you are getting their answer, in writing, signed.</p>
+      <p>SurePath does not give legal advice. We help you ask the question correctly.</p>
+    </div>
+  </section>
+
+  <section class="twoup">
+    <div class="tickmark" aria-hidden="true"></div>
+    <div class="wrap twoup-grid" data-animate>
+      <div>
+        <h3>Built for people coming home</h3>
+        <p>If you're out and trying to get into a real trade, this was made for you. It works just as well with someone helping you through it — a counselor, a caseworker, a public defender sitting next to you.</p>
+      </div>
+      <div>
+        <h3>We never see your information</h3>
+        <p>Everything you enter stays on the device you're using. There is no server holding your record, because there is no server. One button clears it when you're done.</p>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /doc -->
+
+<section class="closing">
+  <div class="wrap closing-inner" data-animate>
+    <h2>Find out where you stand.</h2>
+    <button type="button" class="btn-gold" data-open-states>Get started</button>
+    <p class="closing-small">Two states available now. More coming.</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-stack">
+    <img src="assets/surepath_logo_white.svg" alt="SurePath" width="252" height="74">
+    <a class="btn-contact" href="#">Contact us</a>
+    <p class="footer-small">SurePath is not a law firm and does not provide legal advice. Determinations are issued by state licensing boards, not by SurePath.</p>
+  </div>
+</footer>
+
+<dialog class="states-modal" id="stateModal" aria-labelledby="stateModalTitle">
+  <div class="modal-frame">
+    <div class="modal-head">
+      <h2 id="stateModalTitle" tabindex="-1">Find your state</h2>
+      <button type="button" class="modal-close" aria-label="Close">​</button>
+    </div>
+    <div class="modal-scroll">
+      <p>Before you begin, you'll need your complete criminal history — every state you've been convicted in, not just the one you're choosing. For each conviction: the date, the county, and the specific court that handled it.</p>
+      <p>If your record is long or spread across states, the reliable way to get it is an official copy from the records agency in each state. For a single charge, the county clerk's office for that courthouse can usually confirm the details.</p>
+      <div class="mtick" aria-hidden="true"></div>
+      <ul class="states">
+        <li><button type="button" class="state">Arizona</button></li>
+        <li><button type="button" class="state">Arkansas</button></li>
+        <li><button type="button" class="state">Georgia</button></li>
+        <li><button type="button" class="state">Indiana</button></li>
+        <li><button type="button" class="state">Iowa</button></li>
+        <li><button type="button" class="state">Kansas</button></li>
+        <li><button type="button" class="state">Louisiana</button></li>
+        <li><button type="button" class="state">Maryland</button></li>
+        <li><button type="button" class="state">Minnesota</button></li>
+        <li><button type="button" class="state">Mississippi</button></li>
+        <li><button type="button" class="state">New Hampshire</button></li>
+        <li><button type="button" class="state">North Carolina</button></li>
+        <li><button type="button" class="state">Ohio</button></li>
+        <li><button type="button" class="state">Oklahoma</button></li>
+        <li><button type="button" class="state">Pennsylvania</button></li>
+        <li><button type="button" class="state">Tennessee</button></li>
+        <li><button type="button" class="state">Texas</button></li>
+        <li><button type="button" class="state">Utah</button></li>
+        <li><button type="button" class="state">Vermont</button></li>
+        <li><button type="button" class="state">West Virginia</button></li>
+        <li><button type="button" class="state">Wisconsin</button></li>
+        <li><button type="button" class="state">Wyoming</button></li>
+      </ul>
+      <p class="states-coming">State pages are coming.</p>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* state picker modal — wired first so nothing else can break it */
+var dlg = document.getElementById('stateModal');
+var opener = null;
+var hasNativeDialog = typeof dlg.showModal === 'function';
+var scrim = null;
+
+function openModal(btn) {
+  opener = btn;
+  if (hasNativeDialog) {
+    dlg.showModal();
+  } else {
+    dlg.classList.add('fallback');
+    dlg.setAttribute('open', '');
+    scrim = document.createElement('div');
+    scrim.className = 'fallback-scrim';
+    scrim.addEventListener('click', closeModal);
+    document.body.appendChild(scrim);
+  }
+  document.documentElement.classList.add('modal-open');
+  document.getElementById('stateModalTitle').focus();
+}
+function onClosed() {
+  document.documentElement.classList.remove('modal-open');
+  if (scrim) { scrim.remove(); scrim = null; }
+  if (opener) opener.focus();
+}
+function closeModal() {
+  if (hasNativeDialog) {
+    dlg.close();
+  } else {
+    dlg.removeAttribute('open');
+    onClosed();
+  }
+}
+document.querySelectorAll('[data-open-states]').forEach(function (btn) {
+  btn.addEventListener('click', function () { openModal(btn); });
+});
+dlg.querySelector('.modal-close').addEventListener('click', closeModal);
+dlg.addEventListener('click', function (e) {
+  if (e.target === dlg) closeModal();
+});
+dlg.addEventListener('close', onClosed);
+document.addEventListener('keydown', function (e) {
+  if (!hasNativeDialog && e.key === 'Escape' && dlg.hasAttribute('open')) closeModal();
+});
+
+/* scroll-in animation (motion moments 1–2) — guarded; page shows everything if unsupported */
+try {
+  if ('IntersectionObserver' in window) {
+    document.documentElement.classList.add('js');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('[data-animate]').forEach(function (el) { io.observe(el); });
+  }
+} catch (err) { /* animations are optional; never let them break the page */ }
+</script>
+</body>
+</html>

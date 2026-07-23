@@ -2,11 +2,11 @@ import * as Popover from '@radix-ui/react-popover'
 import { useNavigate } from 'react-router-dom'
 import { CheckSmall, Icon, Menu } from '../ui/icons'
 import { draftCounts } from './draft'
-import { DELETE_CONFIRM, downloadJson, formatCounter } from './railShared'
+import { DELETE_CONFIRM, formatCounter } from './railShared'
 import { validateSection } from './sectionValidation'
 import { eraseStoredData, useAppStore } from './storeContext'
 
-export function MobileRail() {
+export function MobileRail({ onSaveProgress }: { onSaveProgress: () => void }) {
   const { state, dispatch, config } = useAppStore()
   const navigate = useNavigate()
   const counts = draftCounts(state.draft)
@@ -122,15 +122,15 @@ export function MobileRail() {
                 <p className="mb-3 text-[12px] font-semibold uppercase text-ink">
                   {formatCounter(counts)}
                 </p>
-                <button
-                  type="button"
-                  onClick={() =>
-                    downloadJson(`surepath-progress-${config.code.toLowerCase()}.json`, state.draft)
-                  }
-                  className="h-10 w-full rounded-[4px] border border-line bg-field text-[13px] font-medium text-ink transition-colors duration-150 hover:border-accent hover:text-accent"
-                >
-                  Save my progress
-                </button>
+                <Popover.Close asChild>
+                  <button
+                    type="button"
+                    onClick={onSaveProgress}
+                    className="save-progress-action h-10 w-full rounded-[4px] bg-brand-gold text-[13px] font-bold text-rail hover:bg-brand-gold-deep"
+                  >
+                    Save my progress
+                  </button>
+                </Popover.Close>
                 <button
                   type="button"
                   onClick={() => {

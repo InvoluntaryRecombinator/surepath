@@ -1,64 +1,67 @@
-/**
- * <MarketingLayout> — the content site's shell (SITE_STRUCTURE §1). Header with nav,
- * footer with the trust line. No session, nothing sensitive. The application at
- * /<state>/apply has its own shell and no marketing header.
- */
-import { Link, NavLink, Outlet } from 'react-router-dom'
-import { Mark } from '../ui/icons'
-
-const nav = [
-  { to: '/states', label: 'Where it works' },
-  { to: '/faq', label: 'Questions' },
-  { to: '/about', label: 'About' },
-]
+import { useState } from 'react'
+import { Link, Outlet } from 'react-router-dom'
+import { StateModal } from './StateModal'
+import type { MarketingOutletContext } from './stateModalContext'
 
 export function MarketingLayout() {
+  const [stateModalOpen, setStateModalOpen] = useState(false)
   return (
-    <div className="flex min-h-screen flex-col bg-ground">
-      <header className="border-b border-line bg-surface">
-        <div className="mx-auto flex h-[72px] max-w-5xl items-center justify-between px-8">
-          <Link to="/" className="flex items-center gap-2.5">
-            <Mark />
-            <span className="text-[18px] font-extrabold tracking-tight text-ink">SurePath</span>
+    <div className="flex min-h-screen flex-col bg-silica">
+      <header className="relative z-20 border-b border-wet/20 bg-silica">
+        <div className="flex min-h-[78px] items-center justify-between px-6">
+          <Link to="/" aria-label="SurePath home" className="inline-flex">
+            <img
+              src="/assets/surepath_arrow_s_logo-2.svg"
+              alt="SurePath"
+              className="h-auto w-[197px]"
+            />
           </Link>
-          <nav className="flex items-center gap-7" aria-label="Site">
-            {nav.map((n) => (
-              <NavLink
-                key={n.to}
-                to={n.to}
-                className={({ isActive }) =>
-                  `text-[14.5px] font-medium transition-colors duration-150 ${
-                    isActive ? 'text-accent' : 'text-ink hover:text-accent'
-                  }`
-                }
-              >
-                {n.label}
-              </NavLink>
-            ))}
+          <nav className="flex items-center gap-7" aria-label="Main navigation">
             <Link
-              to="/texas"
-              className="inline-flex h-10 items-center rounded-[4px] bg-accent px-4 text-[14.5px] font-semibold text-field transition-opacity duration-150 hover:opacity-92"
+              to="/#how-it-works"
+              className="text-[15px] font-semibold text-ink underline-offset-4 hover:underline"
             >
-              Start in Texas
+              How it works
             </Link>
+            <Link
+              to="/about"
+              className="text-[15px] font-semibold text-ink underline-offset-4 hover:underline"
+            >
+              About
+            </Link>
+            <button
+              type="button"
+              onClick={() => setStateModalOpen(true)}
+              className="inline-flex h-11 cursor-pointer items-center rounded-[2px] border-[1.5px] border-ink bg-brass px-[22px] text-[15px] font-bold tracking-[0.01em] text-ink shadow-action transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-action-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            >
+              Find your state
+            </button>
           </nav>
         </div>
       </header>
 
       <main className="flex-1">
-        <Outlet />
+        <Outlet context={{ openStateModal: () => setStateModalOpen(true) } satisfies MarketingOutletContext} />
       </main>
 
-      <footer className="border-t border-line bg-surface">
-        <div className="mx-auto flex max-w-5xl flex-col gap-1.5 px-8 py-7">
-          <p className="text-[13.5px] font-medium text-ink">
-            Nothing leaves your browser. No account, no database — your information stays on
-            your computer.
-          </p>
-          <p className="text-[12.5px] leading-relaxed text-muted">
-            SurePath is a document-preparation tool, not a law firm, and does not give legal
-            advice. The licensing board makes every determination — SurePath helps you ask it
-            the question.
+      <StateModal open={stateModalOpen} onClose={() => setStateModalOpen(false)} />
+
+      <footer className="bg-ink px-6 py-[68px] text-center">
+        <div className="mx-auto flex max-w-[1100px] flex-col items-center gap-8">
+          <img
+            src="/assets/surepath_logo_white.svg"
+            alt="SurePath"
+            className="h-auto w-[252px]"
+          />
+          <Link
+            to="/about"
+            className="inline-flex h-12 items-center rounded-[2px] border-[1.5px] border-silica/70 px-8 text-[16px] font-semibold text-silica hover:bg-paper/10"
+          >
+            About SurePath
+          </Link>
+          <p className="max-w-[62ch] text-[14.5px] leading-relaxed text-rail-muted">
+            SurePath is not a law firm and does not provide legal advice. Determinations are
+            issued by state licensing boards, not by SurePath.
           </p>
         </div>
       </footer>

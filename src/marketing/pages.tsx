@@ -1,8 +1,9 @@
 /**
  * Marketing pages — stubs (heading + a line) except for the CTAs that make the flow
  * walkable. Real content lands in Phase 6. No invented facts; no outcome language (L1).
+ * NOTE: /states is deliberately gone — "Find your state" opens the StateModal instead.
  */
-import { Link } from 'react-router-dom'
+export { LandingPage as Landing } from './LandingPage'
 
 function Page({ title, line, children }: { title: string; line: string; children?: React.ReactNode }) {
   return (
@@ -16,19 +17,6 @@ function Page({ title, line, children }: { title: string; line: string; children
   )
 }
 
-const cta =
-  'mt-8 inline-flex h-12 items-center rounded-[4px] bg-accent px-6 text-[15.5px] font-semibold text-field transition-opacity duration-150 hover:opacity-92'
-
-export const Landing = () => (
-  <Page
-    title="Find out where you stand — before you spend years getting there."
-    line="Texas will review your criminal history and answer in writing before you enroll in training for a licensed trade. SurePath helps you ask — a complete, correct request packet, assembled with you, ready to mail."
-  >
-    <Link to="/texas" className={cta}>
-      Start in Texas
-    </Link>
-  </Page>
-)
 
 export const About = () => (
   <Page
@@ -44,13 +32,3 @@ export const Faq = () => (
   />
 )
 
-export const States = () => (
-  <Page
-    title="Where it works"
-    line="Texas is live today. Other states with a pre-application review process are on the way."
-  >
-    <Link to="/texas" className={cta}>
-      Texas — start here
-    </Link>
-  </Page>
-)

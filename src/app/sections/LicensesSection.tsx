@@ -106,20 +106,28 @@ export function LicensesSection() {
           </p>
         )}
 
-        <p className="mt-6 max-w-[62ch] text-[13px] leading-relaxed text-muted">
-          Don't see your trade? These are the trades currently licensed by the{' '}
-          {config.agencyFullName}. Other licensed occupations may have their own pathways,
-          not yet covered by SurePath —{' '}
-          <a
-            href={config.links.agencySite.url}
-            target="_blank"
-            rel="noreferrer"
-            className="font-medium text-accent hover:underline"
-          >
-            check {config.agency}'s site ↗
-          </a>{' '}
-          for more on trades not listed here.
-        </p>
+        {/* composed, not clamped: the lead-in stands alone and each sentence owns its
+            line, so breaks land at sentence boundaries instead of wherever a width
+            limit happens to cut */}
+        <div className="mt-7 border-t border-line/70 pt-5 text-[13px] leading-relaxed text-muted">
+          <p className="text-[13.5px] font-semibold text-ink/80">Don't see your trade?</p>
+          <p className="mt-1.5">
+            These are the trades currently licensed by the {config.agencyFullName}.
+          </p>
+          <p>
+            Other licensed occupations may have their own pathways, not yet covered by
+            SurePath —{' '}
+            <a
+              href={config.links.agencySite.url}
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-accent hover:underline"
+            >
+              check {config.agency}'s site ↗
+            </a>{' '}
+            for trades not listed here.
+          </p>
+        </div>
       </div>
 
       {/* ── your packets ── */}

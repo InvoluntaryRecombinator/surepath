@@ -95,6 +95,7 @@ body:has(#apply-section-form) main {
 #apply-section-form button.bg-transparent.text-accent {
   background-color: var(--color-interactive);
   color: var(--color-field);
+  text-decoration-line: none;
 }
 
 #apply-section-form a,
@@ -162,6 +163,10 @@ body:has(#apply-section-form) main {
   background: rgb(18 20 23 / 78%);
 }
 
+.delete-data-dialog::backdrop {
+  background: rgb(18 20 23 / 78%);
+}
+
 .save-progress-action {
   border: 1px solid var(--color-ink);
   box-shadow: 2px 2px 0 var(--color-ink);
@@ -199,9 +204,9 @@ body:has(#apply-section-form) main {
 }
 
 /* ── the state modal ─────────────────────────────────────────────────────────────────
- * One lit object on a dimmed page. Ink deeper than the chrome, sharp corners, hard
- * offset shadow — the landing page's language at full contrast. The map dominates:
- * every state a barely-there hairline, Texas the only saturated shape on screen. */
+ * A small, contained dialog on a dimmed page — clearly a card sitting on top of the
+ * site. The map inside is a flat illustration confirming the selection: light grey
+ * states, hairline strokes, Texas filled gold. Nothing lifted, nothing 3D. */
 @keyframes state-modal-in {
   from { opacity: 0; transform: scale(0.965); }
   to   { opacity: 1; transform: scale(1); }
@@ -214,14 +219,9 @@ body:has(#apply-section-form) main {
 .state-modal-panel   { animation: state-modal-in 200ms ease-out; }
 
 .us-map svg { display: block; width: 100%; height: auto; }
-.us-map .state path { fill: #1a1e23; }              /* context, not content */
+.us-map .state path { fill: #e0e4e6; }
 .us-map path[class*='-'],
-.us-map .borders path { stroke: rgb(150 158 163 / 0.28); stroke-width: 0.6; fill: none; }
-.us-map .separator1 { stroke: rgb(150 158 163 / 0.28); stroke-width: 0.6; fill: none; }
-.us-map .dccircle { display: none; }                 /* a lit dot would compete with Texas */
-.us-map path.tx {
-  fill: var(--color-brass);
-  stroke: var(--color-ink);
-  stroke-width: 1.5;
-  filter: drop-shadow(12px 12px 0 #000);             /* hard offset — no blur, no glow */
-}
+.us-map .borders path { stroke: #ffffff; stroke-width: 0.8; fill: none; }
+.us-map .separator1 { stroke: #c6cbce; stroke-width: 0.8; fill: none; }
+.us-map .dccircle { display: none; }
+.us-map path.tx { fill: var(--color-brass); }

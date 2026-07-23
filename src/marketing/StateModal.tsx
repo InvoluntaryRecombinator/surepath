@@ -1,24 +1,23 @@
 /**
- * The state modal — "Find your state" opens this over the landing page. It gets a
- * full-screen shot in the demo, and it is deliberately NOT a default dialog: ink
- * panel deeper than the chrome, sharp corners, hard offset shadow, one enormous map
- * where Texas is the only saturated shape, one statement at display scale, one
- * action. No cancel, no X — Esc and the overlay close it silently.
+ * The state modal — "Find your state" opens this over the landing page. A small,
+ * clean, light card on a dimmed page: clearly a dialog, not a takeover. A flat map
+ * confirming the selection, a State select already showing Texas (other states
+ * listed but disabled), one line of body text, Get started.
  *
- * The map is public-domain (Wikimedia "Blank US Map (states only)"), processed in
- * src/marketing/us-states.svg: Texas painted last so its hard shadow sits above
- * every border stroke. All styling lives in index.css (.us-map).
+ * The map is public-domain (Wikimedia "Blank US Map (states only)"), styled flat in
+ * index.css (.us-map): light grey states, hairline strokes, Texas filled gold.
  */
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { US_STATES } from '../app/lib/format'
 import usStates from './us-states.svg?raw'
 
 export function StateModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const actionRef = useRef<HTMLAnchorElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (!open) return
-    actionRef.current?.focus()
+    closeRef.current?.focus()
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
@@ -32,38 +31,67 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
 
   return (
     <div
-      className="state-modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-[3vmin]"
+      className="state-modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-6"
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Where SurePath works"
+        aria-label="Choose your state"
         onClick={(e) => e.stopPropagation()}
-        className="state-modal-panel flex max-h-[94vh] w-[min(960px,95vw)] flex-col overflow-y-auto bg-[#0e1114] shadow-[16px_16px_0_#000]"
+        className="state-modal-panel relative w-[min(480px,94vw)] bg-paper p-8 shadow-paper"
       >
-        {/* the map — an object, not an illustration. No label above it: the statement
-            below says everything, and silence is what makes the shape land. */}
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center text-[22px] leading-none text-wet transition-colors duration-150 hover:text-ink"
+        >
+          ×
+        </button>
+
+        {/* a small flat illustration confirming the selection — not a background */}
         <div
           aria-hidden="true"
-          className="us-map mt-[clamp(16px,2.5vh,32px)] px-2"
+          className="us-map mx-auto mt-2 max-w-[380px]"
           dangerouslySetInnerHTML={{ __html: usStates }}
         />
 
-        <p className="max-w-[32ch] px-[clamp(28px,4.5vw,60px)] pb-[clamp(28px,4.5vh,52px)] pt-[clamp(16px,2.5vh,32px)] font-display text-[clamp(26px,3.4vw,42px)] font-extrabold leading-[1.14] tracking-[-0.01em] text-silica">
-          Licensing is state law. Every state has its own board and its own process.{' '}
-          <span className="text-brass">SurePath covers Texas.</span>
+        <div className="mt-6">
+          <label
+            htmlFor="state-modal-select"
+            className="mb-1.5 block text-[13px] font-semibold text-ink"
+          >
+            State
+          </label>
+          <select
+            id="state-modal-select"
+            value="Texas"
+            onChange={() => {}}
+            className="h-11 w-full cursor-pointer rounded-[2px] border-[1.5px] border-wet/40 bg-paper px-3 text-[15px] text-ink"
+          >
+            {US_STATES.map((state) => (
+              <option key={state} value={state} disabled={state !== 'Texas'}>
+                {state}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <p className="mt-5 text-[15px] leading-[1.6] text-wet">
+          Licensing is state law. Every state has its own board and its own process.
         </p>
 
-        {/* the one action — the nav button's exact treatment, spanning the bottom */}
-        <Link
-          ref={actionRef}
-          to="/texas"
-          onClick={onClose}
-          className="flex h-[66px] w-full shrink-0 items-center justify-center rounded-[2px] border-[1.5px] border-ink bg-brass text-[17px] font-bold tracking-[0.01em] text-ink shadow-action transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-action-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-        >
-          Continue in Texas
-        </Link>
+        <div className="mt-7 flex justify-end">
+          <Link
+            to="/texas"
+            onClick={onClose}
+            className="inline-flex h-11 items-center rounded-[2px] border-[1.5px] border-ink bg-brass px-[26px] text-[15px] font-bold tracking-[0.01em] text-ink shadow-action transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-action-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          >
+            Get started
+          </Link>
+        </div>
       </div>
     </div>
   )

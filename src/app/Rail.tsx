@@ -12,7 +12,7 @@ import { draftCounts } from './draft'
 import { DELETE_CONFIRM, downloadJson, formatCounter } from './railShared'
 import { validateSection } from './sectionValidation'
 import { eraseStoredData, useAppStore } from './storeContext'
-import { CheckSmall, Icon, Mark } from '../ui/icons'
+import { CheckSmall, Icon } from '../ui/icons'
 
 const ROW_H = 50 // px — one nav row. The connector geometry derives from this.
 
@@ -28,10 +28,7 @@ export function Rail() {
       {/* ── identity — the rail carries what the dead header used to: the product AND the
           formal name of the legal artifact being assembled. ── */}
       <div className="border-b border-rail-line px-5 pb-5 pt-6">
-        <div className="flex items-center gap-2.5">
-          <Mark />
-          <span className="text-[18px] font-[750] text-rail-ink">SurePath</span>
-        </div>
+        <img src="/surepath-logo-white.svg" alt="SurePath" className="h-auto w-[168px]" />
         <p className="mt-3 text-[12px] font-medium leading-[1.5] text-rail-muted">
           {config.processName}
           <span className="mt-0.5 block text-[11.5px] text-rail-muted/80">{config.railTag}</span>

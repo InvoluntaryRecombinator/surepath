@@ -1,6 +1,6 @@
 import * as Popover from '@radix-ui/react-popover'
 import { useNavigate } from 'react-router-dom'
-import { CheckSmall, Icon, Mark, Menu } from '../ui/icons'
+import { CheckSmall, Icon, Menu } from '../ui/icons'
 import { draftCounts } from './draft'
 import { DELETE_CONFIRM, downloadJson, formatCounter } from './railShared'
 import { validateSection } from './sectionValidation'
@@ -16,10 +16,7 @@ export function MobileRail() {
   return (
     <div className="shrink-0 lg:hidden">
       <div className="flex h-14 items-center border-b border-rail-line bg-rail px-5 sm:px-8">
-        <div className="flex items-center gap-2.5">
-          <Mark size={20} />
-          <span className="text-[16px] font-[750] text-rail-ink">SurePath</span>
-        </div>
+        <img src="/surepath-logo-white.svg" alt="SurePath" className="h-auto w-[132px]" />
         <p className="ml-auto mr-3 flex items-center gap-1.5 text-[11.5px] font-medium text-rail-muted">
           <span className="text-rail-ink">
             <CheckSmall size={8} />

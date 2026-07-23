@@ -5,49 +5,120 @@
  * ("dd"), and the checked label writes VERBATIM into the license-type field of that
  * packet's form — so the only selectable values are the agency's real program names.
  *
+ * Findability, two mechanisms, browsing always primary:
+ *   - COLUMN FLOW: the order runs DOWN the left column, then down the right — an
+ *     alphabetical list you can actually scan (row-fill made the alphabet zigzag).
+ *   - A QUIET TYPE-TO-FILTER with trade aliases, because the agency's names aren't what
+ *     people call their jobs ("hvac" finds Air Conditioning and Refrigeration
+ *     Contractors; "tow truck" finds Tow Trucks, Operators and VSFs). Empty filter =
+ *     ALL programs visible; nothing is ever hidden by default, and clearing restores
+ *     the full list. People who don't know what's offered must be able to see it all.
+ *
  * No screening, no red lights, no recommendation (L2). The agency decides; we count the fee.
  */
+import { useState } from 'react'
 import { useAppStore } from '../storeContext'
 
 export function LicensesSection() {
   const { state, dispatch, config } = useAppStore()
   const licenses = state.draft.licenses
+  const [query, setQuery] = useState('')
 
-  const selectedIndex = (program: string) =>
-    licenses.findIndex((l) => l.specificLicenseType === program)
+  const selectedIndex = (name: string) =>
+    licenses.findIndex((l) => l.specificLicenseType === name)
 
-  const toggle = (program: string) => {
-    const index = selectedIndex(program)
+  const toggle = (name: string) => {
+    const index = selectedIndex(name)
     if (index >= 0) dispatch({ type: 'remove-license', index })
-    else dispatch({ type: 'add-license', program, specificLicenseType: program })
+    else dispatch({ type: 'add-license', program: name, specificLicenseType: name })
+  }
+
+  const q = query.trim().toLowerCase()
+  const visible = q
+    ? config.programs.filter(
+        (p) => p.name.toLowerCase().includes(q) || p.aliases.some((a) => a.includes(q)),
+      )
+    : config.programs
+
+  // Column flow: first half runs down the LEFT column, second half down the right —
+  // the alphabet reads vertically instead of zigzagging across rows.
+  const mid = Math.ceil(visible.length / 2)
+  const columns = visible.length > 6 ? [visible.slice(0, mid), visible.slice(mid)] : [visible]
+
+  const row = (p: { name: string }) => {
+    const active = selectedIndex(p.name) >= 0
+    return (
+      <li key={p.name}>
+        <label className="flex cursor-pointer items-start gap-3 rounded-[5px] px-2 py-[7px] transition-colors duration-150 hover:bg-ground">
+          <input
+            type="checkbox"
+            checked={active}
+            onChange={() => toggle(p.name)}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
+          />
+          <span
+            className={`text-[14px] leading-snug ${active ? 'font-semibold text-ink' : 'text-ink/85'}`}
+          >
+            {p.name}
+          </span>
+        </label>
+      </li>
+    )
   }
 
   return (
     <div className="flex flex-col gap-10">
-      {/* ── the list — all 41, flat, visible at once ── */}
       <div>
-        <ul className="grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2">
-          {config.programs.map((program) => {
-            const active = selectedIndex(program) >= 0
-            return (
-              <li key={program}>
-                <label className="flex cursor-pointer items-start gap-3 rounded-[5px] px-2 py-[7px] transition-colors duration-150 hover:bg-ground">
-                  <input
-                    type="checkbox"
-                    checked={active}
-                    onChange={() => toggle(program)}
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
-                  />
-                  <span
-                    className={`text-[14px] leading-snug ${active ? 'font-semibold text-ink' : 'text-ink/85'}`}
-                  >
-                    {program}
-                  </span>
-                </label>
-              </li>
-            )
-          })}
-        </ul>
+        {/* ── the quiet filter — a shortcut, never a gate: empty shows everything ── */}
+        <div className="mb-5 flex items-baseline gap-4">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Find your trade — start typing…"
+            aria-label="Filter the program list"
+            className="w-full max-w-[340px] rounded-[5px] border border-line bg-field px-3.5 py-2 text-[14px] text-ink placeholder:text-muted/60 transition-colors duration-150 hover:border-muted/70"
+          />
+          {q && (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              className="shrink-0 text-[13px] font-medium text-accent hover:underline"
+            >
+              Show all {config.programs.length}
+            </button>
+          )}
+        </div>
+
+        {visible.length > 0 ? (
+          <div className={`grid grid-cols-1 gap-x-8 ${columns.length > 1 ? 'sm:grid-cols-2' : ''}`}>
+            {columns.map((col, i) => (
+              <ul key={i} className="flex flex-col gap-y-1">
+                {col.map(row)}
+              </ul>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[14px] leading-relaxed text-muted">
+            Nothing here matches "{query}".{' '}
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              className="font-medium text-accent hover:underline"
+            >
+              Show all {config.programs.length} programs
+            </button>{' '}
+            — or it may be licensed by a different board:{' '}
+            <a
+              href={config.links.agencySite.url}
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-accent hover:underline"
+            >
+              check {config.agency}'s site ↗
+            </a>
+          </p>
+        )}
 
         <p className="mt-6 text-[13px] leading-relaxed text-muted">
           Don't see your trade? It may be licensed by a different board —{' '}

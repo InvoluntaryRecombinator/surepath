@@ -64,8 +64,10 @@ export type StateConfig = {
   /** The flat program list for license selection — the agency's own names, in the
    *  agency's own order, from data/ (the single source of truth). The checked label
    *  writes VERBATIM into the license-type field of that packet's form. Checkbox
-   *  selection only: free text produced garbage packets ("dd"). */
-  programs: string[]
+   *  selection only: free text produced garbage packets ("dd"). Aliases are what people
+   *  actually call the trade ("hvac", "tow truck") — filter-matching only, never shown,
+   *  never written anywhere. */
+  programs: { name: string; aliases: string[] }[]
 
   /** External links the chassis renders. Attributed, never hardcoded in a component. */
   links: {

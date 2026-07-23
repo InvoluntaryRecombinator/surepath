@@ -229,7 +229,7 @@ export function TexasPage() {
       <div className="mt-14 flex flex-wrap items-center gap-5 border-t-2 border-line pt-9">
         <Link
           to="/texas/apply"
-          className="inline-flex h-12 items-center rounded-[6px] bg-accent px-6 text-[15.5px] font-semibold text-field transition-colors duration-150 hover:bg-accent-deep"
+          className="inline-flex h-12 items-center rounded-[2px] border-[1.5px] border-ink bg-brass px-[30px] text-[15.5px] font-bold tracking-[0.01em] text-ink shadow-action transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-action-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
         >
           Begin my request packet
         </Link>

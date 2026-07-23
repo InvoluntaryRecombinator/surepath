@@ -16,6 +16,7 @@ export const txConfig: StateConfig = {
   code: 'TX',
   stateName: 'Texas',
   agency: 'TDLR',
+  agencyFullName: 'Texas Department of Licensing and Regulation',
   railTag: 'Texas licensing request',
   processName: 'Criminal History Evaluation Letter — request packet',
   routeBase: '/texas',

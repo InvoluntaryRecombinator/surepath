@@ -39,6 +39,7 @@ export type StateConfig = {
   code: string // 'TX'
   stateName: string // 'Texas'
   agency: string // 'TDLR'
+  agencyFullName: string // 'Texas Department of Licensing and Regulation'
   /** The rail's small tag under the wordmark: "Texas · TDLR" */
   railTag: string
   /** The formal name of the legal artifact, anchoring the content header bar. */

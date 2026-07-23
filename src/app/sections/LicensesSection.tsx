@@ -99,29 +99,17 @@ export function LicensesSection() {
             ))}
           </div>
         ) : (
+          /* usually just a wrong search word — the Show-all next to the bar is the way
+             back, and the standing line below covers the genuinely-not-listed case */
           <p className="text-[14px] leading-relaxed text-muted">
-            Nothing here matches "{query}".{' '}
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              className="font-medium text-accent hover:underline"
-            >
-              Show all {config.programs.length} programs
-            </button>{' '}
-            — or it may be licensed by a different board:{' '}
-            <a
-              href={config.links.agencySite.url}
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium text-accent hover:underline"
-            >
-              check {config.agency}'s site ↗
-            </a>
+            Nothing here matches "{query}".
           </p>
         )}
 
-        <p className="mt-6 text-[13px] leading-relaxed text-muted">
-          Don't see your trade? It may be licensed by a different board —{' '}
+        <p className="mt-6 max-w-[62ch] text-[13px] leading-relaxed text-muted">
+          Don't see your trade? These are the trades currently licensed by the{' '}
+          {config.agencyFullName}. Other licensed occupations may have their own pathways,
+          not yet covered by SurePath —{' '}
           <a
             href={config.links.agencySite.url}
             target="_blank"
@@ -129,7 +117,8 @@ export function LicensesSection() {
             className="font-medium text-accent hover:underline"
           >
             check {config.agency}'s site ↗
-          </a>
+          </a>{' '}
+          for more on trades not listed here.
         </p>
       </div>
 

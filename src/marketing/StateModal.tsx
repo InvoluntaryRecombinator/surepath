@@ -1,9 +1,9 @@
 /**
  * The state modal — "Find your state" opens this over the landing page. A floating
- * card (soft ambient shadow — modals float; buttons stamp) behind a 1.5px ink edge,
- * 4px radius, reading as three distinct steps top to bottom:
+ * card (soft ambient shadow — modals float; buttons stamp) behind a 2px ink edge,
+ * 5px radius, reading as three distinct steps top to bottom:
  *   dark header  · warm dark grey (a step off ink), "Choose your state" in white,
- *                  white X, 3px gold rule along the band's bottom edge
+ *                  white X, 4px gold rule along the band's bottom edge
  *   warm map     · the flat continental map filling the band, the licensing sentence
  *                  as its caption. The gold fill IS the indicator — no labels.
  *   near-white   · State select (Texas chosen, others disabled) + Get started,
@@ -46,12 +46,12 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
         aria-modal="true"
         aria-label="Choose your state"
         onClick={(e) => e.stopPropagation()}
-        className="state-modal-panel w-[min(560px,94vw)] overflow-hidden rounded-[4px] border-[1.5px] border-ink bg-paper shadow-[0_0_50px_12px_rgba(22,25,29,0.35)]"
+        className="state-modal-panel w-[min(728px,94vw)] overflow-hidden rounded-[5px] border-2 border-ink bg-paper shadow-[0_0_50px_12px_rgba(22,25,29,0.35)]"
       >
         {/* ── header — warm dark grey (a step off ink), white title, gold rule ────── */}
-        <div className="border-b-[3px] border-brass bg-[#35322b]">
-          <div className="flex items-center justify-between py-4 pl-6 pr-3">
-            <h2 className="font-display text-[22px] font-extrabold leading-tight text-paper">
+        <div className="border-b-4 border-brass bg-[#35322b]">
+          <div className="flex items-center justify-between py-5 pl-8 pr-4">
+            <h2 className="font-display text-[28px] font-extrabold leading-tight text-paper">
               Choose your state
             </h2>
             <button
@@ -59,7 +59,7 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="flex h-9 w-9 items-center justify-center text-[24px] leading-none text-paper/75 transition-colors duration-150 hover:text-paper"
+              className="flex h-11 w-11 items-center justify-center text-[30px] leading-none text-paper/75 transition-colors duration-150 hover:text-paper"
             >
               ×
             </button>
@@ -67,18 +67,18 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
         </div>
 
         {/* ── the map — a clearly warmer, darker step than the control band ───────── */}
-        <div className="bg-[#efe8d8] px-4 pb-4 pt-4">
+        <div className="bg-[#efe8d8] px-5 pb-5 pt-5">
           <div aria-hidden="true" className="us-map" dangerouslySetInnerHTML={{ __html: usStates }} />
-          <p className="mt-3 px-2 text-center text-[13.5px] leading-relaxed text-wet">
+          <p className="mt-4 px-2 text-center text-[17px] leading-relaxed text-wet">
             Licensing is state law. Every state has its own board and its own process.
           </p>
         </div>
 
         {/* ── control — a hair warmer than white; select + button, one decision ───── */}
-        <div className="border-t border-[#d8d2c2] bg-[#fbf9f5] px-7 pb-7 pt-7">
+        <div className="border-t border-[#d8d2c2] bg-[#fbf9f5] px-9 pb-9 pt-9">
           <label
             htmlFor="state-modal-select"
-            className="mb-2 block text-[15px] font-bold text-ink"
+            className="mb-2.5 block text-[19px] font-bold text-ink"
           >
             State
           </label>
@@ -87,7 +87,7 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
               id="state-modal-select"
               value="Texas"
               onChange={() => {}}
-              className="h-11 w-full cursor-pointer appearance-none rounded-[2px] border-[1.5px] border-[#d8d4cc] bg-paper px-3 pr-10 text-[15px] text-ink focus:border-brass focus:outline-none"
+              className="h-14 w-full cursor-pointer appearance-none rounded-[2px] border-2 border-[#d8d4cc] bg-paper px-4 pr-12 text-[19px] text-ink focus:border-brass focus:outline-none"
             >
               {US_STATES.map((state) => (
                 <option key={state} value={state} disabled={state !== 'Texas'}>
@@ -99,7 +99,7 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
             <svg
               aria-hidden="true"
               viewBox="0 0 12 8"
-              className="pointer-events-none absolute right-3.5 top-1/2 h-2 w-3 -translate-y-1/2"
+              className="pointer-events-none absolute right-4 top-1/2 h-2.5 w-3.5 -translate-y-1/2"
             >
               <path
                 d="M1 1.5 6 6.5 11 1.5"
@@ -112,11 +112,11 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
             </svg>
           </div>
 
-          <div className="mt-6 flex justify-center">
+          <div className="mt-8 flex justify-center">
             <Link
               to="/texas"
               onClick={onClose}
-              className="inline-flex h-11 items-center rounded-[2px] border-[1.5px] border-ink bg-brass px-[52px] text-[15px] font-bold tracking-[0.01em] text-ink shadow-action transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-action-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+              className="inline-flex h-14 items-center rounded-[2px] border-2 border-ink bg-brass px-[68px] text-[19px] font-bold tracking-[0.01em] text-ink shadow-action transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-action-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
             >
               Get started
             </Link>

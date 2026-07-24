@@ -364,7 +364,6 @@ export function StoryWorkbench({
 
       {/* ── exits — the workbench owns them; Save always lands on the account list ──── */}
       <div className="mx-auto mt-8 flex max-w-[72ch] items-center justify-end gap-2.5 border-t border-line/70 pt-6">
-        <p className="mr-auto text-[12.5px] text-muted">Saved on this computer as you type.</p>
         <Button variant="ghost" onClick={onBack}>
           <ArrowLeft />
           Back

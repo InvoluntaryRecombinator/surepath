@@ -123,6 +123,27 @@ body:has(#apply-section-form) main {
   background: linear-gradient(to right, var(--color-ink) 8%, rgb(22 25 29 / 0%) 92%);
 }
 
+@keyframes state-cta-arrow-nudge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+.state-cta-arrow {
+  display: block;
+  margin: 14px auto 0;
+  animation: state-cta-arrow-nudge 1.4s ease-in-out infinite;
+}
+
+.state-cta-arrow path:first-child {
+  transform: scaleY(1.25);
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state-cta-arrow { animation: none; }
+}
+
 .save-progress-dialog::backdrop {
   background: rgb(18 20 23 / 78%);
 }
@@ -182,7 +203,12 @@ body:has(#apply-section-form) main {
 .state-modal-overlay { animation: state-modal-dim 200ms ease-out; }
 .state-modal-panel   { animation: state-modal-in 200ms ease-out; }
 
-.us-map svg { display: block; width: 100%; height: auto; }
+.us-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: translateX(15px);
+}
 /* the map sits in the warm map band; states one step darker so they read against it,
    borders engraved in the band's own tone */
 .us-map .state path { fill: #d9d1bd; }

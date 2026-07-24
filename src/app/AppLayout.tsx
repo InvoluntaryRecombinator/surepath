@@ -19,6 +19,7 @@ import { useAppStore } from './storeContext'
 import { DeleteDataDialog } from './DeleteDataDialog'
 import { MobileRail } from './MobileRail'
 import { Rail } from './Rail'
+import { ResumeProgressDialog } from './ResumeProgressDialog'
 import { SaveProgressDialog } from './SaveProgressDialog'
 import { validateSection } from './sectionValidation'
 
@@ -33,6 +34,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const isLast = idx === config.sections.length - 1
   const [attemptedSectionId, setAttemptedSectionId] = useState<string | null>(null)
   const [saveProgressOpen, setSaveProgressOpen] = useState(false)
+  const [resumeProgressOpen, setResumeProgressOpen] = useState(false)
   const [deleteDataOpen, setDeleteDataOpen] = useState(false)
   const errorSummaryRef = useRef<HTMLDivElement>(null)
   const validation = validateSection(stage.id, state.draft, {
@@ -61,12 +63,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
     <div className="fixed inset-0 flex flex-col bg-rail lg:flex-row">
       <Rail
         onSaveProgress={() => setSaveProgressOpen(true)}
+        onUploadProgress={() => setResumeProgressOpen(true)}
         onDeleteData={() => setDeleteDataOpen(true)}
       />
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <MobileRail
           onSaveProgress={() => setSaveProgressOpen(true)}
+          onUploadProgress={() => setResumeProgressOpen(true)}
           onDeleteData={() => setDeleteDataOpen(true)}
         />
 
@@ -145,6 +149,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
         onSaveProgress={() => setSaveProgressOpen(true)}
       />
       <SaveProgressDialog open={saveProgressOpen} onOpenChange={setSaveProgressOpen} />
+      <ResumeProgressDialog
+        open={resumeProgressOpen}
+        onOpenChange={setResumeProgressOpen}
+        config={config}
+        onRestore={(restoredState) => {
+          setAttemptedSectionId(null)
+          dispatch({ type: 'replace-state', state: restoredState })
+        }}
+      />
     </div>
   )
 }

@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
+import { ArrowDown } from 'lucide-react'
 import { useStateModal } from './stateModalContext'
 
 function Wrap({ children, className = '' }: { children: ReactNode; className?: string }) {
@@ -92,12 +93,49 @@ function PacketVisual() {
   )
 }
 
+const USA_MASK_STYLE: CSSProperties = {
+  WebkitMaskImage: 'url("/assets/usa-silhouette.svg")',
+  maskImage: 'url("/assets/usa-silhouette.svg")',
+  WebkitMaskPosition: 'center',
+  maskPosition: 'center',
+  WebkitMaskRepeat: 'no-repeat',
+  maskRepeat: 'no-repeat',
+  WebkitMaskSize: '100% 100%',
+  maskSize: '100% 100%',
+}
+
+function FindStateMapButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Choose your state"
+      className="group relative left-[10px] mt-1 inline-flex aspect-[675/419] w-[min(320px,85vw)] cursor-pointer items-center justify-center border-0 bg-transparent p-0 outline-none transition-transform duration-150 hover:-translate-x-px hover:-translate-y-px active:translate-x-[2px] active:translate-y-[2px] focus-visible:border-transparent focus-visible:shadow-none"
+    >
+      <span
+        aria-hidden="true"
+        className="absolute inset-0 bg-ink opacity-0 transition-opacity duration-150 group-focus-visible:opacity-100"
+        style={USA_MASK_STYLE}
+      />
+      <span
+        aria-hidden="true"
+        className="absolute inset-2 translate-x-[5px] translate-y-[5px] bg-ink transition-transform duration-150 group-hover:translate-x-[7px] group-hover:translate-y-[7px] group-active:translate-x-[3px] group-active:translate-y-[3px]"
+        style={USA_MASK_STYLE}
+      />
+      <span
+        aria-hidden="true"
+        className="absolute inset-2 bg-brass [filter:drop-shadow(1px_0_0_#16191d)_drop-shadow(-1px_0_0_#16191d)_drop-shadow(0_1px_0_#16191d)_drop-shadow(0_-1px_0_#16191d)]"
+        style={USA_MASK_STYLE}
+      />
+    </button>
+  )
+}
+
 const steps = [
   {
     number: '01',
     title: 'Gather your record',
-    body: "Every conviction, the offense, the sentence you received, and the court or county that handled it. It's worth requesting a full copy of your record before you start.",
-    note: 'List everything. The license application later runs a full fingerprint check, and anything left out here shows up there.',
+    body: "For most cases you'll need every conviction — the offense, the sentence, and the court or county that handled it. This has to be accurate, so it's worth requesting a full copy of your record before you start. Most states have an official source for it, and we'll point you to the right one as you go.",
     background: 'bg-concrete',
     visual: <RecordVisual />,
   },
@@ -111,14 +149,14 @@ const steps = [
   {
     number: '03',
     title: 'Answer the questions',
-    body: 'Identifying information, then your record — and for some incidents, a short account of what happened. You can stop and come back at any point.',
+    body: "You'll provide your identifying information, the details of your criminal history, and — in most cases — a short personal account of what happened in each incident and why. You can stop and come back at any point.",
     background: 'bg-concrete-3',
     visual: <QuestionVisual />,
   },
   {
     number: '04',
     title: 'Get your packet',
-    body: 'SurePath fills out the forms and assembles everything into one packet, with a checklist and instructions for mailing it. Sign it, stamp it, send it.',
+    body: 'SurePath fills out the forms and assembles your information into a print-ready packet for each licensed occupation you want evaluated. Every packet includes a checklist with the specific instructions for mailing it. Sign it, stamp it, send it.',
     background: 'bg-concrete-4',
     visual: <PacketVisual />,
   },
@@ -140,9 +178,6 @@ function ProcessStep({ step, alternate }: { step: (typeof steps)[number]; altern
             </h3>
           </div>
           <p className="max-w-[52ch] text-[18px] leading-[1.65] text-ink/90">{step.body}</p>
-          {step.note && (
-            <p className="mt-4 max-w-[52ch] text-[17px] leading-[1.65] text-wet">{step.note}</p>
-          )}
         </div>
         <div aria-hidden="true" className="relative flex basis-[380px] justify-center">
           <span
@@ -177,7 +212,7 @@ export function LandingPage() {
           </h1>
           <p className="mt-[26px] max-w-[50ch] text-[19px] leading-[1.65] text-[#c9cfd4]">
             Many state licensing boards will review your record and tell you where you stand —
-            in writing, before you spend a year and a tuition finding out.
+            in writing, before you spend a dollar on training.
           </p>
           <a
             href="#how-it-works"
@@ -199,24 +234,27 @@ export function LandingPage() {
         </section>
 
         <section className="relative bg-ink">
-          <Wrap className="grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] items-stretch gap-[clamp(44px,6vw,84px)] py-[clamp(96px,14vh,150px)]">
+          <Wrap className="grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] items-stretch gap-[clamp(44px,6vw,84px)] py-[clamp(48px,6vh,64px)]">
             <div>
-              <h3 className="mb-4 font-display text-[22px] font-extrabold text-silica">
-                Built for people coming home
+              <h3 className="mb-4 font-display text-[22px] font-extrabold text-brass">
+                Built for the next step
               </h3>
               <p className="max-w-[43ch] text-[17px] leading-[1.7] text-[#d8d1c2]">
-                Use it on your own or with a counselor, caseworker, public defender, or anyone
-                helping you move toward a licensed career.
+                Whatever your background looks like, if you're ready to move toward a licensed
+                occupation, this tool is meant to help you. Use it on your own or alongside a
+                counselor, caseworker, or anyone helping you get there.
               </p>
             </div>
             <span className="w-px self-stretch bg-silica/20" aria-hidden="true" />
             <div>
-              <h3 className="mb-4 font-display text-[22px] font-extrabold text-silica">
-                Your information stays with you
+              <h3 className="mb-4 font-display text-[22px] font-extrabold text-brass">
+                We <em className="text-silica">never</em> store your information
               </h3>
               <p className="max-w-[43ch] text-[17px] leading-[1.7] text-[#d8d1c2]">
-                Your answers stay on the device you’re using. You can save a progress file and
-                return when you are ready.
+                No login, nothing to sign up for. Your packet is built on your own machine, in
+                your browser, and we never store your personal information or your criminal
+                history. You keep the file, and you can save your progress and come back whenever
+                you're ready.
               </p>
             </div>
           </Wrap>
@@ -225,16 +263,19 @@ export function LandingPage() {
 
       <section className="border-t border-wet/15 bg-paper text-center">
         <div className="mx-auto max-w-landing px-6 py-[clamp(88px,13vh,150px)]">
-          <h2 className="mb-11 font-display text-[clamp(36px,5.5vw,60px)] font-extrabold leading-[1.05] tracking-[-0.015em] text-ink">
+          <h2 className="font-display text-[clamp(36px,5.5vw,60px)] font-extrabold leading-[1.05] tracking-[-0.015em] text-ink">
             Find out where you stand.
           </h2>
-          <button
-            type="button"
-            onClick={openStateModal}
-            className="inline-flex cursor-pointer rounded-[2px] border-[1.5px] border-ink bg-brass px-[46px] py-[17px] text-[17px] font-bold tracking-[0.01em] text-ink shadow-[4px_4px_0_#16191d] transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-[6px_6px_0_#16191d]"
-          >
-            Find your state
-          </button>
+          <p className="mt-4 text-[17px] font-medium text-wet">
+            Choose your state to get started.
+          </p>
+          <ArrowDown
+            aria-hidden="true"
+            className="state-cta-arrow text-ink"
+            size={28}
+            strokeWidth={1.75}
+          />
+          <FindStateMapButton onClick={openStateModal} />
         </div>
       </section>
     </>

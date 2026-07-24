@@ -10,86 +10,6 @@ reason is there so you do not rationalize around the rule. If a rule seems wrong
 
 ---
 
-## GIT WORKFLOW — commit constantly, in small pieces
-
-**This is a standing rule for every session. Follow it without being asked.**
-
-The human needs a dense, legible commit history — both to roll back cleanly when something
-goes wrong, and to see progress. **Large uncommitted working trees are a failure state.**
-
-### Commit after every meaningful unit of work
-
-Not "at the end." After each unit — a passing test, a working component, a fixed bug, a
-completed doc correction. If you just made something work, **commit it before starting the
-next thing.** A good rule of thumb: if you would be annoyed to lose it, it should already be
-committed.
-
-**Never batch a whole phase into one commit.** A phase is many commits.
-
-### Commit message format
-
-```
-<type>: <what changed, imperative, specific>
-
-<why, if not obvious. reference the invariant or acceptance criterion.>
-```
-
-`type` ∈ `feat` · `fix` · `test` · `docs` · `chore` · `refactor`
-
-**Good:**
-```
-fix: correct ENF003 parole export values (were inverted)
-
-Parole yes was /Choice3, is actually /Choice1. Verified by widget geometry
-on the real blank — "No" is the left box. Old value made the packet tell TDLR
-a man not on parole IS on parole. CLAUDE.md F8.
-```
-```
-test: add set-equality "no charge dropped" guard (D1)
-feat: Stepper — three states differ in form not color (DESIGN_SYSTEM §5.5)
-docs: resolve header height to 80px across DESIGN_SYSTEM
-```
-
-**Bad:** `updates` · `wip` · `phase 2` · `fixed stuff` · `changes per feedback`
-
-### Rules
-
-- **Commit before you refactor**, so the working version is a restore point.
-- **One logical change per commit.** Don't mix a bug fix and a new feature. If you did two
-  things, make two commits (`git add -p` for partial staging).
-- **Never commit broken code to `main`** knowingly. If a test is red, either fix it or mark it
-  clearly in the message (`test: add failing case for X (not yet implemented)`).
-- **After a batch of commits, print `git log --oneline -n 10`** so the human can see the trail.
-- **Do not `git push` unless asked** — the human controls the remote.
-- The human commits at their own checkpoints too; your commits and theirs interleave. Keep
-  yours small enough that theirs never collides.
-
-### This repo will be reviewed by humans — commit like it
-
-This project is a **portfolio piece**. The commit history itself is part of what gets
-judged — by a course reviewer, and potentially by people evaluating the author for jobs.
-A history of many small, well-described commits reads as competent, deliberate engineering.
-A history of three giant "wip" commits reads as the opposite.
-
-So, beyond the granularity rules above:
-- **Err on the side of MORE commits, smaller.** A component, a test, a fix, a doc
-  correction, a refactor — each is its own commit. If you did two nameable things, that's
-  two commits.
-- **Every commit message is a sentence someone will read.** Specific, imperative, and it
-  says *what* and (if not obvious) *why*, referencing the invariant or acceptance criterion.
-- **TDD is visible in the history when you let it be.** When you write a test then make it
-  pass, that can be two commits — `test: add failing X` then `feat: implement X` — and that
-  sequence is *good* to show: it demonstrates test-driven work to anyone reading the log.
-  Do this whenever it's natural; don't contort the work for it.
-- The history should read like a **clean, steady narrative of the build** — someone
-  scrolling `git log --oneline` should be able to follow what happened and when.
-
-### At the start of a session
-
-If `git status` shows an uncommitted working tree from a previous session, **stop and tell the
-human before doing anything** — don't bury their work under yours. Offer to commit it with a
-descriptive message first.
-
 ## 0. What SurePath is
 
 SurePath helps a justice-impacted person in Texas assemble a **complete, correct
@@ -182,15 +102,18 @@ not the count.*
 ### L5 — Coaching must be general and published, never case-specific strategy.
 
 **OK** (published, general, citable):
+
 > "Tex. Occ. Code §53.025(a) lists the factors TDLR considers, including time
 > elapsed since the offense, conduct and work activity before and after, and
 > evidence of rehabilitation."
 
 **OK** (general, clearly marked as general guidance, not attributed to the statute):
+
 > "In general, licensing boards look for an account that takes responsibility.
 > This is your account to write."
 
 **NOT OK** (case-specific strategy):
+
 > "In your case, emphasize the job and downplay the assault charge."
 
 *Reason: applying law to a specific person's facts to advise a course of action is
@@ -204,14 +127,53 @@ buys a money order, and mails it. There is no auto-submit, no e-file, no
 
 **Both forms carry a `/Sig` (cryptographic digital signature) field** —
 `Signature of person who is subject of this evaluation` on ENF006, `Signature3` on
-ENF003 — and the AcroForm sets `/SigFlags 1`. **NEVER POPULATE THEM.**
+ENF003 — and the AcroForm sets `/SigFlags 1`. These fields are never populated.
 
 SurePath applying a signature on a user's behalf, to a document affirming their
 record is full and accurate *under penalty of administrative sanction*, would be
-catastrophic. **Wet ink. Their hand. Always.**
+catastrophic. Wet ink, in their own hand, every time.
 
 *(`form.flatten()` has been smoke-tested with `/Sig` present and works — but verify
 in the browser on day 1. Some libraries throw on `/Sig`.)*
+
+### L7 — SurePath does not touch appeals.
+
+The post-denial administrative appeal (SOAH hearing) is out of scope permanently.
+SurePath exists so users never reach that stage. Do not build toward it, do not
+mention it as a feature, do not offer help with it.
+
+### L8 — SurePath does not advise on expunged or sealed records. Ever.
+
+Texas has **two different instruments** and people confuse them constantly:
+
+- **Expunction** — the record is destroyed. The person may generally deny it happened.
+  TDLR likely never sees it. **Telling them to disclose it may talk them into
+  volunteering something they had a legal right to never mention.**
+
+- **Order of nondisclosure** — the record is sealed from the *public*, but certain
+  agencies can still access it. It is most commonly granted after **deferred
+  adjudication** — which TDLR explicitly requires be reported. **Telling them they
+  don't have to list it, when TDLR can see it, makes them look like a liar on a form
+  they signed under penalty of administrative sanction.**
+
+**Two instruments. Opposite answers. Either error badly harms the user.**
+TDLR's published FAQ addresses neither.
+
+**Therefore SurePath:**
+
+- **Never** says "you don't have to list that."
+- **Never** silently omits a record from intake because it was sealed or expunged.
+- **Never** decides this for the user, in either direction.
+- **Does** state plainly that expunction and nondisclosure are different legal
+  instruments with different consequences, and that **this is a question for TDLR or a
+  lawyer** — before they decide.
+- **Does** surface what TDLR publishes: report all convictions and deferred
+  adjudications, no matter how old. *(Which is evidence, but does not settle sealing.)*
+
+*This is the single most likely place a well-meaning tool gets someone into real
+trouble. It is exactly the judgment the scrivener's exception forbids us from making.*
+
+*(See `OPEN_QUESTIONS.md` Q8 — pending TDLR.)*
 
 ### L9 — SurePath informs. It does not steer.
 
@@ -232,9 +194,9 @@ real tradeoff:
 against completeness — is a decision about **their own life and their own money.** It is not
 ours to make.
 
-⚠️ **Do not hard-gate on the fingerprint review.** *"Go get fingerprinted, wait two weeks,
+**Do not hard-gate on the fingerprint review.** *"Go get fingerprinted, wait two weeks,
 then come back"* means **nobody comes back.** A gate like that doesn't make the product
-safer. It makes it **unused** — which helps precisely zero people.
+safer. It makes it unused — which helps precisely zero people.
 
 **The right mitigation is a reframe, not a gate:**
 
@@ -245,66 +207,30 @@ The report is a **memory aid, not an oracle.** And SurePath has **save/resume** 
 honest path is: *start now from memory, save, get your report, come back and reconcile.*
 The Review stage's count check is exactly where that reconciliation lands.
 
-### L8 — SurePath does not advise on expunged or sealed records. Ever.
-
-Texas has **two different instruments** and people confuse them constantly:
-
-- **Expunction** — the record is destroyed. The person may generally deny it happened.
-  TDLR likely never sees it. **Telling them to disclose it may talk them into
-  volunteering something they had a legal right to never mention.**
-- **Order of nondisclosure** — the record is sealed from the *public*, but certain
-  agencies can still access it. It is most commonly granted after **deferred
-  adjudication** — which TDLR explicitly requires be reported. **Telling them they
-  don't have to list it, when TDLR can see it, makes them look like a liar on a form
-  they signed under penalty of administrative sanction.**
-
-**Two instruments. Opposite answers. Either error badly harms the user.**
-TDLR's published FAQ addresses neither.
-
-**Therefore SurePath:**
-- **NEVER** says "you don't have to list that."
-- **NEVER** silently omits a record from intake because it was sealed or expunged.
-- **NEVER** decides this for the user, in either direction.
-- **DOES** state plainly that expunction and nondisclosure are different legal
-  instruments with different consequences, and that **this is a question for TDLR or a
-  lawyer** — before they decide.
-- **DOES** surface what TDLR publishes: report all convictions and deferred
-  adjudications, no matter how old. *(Which is evidence, but does not settle sealing.)*
-
-*This is the single most likely place a well-meaning tool gets someone into real
-trouble. It is exactly the judgment the scrivener's exception forbids us from making.*
-*(See `OPEN_QUESTIONS.md` Q8 — pending TDLR.)*
-
-### L7 — SurePath does not touch appeals.
-
-The post-denial administrative appeal (SOAH hearing) is out of scope permanently.
-SurePath exists so users never reach that stage. Do not build toward it, do not
-mention it as a feature, do not offer help with it.
-
 ---
 
 ## 2. DATA INVARIANTS
 
-### D1 — REPORT EVERY CONVICTION. NO LOOKBACK WINDOW. EVER.
+### D1 — Every conviction is reported. There is no lookback window.
 
 **TDLR FAQ #9, verbatim question:** *"Do I have to report convictions that are
 more than ten years old?"* **Answer: yes.** All convictions and deferred
-adjudications must be reported **no matter how long ago they occurred**, because
+adjudications must be reported no matter how long ago they occurred, because
 TDLR needs the full history to assess whether there is a pattern.
 
-**DO NOT** build a filter, a toggle, a "these are probably too old to matter"
-hint, or any logic that drops, hides, de-emphasizes, or makes optional a
-conviction based on its age. **Not one. Not ever.**
+Do not build a filter, a toggle, a "these are probably too old to matter" hint,
+or any logic that drops, hides, de-emphasizes, or makes optional a conviction
+based on its age.
 
 *Reason: this is the single most likely way an agent destroys this product while
 trying to be helpful. An omitted conviction voids the evaluation letter — TDLR
 runs a full DPS/FBI fingerprint check at the real license application, finds the
-gap, and the "yes" the user got is worthless or worse. **We would have caused the
-exact harm the product exists to prevent.***
+gap, and the "yes" the user got is worthless or worse. We would have caused the
+exact harm the product exists to prevent.*
 
 *If you are thinking of the 7-year rule: that is **California AB 2138**. A
 different state. It appears in this project's background research for a different
-reason. **It does not apply to Texas.***
+reason. It does not apply to Texas.*
 
 ### D2 — Deferred adjudications are reported too.
 
@@ -325,7 +251,7 @@ the cleanest thing we can say to a security reviewer.*
 
 *Note: ENF006 says "Do not leave blank fields, use N/A if not applicable." The SSN
 is applicable, so N/A is wrong. The user must write it in. The checklist must be
-**loud** about this — a blank SSN box can get the packet rejected.*
+loud about this — a blank SSN box can get the packet rejected.*
 
 ### D4 — No database. No accounts. No server-side persistence of user data.
 
@@ -335,22 +261,20 @@ The user's data lives **on the user's own device** and is carried between device
 Do not add: user accounts, login, JWTs, Postgres, Mongo, Redis, Supabase, Firebase,
 session cookies carrying user data, or any **server-side** store of anything the user typed.
 
-**On-device autosave IS allowed, and is required.** Autosave to **`localStorage`** so an
-accidental tab-close doesn't destroy 45 minutes of work.
+**On-device autosave is allowed, and is required.** Autosave to `localStorage` so an
+accidental tab-close doesn't destroy 45 minutes of work. The reasoning:
 
-> ⚠️ **This reverses an earlier version of this rule, which banned `localStorage`.** The
-> reversal is deliberate and the reasoning is:
-> - The honeypot risk D4 exists to prevent is a **server-side database** of criminal
->   histories — a single breachable store of many people's data. `localStorage` is none of
->   that: it's one person's data, on their own machine, that never transmits.
-> - **Nobody clicks "Save" mid-session.** If autosave died on tab-close (`sessionStorage`),
->   the exact failure we're trying to prevent — lost work from a stray Cmd-W — is what we'd
->   ship. Autosave must survive tab-close. That requires `localStorage`.
-> - **The SSN is never in the data at all (D3)** — the most radioactive field never touches
->   the disk. That's what makes on-device storage defensible here.
-> - The residual risk (data left on a shared/library computer) is mitigated by a prominent
->   **"Delete my information from this computer"** control, framed as protection. See
->   `SITE_STRUCTURE.md` §4.
+- The honeypot risk D4 exists to prevent is a **server-side database** of criminal
+  histories — a single breachable store of many people's data. `localStorage` is none of
+  that: it's one person's data, on their own machine, that never transmits.
+- **Nobody clicks "Save" mid-session.** If autosave died on tab-close (`sessionStorage`),
+  the exact failure we're trying to prevent — lost work from a stray Cmd-W — is what we'd
+  ship. Autosave must survive tab-close. That requires `localStorage`.
+- **The SSN is never in the data at all (D3)** — the most radioactive field never touches
+  the disk. That's what makes on-device storage defensible here.
+- The residual risk (data left on a shared or library computer) is mitigated by a prominent
+  **"Delete my information from this computer"** control, framed as protection. See
+  `SITE_STRUCTURE.md` §4.
 
 **Never say "localStorage" or "sessionStorage" to the user** — the words alarm without
 informing this audience. Frame storage as protection and deletion as safety, not loss.
@@ -370,7 +294,7 @@ The narrative-structuring LLM call is the sole server round-trip. It sends the
 user's account of an incident **without** name, DOB, SSN, or address.
 
 **It must be a zero-retention API configuration.** Verify this against the
-provider's terms and record which provider/config in the architecture doc.
+provider's terms and record which provider and config in the architecture doc.
 
 **Do not claim this is anonymization.** A first-person account of a specific
 conviction, with dates and a rehabilitation history, is identifying on its own.
@@ -382,51 +306,16 @@ The honest claim is **data minimization**:
 Never write "100% PII-safe" or "fully anonymous." A security reviewer will take
 that apart and they will be right.
 
-### D8 — The escrow email is the ONE exception to D5, and it ships ENCRYPTED or not at all.
+### D7 — Templates must be authoritative blanks, and the fill routine must zero every field.
 
-A person on a library computer has no USB stick, no account, and no way to carry a
-JSON file to their future self. Email is the only channel they have. So SurePath
-offers **"Email me my progress"** — but **blind**.
-
-**"We don't write it to a database" is NOT a privacy property.** Function logs
-capture request bodies on error. SMTP relays queue and retain message bodies for
-days or weeks. Inboxes are forever, indexed, and frequently shared with partners,
-family, or employers. One typo'd address discloses a criminal record to a stranger,
-irreversibly. Plaintext escrow is **not** acceptable.
-
-**Therefore, mandatory:**
-
-1. Encrypt **in the browser** before anything is sent. WebCrypto:
-   `PBKDF2(passphrase, salt, 250k, SHA-256)` → **AES-256-GCM**.
-2. **POST ciphertext only.** `{ to, blob }`. Nothing else.
-3. **The passphrase is NEVER transmitted.** Not to the function. Not in the email.
-   Not in the subject. It is shown on screen once and **printed on the mailing
-   checklist**.
-4. The email body carries **zero identifying content**. The attachment is an opaque
-   `.enc` blob.
-5. `/api/escrow` writes nothing and logs nothing but a status code.
-
-**Do not oversell it. State the residual risks:**
-- The destination **email address does reach our function** (unavoidable — you need
-  it to send mail). Never log it. Never store it.
-- **Metadata leaks:** the relay learns that *someone at that address* used a reentry
-  legal tool. That association is itself sensitive.
-- **Lost passphrase = lost data, permanently.** Correct trade. Say it LOUDLY.
-
-**A3 amends to:** *no network request contains **readable** PII.* Still true. Still
-assertable. Still testable.
-
-### D7 — Templates must be authoritative blanks, and the fill routine MUST zero every field.
-
-**This bit us already.** The PDFs originally uploaded to this project were *not*
-blank — they were copies someone had typed test data into. Residue included junk
-text in every box, **`/General Partnership` ticked on ENF006**, and **`Type of
-Request = Renewal` ticked on ENF003**.
+This bit the project already. The PDFs originally uploaded were *not* blank — they were
+copies someone had typed test data into. Residue included junk text in every box,
+`/General Partnership` ticked on ENF006, and `Type of Request = Renewal` ticked on ENF003.
 
 Building on those templates would have shipped, to TDLR, a signed statement that
-the applicant was a general partnership renewing a license. **A material
+the applicant was a general partnership renewing a license — a material
 misstatement on a government form the user signs under penalty of administrative
-sanction.**
+sanction.
 
 Two rules, both mandatory:
 
@@ -436,9 +325,44 @@ Two rules, both mandatory:
    *before* writing anything.** A field you don't explicitly write **keeps whatever
    the template had.** Do not assume the template is clean. Assume it is dirty.
 
-Assert it: after generating a packet, **re-read it and confirm no field holds a
-value the app did not intend to write.** Acceptance criterion A2 (SSN empty) caught
+Assert it: after generating a packet, re-read it and confirm no field holds a
+value the app did not intend to write. Acceptance criterion A2 (SSN empty) caught
 this residue on its very first run. Keep that test.
+
+### D8 — The escrow email is the one exception to D5, and it ships encrypted or not at all.
+
+A person on a library computer has no USB stick, no account, and no way to carry a
+JSON file to their future self. Email is the only channel they have. So SurePath
+offers **"Email me my progress"** — but blind.
+
+**"We don't write it to a database" is not a privacy property.** Function logs
+capture request bodies on error. SMTP relays queue and retain message bodies for
+days or weeks. Inboxes are forever, indexed, and frequently shared with partners,
+family, or employers. One typo'd address discloses a criminal record to a stranger,
+irreversibly. Plaintext escrow is not acceptable.
+
+**Therefore, mandatory:**
+
+1. Encrypt **in the browser** before anything is sent. WebCrypto:
+   `PBKDF2(passphrase, salt, 250k, SHA-256)` → **AES-256-GCM**.
+2. **POST ciphertext only.** `{ to, blob }`. Nothing else.
+3. **The passphrase is never transmitted.** Not to the function. Not in the email.
+   Not in the subject. It is shown on screen once and **printed on the mailing
+   checklist**.
+4. The email body carries **zero identifying content**. The attachment is an opaque
+   `.enc` blob.
+5. `/api/escrow` writes nothing and logs nothing but a status code.
+
+**Do not oversell it. State the residual risks:**
+
+- The destination **email address does reach our function** (unavoidable — you need
+  it to send mail). Never log it. Never store it.
+- **Metadata leaks:** the relay learns that *someone at that address* used a reentry
+  legal tool. That association is itself sensitive.
+- **Lost passphrase means lost data, permanently.** Correct trade. Say it loudly.
+
+**A3 amends to:** *no network request contains **readable** PII.* Still true. Still
+assertable. Still testable.
 
 ---
 
@@ -447,17 +371,17 @@ this residue on its very first run. Keep that test.
 **These were verified against the primary source documents. Do not "correct" them
 from memory or from a web search that surfaces older material.**
 
-### F1 — The packet is ENF006 + ENF003. It is NOT "ENF001."
+### F1 — The packet is ENF006 + ENF003. It is not "ENF001."
 
 | Document | Form # | Revision | Role |
 |---|---|---|---|
 | Request for Criminal History Evaluation Letter | **ENF006** | May 2025 | **The form you fill out and mail.** 2 pages. |
 | Criminal History Questionnaire | **ENF003** | Aug 2024 | One per **additional** conviction. |
-| Instruction sheet | ENF001-**I** | May 2025 | Instructions only. **Not a form. Never filled, never mailed.** |
+| Instruction sheet | ENF001-**I** | May 2025 | Instructions only. Not a form. Never filled, never mailed. |
 
 **Critical structural fact:** ENF006 page 2 contains a full criminal-history
 section (items 15–24: county, court, dates, exact crime, sentence, narrative,
-parole, probation, signature). **ENF006 carries the FIRST conviction.**
+parole, probation, signature). **ENF006 carries the first conviction.**
 
 > **N convictions ⟹ 1 × ENF006 + (N − 1) × ENF003.**
 
@@ -472,7 +396,7 @@ renumbered the form in the May 2025 revision. Work from the actual PDF.*
 
 Fill by **field name** (`form.getTextField('Last Name').setText(...)`).
 
-**Do NOT do X/Y coordinate stamping.** Earlier architecture notes for this project
+**Do not do X/Y coordinate stamping.** Earlier architecture notes for this project
 assumed coordinate mapping. That assumption is dead. It would waste days.
 
 *Caveat: ENF003's field names were auto-derived from label text and are ugly and
@@ -496,9 +420,10 @@ Texas Department of Licensing and Regulation
 P.O. Box 12157
 Austin, TX 78711-2157
 ```
+
 Do not send cash. TDLR does not return submitted documents — the user must keep a copy.
 
-### F5 — The CHEL is ADVISORY.
+### F5 — The CHEL is advisory.
 
 - **Not binding** on TDLR.
 - **No appeal right** from it.
@@ -514,7 +439,17 @@ ENF006 says this explicitly and will not process an incomplete request. Every
 field must be populated or explicitly `N/A`. **The SSN is the sole exception** —
 the user hand-writes it (see D3).
 
-### F8 — The two forms use DIFFERENT checkbox conventions. Verified by render.
+### F7 — Who to contact
+
+TDLR **Enforcement Division** — the division that actually processes the CHEL.
+
+- `enforcement@tdlr.texas.gov`
+- (512) 539-5600
+
+*(The general Customer Service line — (800) 803-9202 / (512) 463-6599 — routes to
+reps who cannot answer questions about this form.)*
+
+### F8 — The two forms use different checkbox conventions. Verified by render.
 
 **ENF006** uses semantic export values. **ENF003 uses `/ChoiceN` — non-sequentially.**
 
@@ -522,20 +457,19 @@ the user hand-writes it (see D3).
 |---|---|---|
 | ENF006 | `Gender` | `/Male` · `/Female` |
 | ENF006 | `Type of Ownership` | `/General Partnership` · `/Sole Proprietor` · `/Corporation` · `/LLC` · `/LLP` · `/Off` |
-| ENF006 | `Are you currently on parole?` | **`/Yes`** · **`/No`** |
-| ENF006 | `Are you currently on probation?` | **`/Yes`** · **`/No`** |
-| ENF003 | `Type of Request` | New = **`/Choice1`** · Renewal = `/Choice2` |
-| ENF003 | `#16` (renewals) | No = **`/Choice1`** · Yes = `/Choice2` |
-| ENF003 | `#17` (parole) | No = **`/Choice3`** · Yes = **`/Choice1`** ⚠️ |
-| ENF003 | `#18` (probation) | No = **`/Choice2`** · Yes = **`/Choice1`** ⚠️ |
+| ENF006 | `Are you currently on parole?` | `/Yes` · `/No` |
+| ENF006 | `Are you currently on probation?` | `/Yes` · `/No` |
+| ENF003 | `Type of Request` | New = `/Choice1` · Renewal = `/Choice2` |
+| ENF003 | `#16` (renewals) | No = `/Choice1` · Yes = `/Choice2` |
+| ENF003 | `#17` (parole) | No = `/Choice3` · Yes = `/Choice1` |
+| ENF003 | `#18` (probation) | No = `/Choice2` · Yes = `/Choice1` |
 
-🚨 **THE TWO PAROLE/PROBATION ROWS ABOVE WERE INVERTED IN EVERY EARLIER REVISION OF THIS
-FILE, AND THE PACKET LIED TO TDLR BECAUSE OF IT.**
+The two parole/probation rows were inverted in earlier versions of this map, and the
+generated packet carried the wrong answers to TDLR because of it.
 
-The old table said parole *Yes* = `/Choice3`. **It is the opposite — `/Choice3` is NO.**
-
-Verified by reading each widget's on-value **together with its rectangle** off the real
-blank. On the printed form, **"No" is the LEFT box and "Yes" is the RIGHT box:**
+The values were re-derived by reading each widget's on-value together with its rectangle
+off the authoritative blank. On the printed form, "No" is the left box and "Yes" is the
+right box:
 
 ```
 #16 (renewals)   left x=481 → /Choice1 = NO      right x=529 → /Choice2 = YES
@@ -543,68 +477,48 @@ blank. On the printed form, **"No" is the LEFT box and "Yes" is the RIGHT box:**
 #18 (probation)  left x=191 → /Choice2 = NO      right x=225 → /Choice1 = YES
 ```
 
-**What that bug actually did:** for a man who is **not on parole** and **is on probation**,
-the generated packet ticked *"Yes, I am on parole"* and *"No, I am not on probation."* Both
-backwards — on a form he signs **under penalty of administrative sanction**, affirming it is
-his full and accurate account.
+What the bug produced: for a man not on parole and on probation, the packet ticked
+*"Yes, I am on parole"* and *"No, I am not on probation."* Both backwards — on a form he
+signs under penalty of administrative sanction, affirming it is his full and accurate
+account.
 
-**And every single check was green.** The field map said so. pdf-lib validated the export
-value and read it back. The PDF was well-formed. **A13 confirmed the packet held exactly the
-values we intended to write — we intended the wrong ones.** No test could catch it, because
-**the error was in the ground truth the tests were written from.**
+Every check was green. The field map said so; pdf-lib validated the export value and read
+it back; the PDF was well-formed; A13 confirmed the packet held exactly the values we
+intended to write. We intended the wrong ones. No test could catch it, because the error
+was in the ground truth the tests were written from.
 
-**ONLY PRINTING THE PAGE AND LOOKING AT IT CAUGHT THIS.** That is why `BUILD_SEQUENCE` Phase 1
-ends with *"Then print it. On paper. Look at it."* **It is not a nicety. It is the only
-control that can detect a lie the entire system agrees on.**
+Printing the page and looking at it is what caught this. That is why `BUILD_SEQUENCE`
+Phase 1 ends with *"print it, on paper, and look at it"* — it is the only control that can
+detect an error the whole system agrees on.
 
-⚠️ **`/Choice1` means YES on `#17` and NO on `#16` — same form, same value, opposite
-meanings. THE NUMBER CARRIES NO MEANING. Never reason from it.** And if the thing you are
-checking *is the map*, read the **geometry** — it is the only ground truth independent of us
-being right.
+**`/Choice1` means YES on `#17` and NO on `#16` — same form, same value, opposite
+meanings. The number carries no meaning. Never reason from it.** And if the thing you are
+checking *is the map*, read the **geometry** — it is the only ground truth independent of
+us being right.
 
-**⚠️ pdf-lib call syntax — the map stores the truth, the helper strips the slash.**
+**pdf-lib call syntax — the map stores the truth, the helper strips the slash.**
 This table lists the **real PDF export values, with the slash** — that is literally
 what is inside the file. But `PDFRadioGroup.select()` wants the **bare name**:
 
 ```ts
-select('Choice3')     // ✅
-select('/Choice3')    // ❌ THROWS
+select('Choice3')     // correct
+select('/Choice3')    // throws
 ```
 
-Route **every** tick through **one** helper that strips the slash, asserts the value
-exists on that field, selects it, and **reads it back.** Map stays true; adapter
+Route every tick through one helper that strips the slash, asserts the value
+exists on that field, selects it, and reads it back. Map stays true; adapter
 absorbs the quirk.
 
-*Correction to an earlier revision of this file: it claimed that guessing `/Yes` on
-ENF003 would leave every box **silently** `/Off`. **It doesn't — pdf-lib throws
-loudly.** So that failure is a nuisance, not a catastrophe. **But the map still earns
-its keep:** pdf-lib will tell you `'/Choice3'` is malformed. It will **never** tell you
-that **`Choice3` is what parole-yes means.** The probe found the value; pdf-lib only
+*Note on failure mode: guessing `/Yes` on ENF003 does not fail silently — pdf-lib throws
+loudly. So that particular error is a nuisance rather than a catastrophe. The map still
+earns its keep: pdf-lib will tell you `'/Choice3'` is malformed. It will never tell you
+that `Choice3` is what parole-yes means. The probe found the value; pdf-lib only
 validates the syntax.*
-
-### F11 — `/Off` IS NOT AN OPTION. Never `select` it.
-
-**`/Off` is the ABSENCE of a selection, not a selectable value.** It does not appear in
-a radio group's option list. **`select('Off')` throws.**
-
-To leave a group unselected: **clear it, or never touch it.** Build `clearButton()` as a
-**distinct primitive** from `tickButton()`.
-
-**Where this bites:** `Type of Ownership` on ENF006. Its real options are
-`[/General Partnership, /Sole Proprietor, /LLC, /LLP, /Corporation]` — **and nothing
-else.** The **non-business-owner** case is **both the default and the common one.**
-
-*An earlier revision of `tdlr_field_map.json` listed `"none": "/Off"` for this field.
-**That was wrong**, and it is exactly the kind of thing that reads as fine in code review
-and **ships a packet declaring the applicant a General Partnership.* Caught in the Phase 0
-browser probe. Fixed.*
-
-Full map: `data/states/texas/tdlr_field_map.json`. Labeled renders: `probe/*_labeled.png`.
 
 ### F9 — ENF006 splits county and state. ENF003 combines them. Same packet.
 
 - **ENF006** — the field *named* `County and State of conviction or deferred
-  adjudication` holds the **COUNTY ONLY** (`"Harris"`). The state goes in a
+  adjudication` holds the **county only** (`"Harris"`). The state goes in a
   **separate** field, `State (ex: Texas)` (`"Texas"`).
   *Writing `"Harris, Texas"` into the first field is wrong **and** leaves the second
   blank.*
@@ -612,7 +526,7 @@ Full map: `data/states/texas/tdlr_field_map.json`. Labeled renders: `probe/*_lab
 
 Same data. Two shapes. Two forms. One packet. Do not unify them in the mapper.
 
-### F10 — Authoritative form structure (and a correction).
+### F10 — Authoritative form structure.
 
 The **authoritative blanks from tdlr.texas.gov** are structurally sound:
 
@@ -623,25 +537,33 @@ The **authoritative blanks from tdlr.texas.gov** are structurally sound:
 | `/SigFlags` | 1 | 1 |
 | Residual values | none | none |
 
-**Correction to an earlier note in this file:** a previous revision warned that these
-forms lack a `/DR` font resource. **That was wrong.** It was an artifact of the
-*mangled* copies (see D7), which had been opened in an editor that stripped the `/DR`
-dict *and* the `/Sig` fields *and* left test data behind — **three** separate
+An earlier characterization of these forms as lacking a `/DR` font resource came from
+examining the *mangled* copies (see D7), which had been opened in an editor that stripped
+the `/DR` dict, stripped the `/Sig` fields, and left test data behind — three separate
 corruptions.
 
-**The lesson is D7, not F10:** never characterize a form from a copy. Go to the source.
+**The lesson is D7:** never characterize a form from a copy. Go to the source.
 
-Still true regardless: **smoke-test the fill + flatten pipeline in the browser on day
-1, not day 8.**
+Still true regardless: smoke-test the fill and flatten pipeline in the browser on day
+1, not day 8.
 
-### F7 — Who to contact
+### F11 — `/Off` is the absence of a selection, not a value.
 
-TDLR **Enforcement Division** — the division that actually processes the CHEL.
-- `enforcement@tdlr.texas.gov`
-- (512) 539-5600
+`/Off` does not appear in a radio group's option list. `select('Off')` throws.
 
-*(The general Customer Service line — (800) 803-9202 / (512) 463-6599 — routes to
-reps who cannot answer questions about this form.)*
+To leave a group unselected: **clear it, or never touch it.** Build `clearButton()` as a
+**distinct primitive** from `tickButton()`.
+
+**Where this bites:** `Type of Ownership` on ENF006. Its real options are
+`[/General Partnership, /Sole Proprietor, /LLC, /LLP, /Corporation]` — and nothing
+else. The **non-business-owner** case is both the default and the common one.
+
+An earlier version of `tdlr_field_map.json` listed `"none": "/Off"` for this field. That
+was wrong, and it is exactly the kind of thing that reads as fine in code review and
+ships a packet declaring the applicant a General Partnership. Caught in the Phase 0
+browser probe. Fixed.
+
+Full map: `data/states/texas/tdlr_field_map.json`. Labeled renders: `probe/*_labeled.png`.
 
 ---
 
@@ -660,7 +582,7 @@ writing several narratives is a **sit-down-with-your-documents task**. It is als
 how the institutional user (a caseworker at a reentry org or trade school) will
 run it.
 
-Responsive layout is fine. **Do not spend time on mobile optimization.** This is a
+Responsive layout is fine. Do not spend time on mobile optimization. This is a
 deliberate product decision, not an oversight.
 
 ### S3 — No RAG. No vector store. No embeddings.
@@ -693,7 +615,6 @@ any place we shaded the truth.
   fingerprint background check**. What they omit here will be found there.
 - **H5.** Tell users this takes up to **90 days** and costs **$10 per trade**.
   Do not bury the wait or the cost.
-
 - **H6 — The advocacy copy standard.** Where SurePath coaches on **published criteria**
   (what boards say they weigh), the copy **states why it matters, recommends plainly, and
   stops.** Never append the escape hatch — exits live in the interface ("Write it now" is
@@ -701,6 +622,7 @@ any place we shaded the truth.
   recommendation. **Banned patterns in advocacy copy:** *"totally your call," "no
   pressure," "you don't have to," "if you want," "this is optional," "or should I write it
   as is."* Where guidance genuinely doesn't matter, cut the line instead of hedging it.
+
   **The carve-out, which is load-bearing:** where an invariant requires neutrality — L8
   (expunged/sealed records), L9 (how to get the record; any decision that is theirs to
   make about their own life and money) — the copy stays **flat**, and advocacy is the
@@ -730,13 +652,89 @@ Ask the human. Do not proceed.
 |---|---|
 | `CLAUDE.md` | **This file.** Invariants. Read first, always. |
 | `docs/SETUP.md` | **Read this to start.** What to install, what keys you need (almost none), where files go, the agent kickoff prompt. |
-| `docs/DESIGN_SYSTEM.md` | Tokens, the ruled-line input, the progress rail, the counter, and a **hard ban list** that keeps the UI from looking AI-generated. |
+| `docs/DESIGN_SYSTEM.md` | Tokens, the ruled-line input, the progress rail, the counter, and a hard ban list that keeps the UI from looking AI-generated. |
 | `docs/PRD.md` | Product: problem, users, screen-by-screen flow, 14 acceptance criteria. |
 | `docs/ARCHITECTURE.md` | Stack, data model, document service, LLM boundary, the two serverless functions, threat model. |
 | `docs/BUILD_SEQUENCE.md` | **Start here to build.** Day-1 smoke test, 7 phases, definitions of done, cut order. |
 | `docs/OPEN_QUESTIONS.md` | Unresolved. **Blocked on TDLR.** Do not invent answers. |
-| `data/states/texas/tdlr_field_map.json` | **The verified AcroForm field map.** Source of truth for the Texas document service. Every trap annotated. **Do not re-derive field names.** |
+| `data/states/texas/tdlr_field_map.json` | **The verified AcroForm field map.** Source of truth for the Texas document service. Every trap annotated. Do not re-derive field names. |
 | `data/states/texas/tdlr_guidelines.json` | *(to build — Phase 3)* `license → [{ crimeCategory, tdlrStatedReason }]`. |
 | `public/forms/texas/ENF006_blank.pdf` | Authoritative blank, form pages only, fresh from tdlr.texas.gov. |
 | `public/forms/texas/ENF003_blank.pdf` | Same. |
 | `probe/*_labeled.png` | Field-map overlay renders. Evidence, and a good capstone artifact. |
+
+---
+
+## 8. GIT WORKFLOW — commit constantly, in small pieces
+
+**This is a standing rule for every session. Follow it without being asked.**
+
+The human needs a dense, legible commit history — both to roll back cleanly when something
+goes wrong, and to see progress. Large uncommitted working trees are a failure state.
+
+### Commit after every meaningful unit of work
+
+Not "at the end." After each unit — a passing test, a working component, a fixed bug, a
+completed doc correction. If you just made something work, **commit it before starting the
+next thing.** A good rule of thumb: if you would be annoyed to lose it, it should already be
+committed.
+
+**Never batch a whole phase into one commit.** A phase is many commits.
+
+### Commit message format
+
+```
+<type>: <what changed, imperative, specific>
+
+<why, if not obvious. reference the invariant or acceptance criterion.>
+```
+
+`type` ∈ `feat` · `fix` · `test` · `docs` · `chore` · `refactor`
+
+**Good:**
+
+```
+fix: correct ENF003 parole export values (were inverted)
+
+Parole yes was /Choice3, is actually /Choice1. Verified by widget geometry
+on the real blank — "No" is the left box. Old value made the packet tell TDLR
+a man not on parole IS on parole. CLAUDE.md F8.
+```
+
+```
+test: add set-equality "no charge dropped" guard (D1)
+feat: Stepper — three states differ in form not color (DESIGN_SYSTEM §5.5)
+docs: resolve header height to 80px across DESIGN_SYSTEM
+```
+
+**Bad:** `updates` · `wip` · `phase 2` · `fixed stuff` · `changes per feedback`
+
+### Rules
+
+- **Commit before you refactor**, so the working version is a restore point.
+- **One logical change per commit.** Don't mix a bug fix and a new feature. If you did two
+  things, make two commits (`git add -p` for partial staging).
+- **Never commit broken code to `main`** knowingly. If a test is red, either fix it or mark
+  it clearly in the message (`test: add failing case for X (not yet implemented)`).
+- **After a batch of commits, print `git log --oneline -n 10`** so the human can see the trail.
+- **Do not `git push` unless asked** — the human controls the remote.
+- The human commits at their own checkpoints too; your commits and theirs interleave. Keep
+  yours small enough that theirs never collides.
+
+### Granularity
+
+- Err on the side of more commits, smaller. A component, a test, a fix, a doc correction,
+  a refactor — each is its own commit.
+- Every commit message is a sentence someone will read: specific, imperative, saying what
+  and (if not obvious) why, referencing the invariant or acceptance criterion.
+- When you write a test then make it pass, that is naturally two commits — `test: add
+  failing X` then `feat: implement X`. Do this where it fits the work; don't contort the
+  work for it.
+- The history should read as a clean, steady narrative of the build — someone scrolling
+  `git log --oneline` should be able to follow what happened and when.
+
+### At the start of a session
+
+If `git status` shows an uncommitted working tree from a previous session, **stop and tell
+the human before doing anything** — don't bury their work under yours. Offer to commit it
+with a descriptive message first.

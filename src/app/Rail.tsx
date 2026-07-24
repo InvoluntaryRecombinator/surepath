@@ -17,9 +17,11 @@ const ROW_H = 50 // px — one nav row. The connector geometry derives from this
 
 export function Rail({
   onSaveProgress,
+  onUploadProgress,
   onDeleteData,
 }: {
   onSaveProgress: () => void
+  onUploadProgress: () => void
   onDeleteData: () => void
 }) {
   const { state, dispatch, config } = useAppStore()
@@ -119,6 +121,13 @@ export function Rail({
           className="save-progress-action save-progress-action-on-dark h-10 rounded-[3px] bg-brand-gold px-3 text-[13px] font-bold text-rail hover:bg-brand-gold-deep"
         >
           Save my progress
+        </button>
+        <button
+          type="button"
+          onClick={onUploadProgress}
+          className="text-[12px] font-medium text-rail-ink underline underline-offset-2 transition-colors duration-150 hover:text-paper"
+        >
+          Upload a saved file
         </button>
         <button
           type="button"

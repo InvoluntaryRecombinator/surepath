@@ -16,8 +16,10 @@
  */
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { US_STATES } from '../app/lib/format'
+import states from '../../data/states.json'
 import usStates from './us-states.svg?raw'
+
+const determinationStates = [...states].sort((a, b) => a.name.localeCompare(b.name))
 
 export function StateModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null)
@@ -70,8 +72,10 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
         <div className="bg-[#efe8d8] px-5 pb-5 pt-5">
           <div aria-hidden="true" className="us-map" dangerouslySetInnerHTML={{ __html: usStates }} />
           <p className="mt-4 px-2 text-center text-[17px] leading-relaxed text-wet">
-            Licensing is state law. Every state has its own board and its own process.
+            These states let you ask a licensing board about your record before you apply.
+            SurePath covers Texas today.
           </p>
+          <p className="mt-1 text-center text-[14px] text-muted">More states are coming soon.</p>
         </div>
 
         {/* ── control — a hair warmer than white; select + button, one decision ───── */}
@@ -89,9 +93,9 @@ export function StateModal({ open, onClose }: { open: boolean; onClose: () => vo
               onChange={() => {}}
               className="h-14 w-full cursor-pointer appearance-none rounded-[2px] border-2 border-[#d8d4cc] bg-paper px-4 pr-12 text-[19px] text-ink focus:border-brass focus:outline-none"
             >
-              {US_STATES.map((state) => (
-                <option key={state} value={state} disabled={state !== 'Texas'}>
-                  {state}
+              {determinationStates.map((state) => (
+                <option key={state.code} value={state.name} disabled={state.status !== 'live'}>
+                  {state.name}
                 </option>
               ))}
             </select>

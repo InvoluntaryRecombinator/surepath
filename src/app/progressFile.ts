@@ -2,8 +2,9 @@ import { z } from 'zod'
 import type { StateConfig } from '../state-config/types'
 import type { AppState } from './store'
 import { emptyRawAnswers, type DraftApplicant, type DraftCase, type DraftIncident } from './draft'
-import { validateSection } from './sectionValidation'
 import { storageKey } from './storeContext'
+
+export const INVALID_PROGRESS_FILE_MESSAGE = "That doesn't look like a SurePath progress file."
 
 const optionalText = z.string().optional().default('')
 
@@ -106,17 +107,14 @@ const draftSchema = z
     }),
   )
 
-const storedProgressSchema = z.object({
-  draft: draftSchema,
-  sectionId: z.string(),
-  maxReachedIndex: z.number().int().nonnegative(),
-})
-
-const progressFileSchema = storedProgressSchema.extend({
+const progressFileSchema = z.object({
   format: z.literal('surepath-progress'),
   formatVersion: z.literal(1),
   stateCode: z.string(),
   savedAt: z.string(),
+  draft: draftSchema,
+  sectionId: z.string().optional(),
+  maxReachedIndex: z.number().int().nonnegative().optional().default(0),
 })
 
 export type ProgressImportResult =
@@ -125,7 +123,7 @@ export type ProgressImportResult =
 
 function normalizePosition(
   draft: DraftCase,
-  sectionId: string,
+  sectionId: string | undefined,
   maxReachedIndex: number,
   config: StateConfig,
 ): AppState {
@@ -138,22 +136,6 @@ function normalizePosition(
       safeIndex,
       Math.min(maxReachedIndex, config.sections.length - 1),
     ),
-  }
-}
-
-function positionLegacyDraft(draft: DraftCase, config: StateConfig): AppState {
-  const firstIncomplete = config.sections.findIndex(
-    (section) =>
-      !validateSection(section.id, draft, {
-        agency: config.agency,
-        narrativeItemLabel: config.copy.narrativeItemLabel,
-      }).complete,
-  )
-  const index = firstIncomplete >= 0 ? firstIncomplete : config.sections.length - 1
-  return {
-    draft,
-    sectionId: config.sections[index].id,
-    maxReachedIndex: index,
   }
 }
 
@@ -178,56 +160,27 @@ export function parseProgressFile(text: string, config: StateConfig): ProgressIm
   try {
     value = JSON.parse(text)
   } catch {
-    return { ok: false, message: 'That file is not a valid SurePath progress file.' }
+    return { ok: false, message: INVALID_PROGRESS_FILE_MESSAGE }
   }
 
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    return { ok: false, message: 'That file is not a valid SurePath progress file.' }
+    return { ok: false, message: INVALID_PROGRESS_FILE_MESSAGE }
   }
 
-  if ('format' in value) {
-    const result = progressFileSchema.safeParse(value)
-    if (!result.success) {
-      return {
-        ok: false,
-        message: 'This progress file is damaged or was created by an unsupported version of SurePath.',
-      }
-    }
-    if (result.data.stateCode.toUpperCase() !== config.code.toUpperCase()) {
-      return {
-        ok: false,
-        message: `This file belongs to a different state. Choose a ${config.stateName} SurePath progress file.`,
-      }
-    }
-    return {
-      ok: true,
-      state: normalizePosition(
-        result.data.draft,
-        result.data.sectionId,
-        result.data.maxReachedIndex,
-        config,
-      ),
-    }
+  const result = progressFileSchema.safeParse(value)
+  if (!result.success || result.data.stateCode.toUpperCase() !== config.code.toUpperCase()) {
+    return { ok: false, message: INVALID_PROGRESS_FILE_MESSAGE }
   }
 
-  const stored = storedProgressSchema.safeParse(value)
-  if (stored.success) {
-    return {
-      ok: true,
-      state: normalizePosition(
-        stored.data.draft,
-        stored.data.sectionId,
-        stored.data.maxReachedIndex,
-        config,
-      ),
-    }
+  return {
+    ok: true,
+    state: normalizePosition(
+      result.data.draft,
+      result.data.sectionId,
+      result.data.maxReachedIndex,
+      config,
+    ),
   }
-
-  // Files downloaded by the first Save Progress implementation contained only the draft.
-  const legacy = draftSchema.safeParse(value)
-  if (legacy.success) return { ok: true, state: positionLegacyDraft(legacy.data, config) }
-
-  return { ok: false, message: 'That file is not a valid SurePath progress file.' }
 }
 
 export function downloadProgressFile(state: AppState, config: StateConfig): void {
@@ -246,4 +199,12 @@ export function storeImportedProgress(state: AppState, config: StateConfig): voi
     storageKey(config),
     JSON.stringify({ ...state, savedAt: new Date().toISOString() }),
   )
+}
+
+/** Validate first, then replace the browser copy in one write. Invalid input writes nothing. */
+export function restoreProgressFile(text: string, config: StateConfig): ProgressImportResult {
+  const result = parseProgressFile(text, config)
+  if (!result.ok) return result
+  storeImportedProgress(result.state, config)
+  return result
 }

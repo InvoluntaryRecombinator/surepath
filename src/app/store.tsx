@@ -29,6 +29,7 @@ export type AppState = {
 }
 
 export type Action =
+  | { type: 'replace-state'; state: AppState }
   | { type: 'go'; sectionId: string; index: number }
   | { type: 'update-applicant'; patch: Partial<DraftApplicant> }
   | { type: 'add-incident' }
@@ -54,6 +55,8 @@ function makeReducer(config: StateConfig) {
 
   return function reduce(s: AppState, a: Action): AppState {
     switch (a.type) {
+      case 'replace-state':
+        return a.state
       case 'go':
         return {
           ...s,

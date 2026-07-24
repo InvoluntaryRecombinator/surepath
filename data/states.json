@@ -1,0 +1,9 @@
+[
+  { "name": "Arizona", "code": "AZ", "status": "planned", "authority": "A.R.S. § 41-1093.04" },
+  { "name": "Iowa", "code": "IA", "status": "planned", "authority": "Iowa Admin. Code r. 641-29.12" },
+  { "name": "Louisiana", "code": "LA", "status": "planned", "authority": "La. R.S. 37:33" },
+  { "name": "North Carolina", "code": "NC", "status": "planned", "authority": "N.C.G.S. § 93B-8.1(b6)" },
+  { "name": "Ohio", "code": "OH", "status": "planned", "authority": "O.R.C. 9.78" },
+  { "name": "Texas", "code": "TX", "status": "live", "authority": "Tex. Occ. Code § 53.102" },
+  { "name": "Virginia", "code": "VA", "status": "planned", "authority": "Va. Code § 54.1-204" }
+]

@@ -146,7 +146,7 @@ export const txConfig: StateConfig = {
     },
     {
       q: 'What about expunged or sealed records?',
-      a: 'We cannot tell you whether an expunged or sealed record has to be disclosed. Expunction and an order of nondisclosure are different, and the answer may differ for each. Ask the board or a lawyer before you decide.',
+      a: "We can't tell you. Expunction and an order of nondisclosure are different legal instruments and the answer is different for each — one destroys the record, the other seals it from the public while some agencies can still see it. Ask TDLR or a lawyer before you decide. We will never leave a record out for you, and we will never tell you to leave one out.",
       attribution: 'surepath-open-question',
     },
   ],

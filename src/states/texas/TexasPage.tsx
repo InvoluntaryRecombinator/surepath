@@ -16,14 +16,16 @@ function Wrap({ children, className = '' }: { children: ReactNode; className?: s
 function Eyebrow({
   children,
   light = false,
+  gold = false,
 }: {
   children: ReactNode
   light?: boolean
+  gold?: boolean
 }) {
   return (
     <p
       className={`font-mono text-[12px] font-bold uppercase tracking-[0.14em] ${
-        light ? 'text-rail-muted' : 'text-wet'
+        gold ? 'text-brass' : light ? 'text-rail-muted' : 'text-wet'
       }`}
     >
       {children}
@@ -71,7 +73,7 @@ export function TexasPage() {
     'List every conviction and every deferred adjudication — including every misdemeanor, no matter how old. There is no cutoff year.',
     'Write a short account of what happened and why for each incident, in your own words. Set aside real time for this part.',
     'Expect the real license application to run a full DPS/FBI fingerprint check. Anything omitted here can make the letter unusable.',
-    'Plan on about an hour with your record in front of you. Your progress remains on your computer, so you can stop and return.',
+    'Once you have your record in front of you, the process can take as little as 15 minutes, depending on the length of your record.',
   ]
 
   return (
@@ -85,7 +87,10 @@ export function TexasPage() {
           >
             What to know before you begin in Texas.
           </h1>
-          <p className="mt-6 max-w-[64ch] text-[17px] leading-[1.7] text-silica/80">
+          <p className="mt-6 max-w-[64ch] text-[18px] font-semibold leading-relaxed text-silica">
+            (It’s a lot to read before you start… but all of it matters.)
+          </p>
+          <p className="mt-3 max-w-[64ch] text-[17px] leading-[1.7] text-silica/80">
             Texas law lets anyone ask the Texas Department of Licensing and Regulation to
             review their criminal history and answer in writing before enrolling in
             training. TDLR calls the answer a Criminal History Evaluation Letter. SurePath
@@ -108,7 +113,7 @@ export function TexasPage() {
 
       <section className="bg-silica">
         <Wrap className="py-16 lg:py-[76px]">
-          <Eyebrow>Before you begin</Eyebrow>
+          <Eyebrow gold>Before you begin</Eyebrow>
           <SectionHeading>Check that TDLR licenses your trade</SectionHeading>
           <p className="mt-4 max-w-[66ch] text-[16px] leading-relaxed text-ink/75">
             This process covers only the trades TDLR licenses. If your trade belongs to a
@@ -125,25 +130,23 @@ export function TexasPage() {
                 {catalog.programs.map((program) => (
                   <li
                     key={program.program}
-                    className="flex min-h-[74px] flex-col justify-center rounded-[4px] border border-carbon bg-paper px-4 py-3"
+                    className="flex min-h-[54px] flex-col justify-center rounded-[4px] border border-carbon bg-paper px-4 py-2.5"
                   >
                     <span className="text-[14px] font-semibold leading-snug text-ink">
                       {program.program}
-                    </span>
-                    <span className="mt-1 text-[11.5px] leading-snug text-muted">
-                      {program.examples.slice(0, 3).join(' · ')}
                     </span>
                   </li>
                 ))}
               </ul>
 
               <p className="mt-5 max-w-[68ch] text-[13.5px] leading-relaxed text-muted">
-                Don’t see your trade? We may simply not have it listed. Check{' '}
+                <strong className="font-semibold text-ink">Don’t see your trade?</strong> We may
+                simply not have it listed. Check{' '}
                 <a
                   href={links.tdlr.chel_page.url}
                   target="_blank"
                   rel="noreferrer"
-                  className={infoLink}
+                  className={`${infoLink} whitespace-nowrap`}
                 >
                   TDLR’s current information ↗
                 </a>{' '}
@@ -167,7 +170,7 @@ export function TexasPage() {
                 ))}
               </ul>
               <p className="mx-auto mt-5 max-w-[48ch] text-[12.5px] leading-relaxed text-muted">
-                SurePath does not support those review processes yet.
+                SurePath covers TDLR only.
               </p>
             </aside>
           </div>
@@ -176,9 +179,9 @@ export function TexasPage() {
 
       <section className="bg-wet text-silica">
         <Wrap className="py-16 lg:py-[76px]">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+          <div>
             <div>
-              <Eyebrow light>What this involves</Eyebrow>
+              <Eyebrow gold>What this involves</Eyebrow>
               <SectionHeading light>Your entire record, honestly told</SectionHeading>
               <ul className="mt-7 flex max-w-[68ch] flex-col gap-4 text-[15.5px] leading-relaxed text-silica/85">
                 {steps.map((step) => (
@@ -192,26 +195,13 @@ export function TexasPage() {
                 ))}
               </ul>
             </div>
-
-            <aside className="flex min-h-[270px] flex-col justify-center rounded-[3px] border border-brass bg-silica px-7 py-7 text-center text-ink shadow-action">
-              <p className="font-display text-[18px] font-extrabold leading-snug">
-                Expunged or sealed records
-              </p>
-              <p className="mt-3 text-[13.5px] leading-relaxed text-muted">
-                {links.expungement_and_nondisclosure.surepath_copy}
-              </p>
-              <p className="mt-3 text-[13.5px] font-semibold leading-relaxed text-ink/80">
-                We will never leave one out for you, and we will never tell you to leave
-                one out.
-              </p>
-            </aside>
           </div>
         </Wrap>
       </section>
 
       <section className="bg-silica">
         <Wrap className="py-16 lg:py-[76px]">
-          <Eyebrow>Get your record first</Eyebrow>
+          <Eyebrow gold>Get your record first</Eyebrow>
           <SectionHeading>Two ways to see your Texas history</SectionHeading>
           <p className="mt-4 max-w-[66ch] text-[16px] leading-relaxed text-ink/75">
             Working from your official history is how a packet ends up complete. Texas
@@ -307,11 +297,6 @@ export function TexasPage() {
             </p>
           </div>
 
-          <p className="mt-8 max-w-[900px] rounded-[4px] border border-wet/20 bg-concrete px-6 py-5 text-[15px] leading-relaxed text-ink/80">
-            <span className="font-semibold text-ink">The report is a starting point, not the final word.</span>{' '}
-            If you remember a conviction that is not on it, include it anyway. You can start
-            from memory, save, and reconcile against the report when it arrives.
-          </p>
         </Wrap>
       </section>
 
@@ -320,9 +305,6 @@ export function TexasPage() {
           <div>
             <p className="font-display text-[24px] font-extrabold text-ink">
               Ready to build your request?
-            </p>
-            <p className="mt-1 text-[13.5px] text-muted">
-              Nothing leaves your computer. Stop any time and return to your saved progress.
             </p>
           </div>
           <Link

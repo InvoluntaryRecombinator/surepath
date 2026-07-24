@@ -7,9 +7,11 @@ import { useAppStore } from './storeContext'
 
 export function MobileRail({
   onSaveProgress,
+  onUploadProgress,
   onDeleteData,
 }: {
   onSaveProgress: () => void
+  onUploadProgress: () => void
   onDeleteData: () => void
 }) {
   const { state, dispatch, config } = useAppStore()
@@ -133,6 +135,15 @@ export function MobileRail({
                     className="save-progress-action h-10 w-full rounded-[4px] bg-brand-gold text-[13px] font-bold text-rail hover:bg-brand-gold-deep"
                   >
                     Save my progress
+                  </button>
+                </Popover.Close>
+                <Popover.Close asChild>
+                  <button
+                    type="button"
+                    onClick={onUploadProgress}
+                    className="mt-3 w-full text-[12px] font-medium text-ink underline underline-offset-2 transition-colors duration-150 hover:text-interactive"
+                  >
+                    Upload a saved file
                   </button>
                 </Popover.Close>
                 <Popover.Close asChild>

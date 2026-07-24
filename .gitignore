@@ -7,10 +7,27 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencies and generated builds
+node_modules/
+dist/
+dist-ssr/
+coverage/
+.vite/
+*.tsbuildinfo
 *.local
+
+# Test runners and local visual QA
+test-results/
+playwright-report/
+blob-report/
+docs/screenshots/
+screenshots/
+# Runtime image assets belong in public/assets/. Root assets/*.png are local design QA.
+assets/*.png
+
+# Tool caches and scratch output
+.cache/
+.tmp/
 
 # Editor directories and files
 .vscode/*

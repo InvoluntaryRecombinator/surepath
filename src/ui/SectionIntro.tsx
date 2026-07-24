@@ -12,9 +12,19 @@ export function SectionBriefing({ section }: { section: SectionDef }) {
         <h1 className="mt-2.5 text-[28px] font-bold leading-[1.2] tracking-[-0.01em] text-silica">
           {intro.title}
         </h1>
-        <p className="mt-3 max-w-[68ch] text-[15px] leading-[1.65] text-concrete">
-          {intro.lead}
-        </p>
+        {intro.lede && (
+          <p className="mt-3 max-w-[62ch] text-[16px] font-semibold leading-[1.6] text-silica">
+            {intro.lede}
+          </p>
+        )}
+        {intro.lead.split('\n\n').map((para) => (
+          <p
+            key={para.slice(0, 24)}
+            className={`max-w-[68ch] text-[15px] leading-[1.65] text-concrete ${intro.lede ? 'mt-2.5' : 'mt-3'}`}
+          >
+            {para}
+          </p>
+        ))}
         {intro.points && (
           <ul className="mt-4 flex flex-col gap-1.5">
             {intro.points.map((p) => (

@@ -60,7 +60,8 @@ export const txConfig: StateConfig = {
       focusIntro: {
         eyebrow: 'Your story',
         title: 'Tell us what happened, in your own words',
-        lead: "This is the part of your packet the board reads most closely. An assistant will ask you questions to help you get it down — what happened, why things went the way they did, what has changed since, and what you did to make it right. Boards weigh all of those, and an account that leaves them out reads as incomplete, so give as much detail as you can. Your answers then get organized into a clear written account in the register a licensing board expects. Nothing is added that you didn't say, nothing is softened, and the words stay yours — you can edit every line before it goes in your packet.",
+        lede: 'This is the part of your packet the board reads most closely.',
+        lead: "An assistant will ask you questions to help you get it down — what happened, why things went the way they did, what has changed since, and what you did to make it right.\n\nBoards weigh all of those, and an account that leaves them out reads as incomplete, so give as much detail as you can. Your answers then get organized into a clear written account in the register a licensing board expects. Nothing is added that you didn't say, nothing is softened, and the words stay yours — you can edit every line before it goes in your packet.",
       },
     },
     {

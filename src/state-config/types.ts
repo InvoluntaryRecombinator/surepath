@@ -38,6 +38,9 @@ export type SectionDef = {
     eyebrow: string
     /** The headline ADDS meaning — the rail already says where you are. Never echo the rail label. */
     title: string
+    /** Optional standout line between title and lead — brighter and heavier than body,
+     *  quieter than the headline. For the one sentence that must land. */
+    lede?: string
     lead: string
     /** Optional short points that must not be missed. Kept few — calm, not flag soup. */
     points?: string[]
@@ -47,6 +50,7 @@ export type SectionDef = {
   focusIntro?: {
     eyebrow: string
     title: string
+    lede?: string
     lead: string
   }
 }

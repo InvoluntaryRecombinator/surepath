@@ -112,11 +112,9 @@ async function run(persona) {
 
 const deferredContext = {
   incidentId: 'eval-1',
-  county: 'Travis',
   state: 'Texas',
-  court: 'Travis County Court at Law No. 8',
-  dateCrimeCommitted: '09/21/2020',
-  dateOfConviction: '04/12/2021',
+  yearOfEvents: '2020',
+  yearResolved: '2021',
   charges: [
     {
       exactOffense: 'Possession of a Controlled Substance, Penalty Group 3, less than 28 grams (Hydrocodone)',

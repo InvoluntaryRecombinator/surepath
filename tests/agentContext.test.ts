@@ -62,6 +62,20 @@ describe('buildNarrativeContext — D6', () => {
     expect(ctx.charges[0].disposition).toBe('deferred_adjudication')
   })
 
+  it('carries NO county, NO court, NO exact dates — only state and years (minimization)', () => {
+    // county + court + day-precise dates + offense is a public-court-record fingerprint.
+    // The wire gets state + years + charges: enough to anchor a draft, not enough to
+    // look anyone up. This is an INVARIANT — do not "helpfully" add these back.
+    expect(serialized).not.toContain('harris')
+    expect(serialized).not.toContain('178th')
+    expect(serialized).not.toContain('district court')
+    expect(serialized).not.toContain('03/14/2019')
+    expect(serialized).not.toContain('11/02/2019')
+    expect(ctx.state).toBe('Texas')
+    expect(ctx.yearOfEvents).toBe('2019')
+    expect(ctx.yearResolved).toBe('2019')
+  })
+
   it('carries NO charge from any OTHER incident', () => {
     expect(serialized).not.toContain(incidentB.charges[0].exactOffense.toLowerCase())
   })

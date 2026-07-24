@@ -385,14 +385,15 @@ Self-contained. Identifier-free. No global state, no reaching around the tree.
 
 ```ts
 // The ONLY thing the narrative agent ever sees.
-// NO name. NO DOB. NO SSN. NO address. NO other incidents. (D6)
+// NO name. NO DOB. NO SSN. NO address. NO other incidents. And NO county, NO court,
+// NO exact dates — state + YEARS + charges only. County + court + day-precise dates +
+// offense is a public-court-record fingerprint; the slim shape anchors a draft
+// ("In 2019…") without being lookup-able. Asserted by test. (D6)
 type NarrativeContext = {
   incidentId: string;
-  county: string;
   state: string;
-  court: string;
-  dateCrimeCommitted: string;
-  dateOfConviction: string;
+  yearOfEvents: string;    // "2019" — derived on-device from the full date
+  yearResolved: string;
   charges: { exactOffense: string; sentence: string }[];   // ALL charges from this event
   rawAnswers: {
     facts: string;        // what happened

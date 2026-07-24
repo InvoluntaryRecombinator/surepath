@@ -59,8 +59,7 @@ describe('parseAgentTurn — fail closed', () => {
 describe('AgentRequest — code owns directive and the skip list', () => {
   const base = {
     context: {
-      incidentId: 'inc-1', county: 'Harris', state: 'Texas', court: '178th District Court',
-      dateCrimeCommitted: '03/14/2019', dateOfConviction: '11/02/2019',
+      incidentId: 'inc-1', state: 'Texas', yearOfEvents: '2019', yearResolved: '2019',
       charges: [{ exactOffense: 'Evading Arrest', sentence: '2 years, suspended', disposition: 'conviction' }],
       rawAnswers: { facts: '', why: '', whatChanged: '', madeItRight: '' },
       currentAccount: '',

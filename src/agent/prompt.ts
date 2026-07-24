@@ -395,12 +395,16 @@ ${guidance.factorsQuote}
 
   parts.push(`THE INCIDENT
 
-County/State: ${context.county}, ${context.state}
-Court: ${context.court}
-Date of the events: ${context.dateCrimeCommitted}
-Date of conviction or deferred adjudication: ${context.dateOfConviction}
+State: ${context.state}
+Year of the events: ${context.yearOfEvents || '(not given)'}
+Year resolved: ${context.yearResolved || '(not given)'}
 Charges from this one arrest (${context.charges.length}):
-${chargeLines}`)
+${chargeLines}
+
+You are given YEARS only, never exact dates, and no county or court. Do not invent a
+specific date, county, or court in anything you write — "In ${context.yearOfEvents || 'that year'}" is the
+right anchor. If the person themselves gives a date or place in conversation, that is
+theirs and you may use it.`)
 
   if (context.charges.length > 1) {
     parts.push(

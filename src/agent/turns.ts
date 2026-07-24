@@ -80,11 +80,10 @@ export type AgentTurn = z.infer<typeof AgentTurnSchema>
 export const AgentRequestSchema = z.object({
   context: z.object({
     incidentId: z.string(),
-    county: z.string(),
+    // no county, no court, no exact dates — state + years + charges only (D6 minimization)
     state: z.string(),
-    court: z.string(),
-    dateCrimeCommitted: z.string(),
-    dateOfConviction: z.string(),
+    yearOfEvents: z.string(),
+    yearResolved: z.string(),
     charges: z.array(
       z.object({
         exactOffense: z.string(),

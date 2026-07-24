@@ -108,12 +108,15 @@ function buildNarrativeContext(incident: Incident): NarrativeContext   // pure, 
 
 type NarrativeContext = {
   incidentId: string
-  county: string; state: string; court: string
-  dateCrimeCommitted: string; dateOfConviction: string
+  state: string
+  yearOfEvents: string; yearResolved: string   // YEARS only, derived on-device
   charges: { exactOffense: string; sentence: string; disposition: Disposition }[]
   rawAnswers: { facts: string; why: string; whatChanged: string; madeItRight: string }
 }
-// NO name. NO DOB. NO SSN. NO address. NO other incidents. Asserted by test. (D6)
+// NO name. NO DOB. NO SSN. NO address. NO other incidents. NO county, NO court, NO
+// exact dates (public-court-record fingerprint — state + years + charges is a crowd).
+// The model is told it has years only and must never invent a date, county, or court.
+// All asserted by test. (D6)
 ```
 
 ---

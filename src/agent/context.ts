@@ -19,11 +19,13 @@ export { emptyRawAnswers, type RawAnswers }
 
 export type NarrativeContext = {
   incidentId: string
-  county: string
+  /** DATA MINIMIZATION (D6, tested): county, court, and exact dates NEVER ride to the
+   *  model. County + court + day-precise dates + offense is a public-court-record
+   *  fingerprint; state + year + charge is a crowd. The years alone anchor the draft
+   *  ("In 2019…") — the form itself carries the precise fields. */
   state: string
-  court: string
-  dateCrimeCommitted: string
-  dateOfConviction: string
+  yearOfEvents: string
+  yearResolved: string
   charges: {
     exactOffense: string
     sentence: string
@@ -40,13 +42,15 @@ export function buildNarrativeContext(
   rawAnswers: RawAnswers = incident.narrative.rawAnswers,
   currentAccount: string = incident.narrative.draft,
 ): NarrativeContext {
+  const year = (mmddyyyy: string) => {
+    const m = /(\d{4})\s*$/.exec(mmddyyyy.trim())
+    return m ? m[1] : ''
+  }
   return {
     incidentId: incident.id,
-    county: incident.county,
     state: incident.state,
-    court: incident.court,
-    dateCrimeCommitted: incident.dateCrimeCommitted,
-    dateOfConviction: incident.dateOfConviction,
+    yearOfEvents: year(incident.dateCrimeCommitted),
+    yearResolved: year(incident.dateOfConviction),
     charges: incident.charges.map((c) => ({
       exactOffense: c.exactOffense,
       sentence: c.sentence,

@@ -10,11 +10,9 @@ import type { AgentRequest, AgentTurn } from '../src/agent/turns'
 const request: AgentRequest = {
   context: {
     incidentId: 'inc-1',
-    county: 'Harris',
     state: 'Texas',
-    court: '178th District Court',
-    dateCrimeCommitted: '03/14/2019',
-    dateOfConviction: '11/02/2019',
+    yearOfEvents: '2019',
+    yearResolved: '2019',
     charges: [
       { exactOffense: 'Possession of a Controlled Substance, PG1 <1g', sentence: '3 years deferred', disposition: 'deferred_adjudication' },
       { exactOffense: 'Evading Arrest', sentence: '2 years, suspended', disposition: 'conviction' },

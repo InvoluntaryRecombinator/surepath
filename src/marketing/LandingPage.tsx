@@ -1,5 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { ArrowDown } from 'lucide-react'
+import scissorsIcon from '../../assets/trade-svg/scissors-svgrepo-com.svg'
+import truckIcon from '../../assets/trade-svg/truck-svgrepo-com.svg'
+import toolsIcon from '../../assets/trade-svg/wrench-hammer-svgrepo-com.svg'
 import { useStateModal } from './stateModalContext'
 
 function Wrap({ children, className = '' }: { children: ReactNode; className?: string }) {
@@ -16,7 +19,7 @@ function Bar({ width }: { width: string }) {
 
 function RecordVisual() {
   return (
-    <div className="relative w-[380px] border-[1.5px] border-paper-border bg-paper px-6 pb-6 pt-7 shadow-paper">
+    <div className="relative w-[285px] border-[1.5px] border-paper-border bg-paper px-6 pb-6 pt-7 shadow-paper">
       <span className="absolute -top-3 left-3.5 border-[1.5px] border-paper-border bg-paper px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-ink">
         Record
       </span>
@@ -39,17 +42,32 @@ function RecordVisual() {
   )
 }
 
-function FolderVisual() {
+function TradeChoiceVisual() {
+  const choices = [
+    { src: toolsIcon, className: 'translate-y-3' },
+    { src: scissorsIcon, className: '-translate-y-2' },
+    { src: truckIcon, className: 'translate-y-3' },
+  ]
+
   return (
-    <div className="relative h-[190px] w-[360px]">
-      <div className="absolute left-0 top-4 h-[122px] w-[62%] border-[1.5px] border-paper-border/45 bg-silica">
-        <span className="absolute -top-3 left-3 h-3 w-14 border-[1.5px] border-b-0 border-paper-border/45 bg-silica" />
-      </div>
-      <div className="absolute right-0 top-[52px] flex h-[122px] w-[64%] items-center gap-3 border-[1.5px] border-paper-border bg-paper px-[18px] shadow-paper">
-        <span className="absolute -top-3 left-3 h-3 w-14 border-[1.5px] border-b-0 border-paper-border bg-paper" />
-        <span className="flex h-4 w-4 items-center justify-center bg-ink text-[11px] font-bold text-paper">✓</span>
-        <Bar width="62%" />
-      </div>
+    <div className="relative isolate flex h-[190px] w-[380px] items-center justify-center gap-4">
+      {choices.map((choice, index) => (
+        <div
+          key={choice.src}
+          className={`relative flex h-[126px] w-[106px] flex-col items-center justify-center border-[1.5px] border-paper-border bg-paper px-5 shadow-paper ${choice.className}`}
+        >
+          <img
+            src={choice.src}
+            alt=""
+            className="h-[58px] w-[58px] object-contain opacity-85 brightness-0"
+          />
+          <span
+            className="mt-4 block h-[3px] bg-paper-border"
+            style={{ width: `${50 + index * 8}%` }}
+          />
+        </div>
+      ))}
+      <div className="absolute left-1/2 top-1/2 -z-10 h-[108px] w-[308px] -translate-x-1/2 -translate-y-1/2 bg-brass/[0.08]" />
     </div>
   )
 }
@@ -68,6 +86,23 @@ function QuestionVisual() {
       <Bar width="100%" />
       <Bar width="74%" />
       <span className="h-9 border-b-[1.5px] border-paper-border" />
+    </div>
+  )
+}
+
+function FormPencilVisual() {
+  return (
+    <div className="relative flex h-[190px] w-[300px] items-center justify-center">
+      <img
+        src="/assets/step3-form-pencil.png"
+        alt=""
+        className="absolute h-[178px] w-[178px] translate-x-2 translate-y-2 object-contain opacity-15 brightness-0"
+      />
+      <img
+        src="/assets/step3-form-pencil.png"
+        alt=""
+        className="relative h-[178px] w-[178px] object-contain brightness-0"
+      />
     </div>
   )
 }
@@ -144,14 +179,15 @@ const steps = [
     title: 'Choose your state and trade',
     body: "Pick where you want to work. You'll see which licensed occupations there offer a determination in advance. You can add more than one.",
     background: 'bg-concrete-2',
-    visual: <FolderVisual />,
+    visual: <TradeChoiceVisual />,
   },
   {
     number: '03',
     title: 'Answer the questions',
     body: "You'll provide your identifying information, the details of your criminal history, and — in most cases — a short personal account of what happened in each incident and why. You can stop and come back at any point.",
     background: 'bg-concrete-3',
-    visual: <QuestionVisual />,
+    visual: <FormPencilVisual />,
+    previousVisual: <QuestionVisual />,
   },
   {
     number: '04',
@@ -181,7 +217,7 @@ function ProcessStep({ step, alternate }: { step: (typeof steps)[number]; altern
         </div>
         <div aria-hidden="true" className="relative flex basis-[380px] justify-center">
           <span
-            className={`pointer-events-none absolute top-1/2 z-0 -translate-y-1/2 font-display text-[clamp(160px,15vw,220px)] font-black leading-none text-brass/[0.07] ${alternate ? '-left-[clamp(92px,10vw,140px)]' : '-right-[clamp(92px,10vw,140px)]'}`}
+            className={`pointer-events-none absolute top-1/2 z-0 -translate-y-1/2 font-display text-[clamp(160px,15vw,220px)] font-black leading-none text-brass/[0.12] ${step.number === '01' ? '-right-[47px]' : step.number === '03' ? '-right-8' : alternate ? '-left-[clamp(92px,10vw,140px)] translate-x-[8px]' : '-right-[clamp(92px,10vw,140px)]'}`}
           >
             {Number(step.number)}
           </span>

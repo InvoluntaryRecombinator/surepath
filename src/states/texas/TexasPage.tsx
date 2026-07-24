@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import catalog from '../../../data/states/texas/tx_licenses.json'
 import links from '../../../data/states/texas/tdlr_links.json'
@@ -52,6 +52,7 @@ function SectionHeading({
 }
 
 export function TexasPage() {
+  const [tradesOpen, setTradesOpen] = useState(false)
   const facts = [
     {
       term: `$${fee} per evaluation`,
@@ -121,8 +122,45 @@ export function TexasPage() {
             here would go to the wrong agency.
           </p>
 
-          <div className="mt-9">
-            <div>
+          <div className="mt-8 flex justify-center sm:justify-start">
+            <button
+              type="button"
+              aria-expanded={tradesOpen}
+              aria-controls="tdlr-trade-lists"
+              onClick={() => setTradesOpen((open) => !open)}
+              className="inline-flex h-12 cursor-pointer items-stretch overflow-hidden rounded-[2px] border-[1.5px] border-ink bg-brass text-ink shadow-action transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-action-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            >
+              <span className="flex items-center px-6 text-[15px] font-bold tracking-[0.01em]">
+                {tradesOpen ? 'Hide the trade list' : 'View trades licensed by TDLR'}
+              </span>
+              <span className="flex w-12 items-center justify-center border-l-[1.5px] border-ink bg-ink text-brass">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 16 10"
+                  className={`h-2.5 w-4 transition-transform duration-250 ${tradesOpen ? 'rotate-180' : ''}`}
+                >
+                  <path
+                    d="M1.5 1.5 8 8.5l6.5-7"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </button>
+          </div>
+
+          <div
+            id="tdlr-trade-lists"
+            aria-hidden={!tradesOpen}
+            inert={!tradesOpen}
+            className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
+              tradesOpen ? 'mt-9 grid-rows-[1fr] opacity-100' : 'mt-0 grid-rows-[0fr] opacity-0'
+            }`}
+          >
+            <div className="min-h-0 overflow-hidden">
               <ul
                 aria-label="Trades supported by this process"
                 className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
@@ -152,9 +190,8 @@ export function TexasPage() {
                 </a>{' '}
                 before deciding this process is not for you.
               </p>
-            </div>
 
-            <aside className="mt-8 rounded-[4px] border border-wet/25 bg-concrete px-7 py-7 text-center">
+              <aside className="mt-8 rounded-[4px] border border-wet/25 bg-concrete px-7 py-7 text-center">
               <h3 className="font-display text-[18px] font-extrabold text-ink">
                 Licensed by a different board
               </h3>
@@ -172,7 +209,8 @@ export function TexasPage() {
               <p className="mx-auto mt-5 max-w-[48ch] text-[12.5px] leading-relaxed text-muted">
                 SurePath covers TDLR only.
               </p>
-            </aside>
+              </aside>
+            </div>
           </div>
         </Wrap>
       </section>
@@ -301,7 +339,7 @@ export function TexasPage() {
       </section>
 
       <section className="bg-concrete">
-        <Wrap className="flex flex-col items-start gap-4 py-10 sm:flex-row sm:items-center sm:justify-between">
+        <Wrap className="flex flex-col items-center gap-4 py-10 text-center">
           <div>
             <p className="font-display text-[24px] font-extrabold text-ink">
               Ready to build your request?

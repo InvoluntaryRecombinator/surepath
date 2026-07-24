@@ -42,7 +42,7 @@ function ChargeRow({
     /* Nesting device: indent + one left rule. Not a box in a box. */
     <div className="flex flex-col gap-4 border-l-2 border-line pl-5">
       <div className="flex items-center justify-between">
-        <span className="text-[12.5px] font-semibold uppercase tracking-[0.07em] text-muted">
+        <span className="text-[11.5px] font-bold uppercase tracking-[0.12em] text-accent">
           {noun} {ordinal}
         </span>
         {removable && (
@@ -109,7 +109,7 @@ function IncidentCard({ incident, ordinal }: { incident: DraftIncident; ordinal:
       className="rounded-[6px] border border-line bg-ground/30 px-7 py-6"
     >
       <div className="flex items-baseline justify-between">
-        <h2 className="text-[15px] font-bold text-ink">
+        <h2 className="text-[11.5px] font-bold uppercase tracking-[0.14em] text-accent">
           Incident {ordinal}
           {summary && <span className="ml-2 font-medium text-muted">{summary}</span>}
         </h2>

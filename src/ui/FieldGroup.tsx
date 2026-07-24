@@ -14,7 +14,6 @@ export function FieldGroup({
   heading,
   description,
   signatureSlot = false,
-  last = false,
   children,
 }: {
   heading: string
@@ -24,15 +23,13 @@ export function FieldGroup({
   children: ReactNode
 }) {
   return (
-    <section
-      className={`grid grid-cols-1 gap-x-12 xl:grid-cols-[216px_minmax(0,1fr)] ${
-        last ? '' : 'border-b border-line/55 pb-11'
-      }`}
-    >
+    <section className="grid grid-cols-1 gap-x-12 border-t border-line/75 pt-5 xl:grid-cols-[216px_minmax(0,1fr)]">
       <aside className="flex flex-col">
-        <h2 className="text-[17px] font-semibold leading-[1.35] text-ink">{heading}</h2>
+        <h2 className="text-[11.5px] font-bold uppercase leading-[1.4] tracking-[0.14em] text-accent">
+          {heading}
+        </h2>
         {description && (
-          <p className="mt-2 text-[14px] leading-[1.65] text-muted">{description}</p>
+          <p className="mt-2 text-[15px] leading-[1.65] text-ink">{description}</p>
         )}
         {signatureSlot && (
           <div
@@ -76,7 +73,7 @@ export function FieldRow({
   className?: string
 }) {
   return (
-    <div className={`grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 ${className}`}>
+    <div className={`grid grid-cols-1 items-start gap-x-8 gap-y-5 sm:grid-cols-2 ${className}`}>
       {children}
     </div>
   )

@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react'
-import { txConfig } from '../state-config/tx'
 import { useStateModal } from './stateModalContext'
-import { ResumeProgress } from './ResumeProgress'
 
 function Wrap({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -129,18 +127,12 @@ const steps = [
 function ProcessStep({ step, alternate }: { step: (typeof steps)[number]; alternate: boolean }) {
   return (
     <section className={`relative overflow-hidden ${step.background}`}>
-      <span
-        aria-hidden="true"
-        className={`absolute -top-[0.14em] font-display text-[clamp(160px,24vw,320px)] font-black leading-none text-brass/17 ${alternate ? '-right-[0.06em]' : '-left-[0.06em]'}`}
-      >
-        {step.number}
-      </span>
       <Wrap
         className={`relative z-10 flex items-center justify-between gap-[clamp(40px,7vw,110px)] py-[clamp(80px,11vh,120px)] ${alternate ? 'flex-row-reverse' : ''}`}
       >
         <div className="max-w-[58ch] flex-1 basis-[420px]">
           <div className="mb-[18px] flex items-center gap-3.5">
-            <span className="rounded-t-[2px] bg-ink px-[11px] pb-[5px] pt-1.5 font-mono text-[15px] font-bold tracking-[0.08em] text-brass">
+            <span className="inline-flex h-11 min-w-[52px] items-center justify-center rounded-t-[2px] bg-ink px-3 font-mono text-[18px] font-bold tracking-[0.08em] text-brass">
               {step.number}
             </span>
             <h3 className="font-display text-[clamp(24px,3vw,32px)] font-extrabold leading-[1.15] tracking-[-0.01em] text-ink">
@@ -152,8 +144,13 @@ function ProcessStep({ step, alternate }: { step: (typeof steps)[number]; altern
             <p className="mt-4 max-w-[52ch] text-[17px] leading-[1.65] text-wet">{step.note}</p>
           )}
         </div>
-        <div aria-hidden="true" className="flex basis-[380px] justify-center">
-          {step.visual}
+        <div aria-hidden="true" className="relative flex basis-[380px] justify-center">
+          <span
+            className={`pointer-events-none absolute top-1/2 z-0 -translate-y-1/2 font-display text-[clamp(160px,15vw,220px)] font-black leading-none text-brass/[0.07] ${alternate ? '-left-[clamp(92px,10vw,140px)]' : '-right-[clamp(92px,10vw,140px)]'}`}
+          >
+            {Number(step.number)}
+          </span>
+          <div className="relative z-10">{step.visual}</div>
         </div>
       </Wrap>
     </section>
@@ -164,13 +161,15 @@ export function LandingPage() {
   const openStateModal = useStateModal()
   return (
     <>
-      <header className="relative overflow-hidden bg-ink">
-        <img
-          src="/assets/hero.jpg"
-          alt="Worn work boots climbing a concrete stairwell toward daylight."
-          className="absolute inset-0 h-full w-full object-cover object-[72%_center]"
-        />
-        <div className="landing-hero-scrim absolute inset-0" aria-hidden="true" />
+      <header className="relative overflow-hidden bg-concrete">
+        <div className="landing-hero-media absolute inset-0">
+          <img
+            src="/assets/hero.jpg"
+            alt="Worn work boots climbing a concrete stairwell toward daylight."
+            className="absolute inset-0 h-full w-full object-cover object-[72%_center]"
+          />
+          <div className="landing-hero-scrim absolute inset-0" aria-hidden="true" />
+        </div>
         <Wrap className="relative z-10 pb-[clamp(96px,13vh,140px)] pt-[clamp(90px,13vh,150px)]">
           <h1 className="max-w-[17ch] font-display text-[clamp(38px,5.6vw,66px)] font-extrabold leading-[1.06] tracking-[-0.015em] text-silica">
             Take the next step toward your licensed career with{' '}
@@ -199,44 +198,27 @@ export function LandingPage() {
           ))}
         </section>
 
-        <section className="landing-dark-section relative bg-ink py-[clamp(88px,13vh,150px)]">
-          <Wrap>
-            <h2 className="mb-[22px] font-display text-[30px] font-extrabold text-silica">
-              We don’t decide anything.
-            </h2>
-            <p className="max-w-[58ch] text-[18px] leading-[1.65] text-[#c9cfd4]">
-              The licensing board makes the final call. SurePath helps you ask that board the
-              question correctly and receive its answer in writing.
-            </p>
-          </Wrap>
-        </section>
-
-        <section className="relative py-[clamp(72px,10vh,112px)]">
-          <Wrap className="grid grid-cols-2 gap-[clamp(40px,6vw,80px)]">
+        <section className="relative bg-ink">
+          <Wrap className="grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] items-stretch gap-[clamp(44px,6vw,84px)] py-[clamp(96px,14vh,150px)]">
             <div>
-              <h3 className="mb-3 font-display text-[20px] font-extrabold text-ink">
+              <h3 className="mb-4 font-display text-[22px] font-extrabold text-silica">
                 Built for people coming home
               </h3>
-              <p className="text-[17px] leading-[1.65] text-wet">
+              <p className="max-w-[43ch] text-[17px] leading-[1.7] text-[#d8d1c2]">
                 Use it on your own or with a counselor, caseworker, public defender, or anyone
                 helping you move toward a licensed career.
               </p>
             </div>
+            <span className="w-px self-stretch bg-silica/20" aria-hidden="true" />
             <div>
-              <h3 className="mb-3 font-display text-[20px] font-extrabold text-ink">
+              <h3 className="mb-4 font-display text-[22px] font-extrabold text-silica">
                 Your information stays with you
               </h3>
-              <p className="text-[17px] leading-[1.65] text-wet">
+              <p className="max-w-[43ch] text-[17px] leading-[1.7] text-[#d8d1c2]">
                 Your answers stay on the device you’re using. You can save a progress file and
                 return when you are ready.
               </p>
             </div>
-          </Wrap>
-        </section>
-
-        <section className="relative bg-concrete-4 py-[clamp(72px,10vh,110px)]">
-          <Wrap>
-            <ResumeProgress config={txConfig} />
           </Wrap>
         </section>
       </div>

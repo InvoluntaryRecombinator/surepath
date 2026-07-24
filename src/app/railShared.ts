@@ -1,12 +1,5 @@
 import { draftCounts } from './draft'
 
-export const DELETE_CONFIRM =
-  'We never store your information on our servers — it stays on this computer while ' +
-  'you work.\n\nThis will remove everything you have entered from this computer, so ' +
-  'nothing is left behind.\n\nTo pick up where you left off later, download ' +
-  'your progress file first (Cancel, then "Save my progress") — deleting is permanent.\n\nDelete everything from ' +
-  'this computer?'
-
 export function formatCounter(counts: ReturnType<typeof draftCounts>) {
   const recordsLabel =
     counts.records === 1

@@ -40,7 +40,7 @@ export function SaveProgressDialog({
       onClose={close}
       onMouseDown={(event) => event.target === event.currentTarget && close()}
     >
-      <div className="border-t-[4px] border-brand-gold">
+      <div className="border-y-[4px] border-forest">
         <header className="flex items-center gap-4 border-b border-line bg-ground/65 px-5 py-4 sm:px-7">
           <div className="min-w-0 flex-1">
             <h2
@@ -115,7 +115,7 @@ export function SaveProgressDialog({
                 </span>
               </p>
               <div className="mx-auto mt-4 max-w-[360px]">
-                <label className="block text-[13px] font-medium text-ink" htmlFor="progress-email">
+                <label className="block text-center text-[13px] font-medium text-ink" htmlFor="progress-email">
                   Email address
                 </label>
                 <input

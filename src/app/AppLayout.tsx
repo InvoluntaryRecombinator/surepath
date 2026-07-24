@@ -16,6 +16,7 @@ import { Notice } from '../ui/Notice'
 import { SectionBriefing } from '../ui/SectionIntro'
 import { useFocusMode } from './focusModeContext'
 import { useAppStore } from './storeContext'
+import { DeleteDataDialog } from './DeleteDataDialog'
 import { MobileRail } from './MobileRail'
 import { Rail } from './Rail'
 import { SaveProgressDialog } from './SaveProgressDialog'
@@ -32,6 +33,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const isLast = idx === config.sections.length - 1
   const [attemptedSectionId, setAttemptedSectionId] = useState<string | null>(null)
   const [saveProgressOpen, setSaveProgressOpen] = useState(false)
+  const [deleteDataOpen, setDeleteDataOpen] = useState(false)
   const errorSummaryRef = useRef<HTMLDivElement>(null)
   const validation = validateSection(stage.id, state.draft, {
     agency: config.agency,
@@ -57,17 +59,25 @@ export function AppLayout({ children }: { children: ReactNode }) {
   return (
     /* fixed inset-0: the app owns the viewport. Only the panel scrolls. */
     <div className="fixed inset-0 flex flex-col bg-rail lg:flex-row">
-      <Rail onSaveProgress={() => setSaveProgressOpen(true)} />
+      <Rail
+        onSaveProgress={() => setSaveProgressOpen(true)}
+        onDeleteData={() => setDeleteDataOpen(true)}
+      />
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <MobileRail onSaveProgress={() => setSaveProgressOpen(true)} />
+        <MobileRail
+          onSaveProgress={() => setSaveProgressOpen(true)}
+          onDeleteData={() => setDeleteDataOpen(true)}
+        />
 
         {/* ── THE PANEL — one paper object on graphite ground, real margins, real edge ── */}
         <main className="min-h-0 flex-1 p-2.5 sm:p-3 lg:p-4">
           <div className="h-full overflow-y-auto rounded-[12px] border border-rail-line bg-surface">
-            <div className="mx-auto max-w-[920px] px-6 pb-14 pt-9 sm:px-10 lg:px-12 lg:pt-11">
-              {!focused && <SectionBriefing section={stage} />}
+            {!focused && <SectionBriefing section={stage} />}
 
+            <div
+              className={`mx-auto max-w-[920px] px-6 pb-14 sm:px-10 lg:px-12 ${focused ? 'pt-9 lg:pt-11' : 'pt-10 lg:pt-12'}`}
+            >
               <form
                 id="apply-section-form"
                 data-validation-attempted={showValidation || undefined}
@@ -125,6 +135,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </main>
       </div>
+      <DeleteDataDialog
+        open={deleteDataOpen}
+        onOpenChange={setDeleteDataOpen}
+        onSaveProgress={() => setSaveProgressOpen(true)}
+      />
       <SaveProgressDialog open={saveProgressOpen} onOpenChange={setSaveProgressOpen} />
     </div>
   )

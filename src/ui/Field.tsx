@@ -27,10 +27,10 @@ type FieldShellProps = {
 export function FieldShell({ label, required, hint, info, htmlFor, children }: FieldShellProps) {
   return (
     <div className="flex flex-col gap-[7px]">
-      <div className="flex items-center gap-1.5">
+      <div className="flex min-h-[18px] items-center gap-1.5">
         <label
           htmlFor={htmlFor}
-          className="text-[13.5px] font-semibold leading-[18px] text-muted"
+          className="text-[12.5px] font-semibold leading-[18px] text-label"
         >
           {label}
           {required && (
@@ -94,7 +94,7 @@ export function ChoiceField({
             key={o.value}
             className={`inline-flex h-11 min-w-[92px] cursor-pointer items-center gap-2.5 rounded-[4px] border px-3.5 text-[14px] transition-colors duration-150 ${
               active
-                ? 'border-accent bg-accent/5 font-semibold text-accent'
+                ? 'border-accent bg-accent/[0.08] font-semibold text-accent'
                 : 'border-line bg-field text-ink hover:border-muted/70'
             }`}
           >
@@ -127,7 +127,7 @@ export function ChoiceField({
       <fieldset>
         <legend className="sr-only">{label}</legend>
         <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-5">
-          <div className="flex items-center gap-1.5 text-[14px] font-semibold leading-[1.45] text-ink">
+          <div className="flex items-center gap-1.5 text-[12.5px] font-semibold leading-[18px] text-label">
             <span aria-hidden="true">{label}</span>
             {required && (
               <span className="text-state/80" aria-hidden="true">
@@ -143,8 +143,8 @@ export function ChoiceField({
   }
 
   return (
-    <fieldset className="flex flex-col gap-[7px]">
-      <legend className="flex items-center gap-1.5 text-[13.5px] font-semibold leading-[18px] text-muted">
+    <fieldset className="flex self-start flex-col gap-[7px]">
+      <legend className="flex min-h-[18px] items-center gap-1.5 text-[12.5px] font-semibold leading-[18px] text-label">
         {label}
         {required && (
           <span className="text-state/80" aria-hidden="true">

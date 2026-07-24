@@ -7,18 +7,22 @@
  * Completed steps are clickable; future ones are not. Status lives in marker form and
  * type weight — there is no connector competing with the icons.
  */
-import { useNavigate } from 'react-router-dom'
 import { draftCounts } from './draft'
-import { DELETE_CONFIRM, formatCounter } from './railShared'
+import { formatCounter } from './railShared'
 import { validateSection } from './sectionValidation'
-import { eraseStoredData, useAppStore } from './storeContext'
+import { useAppStore } from './storeContext'
 import { CheckSmall, Icon } from '../ui/icons'
 
 const ROW_H = 50 // px — one nav row. The connector geometry derives from this.
 
-export function Rail({ onSaveProgress }: { onSaveProgress: () => void }) {
+export function Rail({
+  onSaveProgress,
+  onDeleteData,
+}: {
+  onSaveProgress: () => void
+  onDeleteData: () => void
+}) {
   const { state, dispatch, config } = useAppStore()
-  const navigate = useNavigate()
   const counts = draftCounts(state.draft)
   const currentIdx = config.sections.findIndex((s) => s.id === state.sectionId)
   const counterText = formatCounter(counts)
@@ -118,13 +122,7 @@ export function Rail({ onSaveProgress }: { onSaveProgress: () => void }) {
         </button>
         <button
           type="button"
-          onClick={() => {
-            if (window.confirm(DELETE_CONFIRM)) {
-              eraseStoredData(config)
-              dispatch({ type: 'delete-everything' })
-              navigate(config.routeBase)
-            }
-          }}
+          onClick={onDeleteData}
           className="text-[12px] font-medium text-rail-muted underline underline-offset-2 transition-colors duration-150 hover:text-rail-ink"
         >
           Delete my information from this computer

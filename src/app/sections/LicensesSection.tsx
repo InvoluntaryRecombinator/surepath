@@ -49,7 +49,13 @@ export function LicensesSection() {
     const active = selectedIndex(p.name) >= 0
     return (
       <li key={p.name}>
-        <label className="flex cursor-pointer items-start gap-3 rounded-[5px] px-2 py-[7px] transition-colors duration-150 hover:bg-ground">
+        <label
+          className={`flex cursor-pointer items-start gap-3 rounded-[5px] border px-2 py-[7px] transition-colors duration-150 ${
+            active
+              ? 'border-accent bg-accent/[0.08]'
+              : 'border-line bg-field hover:border-muted/70'
+          }`}
+        >
           <input
             type="checkbox"
             checked={active}

@@ -330,7 +330,13 @@ export function StoryWorkbench({
           />
 
           {/* §7 — the affirmation. The one layer a clever prompt cannot game. */}
-          <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-[8px] border border-line bg-ground px-4 py-3.5">
+          <label
+            className={`mt-4 flex cursor-pointer items-start gap-3 rounded-[8px] border px-4 py-3.5 transition-colors duration-150 ${
+              a.state.affirmed
+                ? 'border-accent bg-accent/[0.08]'
+                : 'border-line bg-field hover:border-muted/70'
+            }`}
+          >
             <input
               type="checkbox"
               checked={a.state.affirmed}

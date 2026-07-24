@@ -35,9 +35,11 @@
   --color-field: #ffffff;
   --color-muted: #3e4a54;
   --color-line: #d3d6d6;
+  --color-label: #6f675d;
   --color-accent: #c9a227;
   --color-accent-deep: #ad8515;
-  --color-interactive: #3e4a54;
+  --color-interactive: #1b4d8f;
+  --color-interactive-deep: #143d73;
   --color-brand-gold: #c9a227;
   --color-brand-gold-deep: #ad8515;
   --color-state: #a43a31;
@@ -86,7 +88,7 @@ form[data-validation-attempted='true'] fieldset:has(input:invalid) legend {
 /* Application controls use slate; marketing and save-progress retain brass. */
 body:has(#apply-section-form) main {
   --color-accent: var(--color-interactive);
-  --color-accent-deep: var(--color-interactive);
+  --color-accent-deep: var(--color-interactive-deep);
 }
 
 #apply-section-form :is(input, select, textarea):focus-visible {
@@ -112,10 +114,13 @@ body:has(#apply-section-form) main {
   background: color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
+.landing-hero-media {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 82%, transparent 100%);
+}
+
 .landing-hero-scrim {
-  background:
-    linear-gradient(to top, var(--color-silica) 0%, transparent 15%),
-    linear-gradient(to right, var(--color-ink) 8%, rgb(22 25 29 / 0%) 92%);
+  background: linear-gradient(to right, var(--color-ink) 8%, rgb(22 25 29 / 0%) 92%);
 }
 
 .save-progress-dialog::backdrop {

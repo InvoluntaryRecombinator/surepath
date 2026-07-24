@@ -73,10 +73,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
         {/* ── THE PANEL — one paper object on graphite ground, real margins, real edge ── */}
         <main className="min-h-0 flex-1 p-2.5 sm:p-3 lg:p-4">
           <div className="h-full overflow-y-auto rounded-[12px] border border-rail-line bg-surface">
-            {!focused && <SectionBriefing section={stage} />}
+            {/* focus mode gets its own briefing when the section defines one — the same
+                slate band as every other step, with the focused view's copy */}
+            {focused
+              ? stage.focusIntro && <SectionBriefing section={{ ...stage, intro: stage.focusIntro }} />
+              : <SectionBriefing section={stage} />}
 
             <div
-              className={`mx-auto max-w-[920px] px-6 pb-14 sm:px-10 lg:px-12 ${focused ? 'pt-9 lg:pt-11' : 'pt-10 lg:pt-12'}`}
+              className={`mx-auto max-w-[920px] px-6 pb-14 sm:px-10 lg:px-12 ${focused && !stage.focusIntro ? 'pt-9 lg:pt-11' : 'pt-10 lg:pt-12'}`}
             >
               <form
                 id="apply-section-form"

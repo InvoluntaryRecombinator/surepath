@@ -42,6 +42,13 @@ export type SectionDef = {
     /** Optional short points that must not be missed. Kept few — calm, not flag soup. */
     points?: string[]
   }
+  /** Briefing for the section's FOCUS-MODE view (the story workbench), rendered in the
+   *  same slate band as every other step. Without it, focus mode shows no briefing. */
+  focusIntro?: {
+    eyebrow: string
+    title: string
+    lead: string
+  }
 }
 
 export type FaqItem = {

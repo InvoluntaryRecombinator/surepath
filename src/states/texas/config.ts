@@ -57,6 +57,11 @@ export const txConfig: StateConfig = {
         title: 'What happened, in your own words',
         lead: 'Each incident needs an account of what happened and why. Write one account per incident. You will sign the completed forms as true and complete, so the account must stay in your own words.',
       },
+      focusIntro: {
+        eyebrow: 'Your story',
+        title: 'Tell us what happened, in your own words',
+        lead: "This is the part of your packet the board reads most closely. An assistant will ask you questions to help you get it down — what happened, why things went the way they did, what has changed since, and what you did to make it right. Boards weigh all of those, and an account that leaves them out reads as incomplete, so give as much detail as you can. Your answers then get organized into a clear written account in the register a licensing board expects. Nothing is added that you didn't say, nothing is softened, and the words stay yours — you can edit every line before it goes in your packet.",
+      },
     },
     {
       id: 'licenses',

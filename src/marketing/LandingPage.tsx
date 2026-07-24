@@ -19,7 +19,7 @@ function Bar({ width }: { width: string }) {
 
 function RecordVisual() {
   return (
-    <div className="relative w-[285px] border-[1.5px] border-paper-border bg-paper px-6 pb-6 pt-7 shadow-paper">
+    <div className="relative -translate-x-2 w-[285px] border-[1.5px] border-paper-border bg-paper px-6 pb-6 pt-7 shadow-paper">
       <span className="absolute -top-3 left-3.5 border-[1.5px] border-paper-border bg-paper px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-ink">
         Record
       </span>

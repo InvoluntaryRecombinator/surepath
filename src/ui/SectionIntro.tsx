@@ -13,7 +13,7 @@ export function SectionBriefing({ section }: { section: SectionDef }) {
           {intro.title}
         </h1>
         {intro.lede && (
-          <p className="mt-3 max-w-[62ch] text-[16px] font-semibold leading-[1.6] text-silica">
+          <p className="mt-3 max-w-[62ch] text-[16px] font-semibold leading-[1.6] text-silica underline underline-offset-4 decoration-silica/60">
             {intro.lede}
           </p>
         )}

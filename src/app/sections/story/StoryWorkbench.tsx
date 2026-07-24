@@ -168,11 +168,20 @@ export function StoryWorkbench({
                   Your account is below. Tell me what you'd like changed — or edit it
                   yourself, it's yours.
                 </p>
+              ) : incident.charges.length > 1 ? (
+                <p className="text-[15px] leading-relaxed text-ink/80">
+                  Start off by recounting what happened with this incident. This one event led
+                  to {incident.charges.length} charges, so tell it as one story — everything
+                  from that day belongs in a single account. Questions will follow, one at a
+                  time, to fill in what the account needs. When there's enough, it gets written
+                  below, and it stays yours to edit.
+                </p>
               ) : (
                 <p className="text-[15px] leading-relaxed text-ink/80">
-                  Tell what happened that day, in your own words — rough is fine. A few short
-                  questions may follow, one at a time; skip any of them. When there's enough,
-                  the account gets written below, and it stays yours to edit.
+                  Start off by recounting what happened with this conviction — what led up to
+                  it, and what happened that day. Questions will follow, one at a time, to fill
+                  in what the account needs. When there's enough, it gets written below, and it
+                  stays yours to edit.
                 </p>
               ))}
 

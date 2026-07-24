@@ -3,7 +3,7 @@
   <img src="public/assets/surepath_arrow_s_logo-2.svg" alt="SurePath" width="360">
 </picture>
 
-**[surepath.com](https://surepath.com) · Texas is live.**
+**[www.asurepath.com](https://www.asurepath.com) · Texas is live.**
 
 Find out whether your criminal record will disqualify you from a licensed trade — in
 writing, from the licensing board, before you spend a dollar on training.
@@ -306,7 +306,7 @@ mocks:
 This repository is public so it can be read and evaluated. It is not an open-source
 project and is not licensed for reuse or redistribution.
 
-The application is live at **[surepath.com](https://surepath.com)** — that's the intended
+The application is live at **[www.asurepath.com](https://www.asurepath.com)** — that's the intended
 way to see it work. The code is here to be read, not deployed.
 
 Built with Vite, React, TypeScript, and Tailwind. PDF generation runs client-side on

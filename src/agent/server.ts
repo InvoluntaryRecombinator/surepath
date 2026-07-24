@@ -236,7 +236,13 @@ export function draftGuardViolations(request: AgentRequest, draft: string): stri
       chargeTrigrams.add(chargeTokens.slice(i, i + 3).join(' '))
     }
     for (const token of new Set(chargeTokens)) {
-      if (token.length <= 4 || CHARGE_BOILERPLATE.has(token) || saidByUser.has(token)) continue
+      // a user's word licenses any charge token it is a stem of — register-raising
+      // ("meth" → "methamphetamine") is allowed; introducing a fact they never named is not
+      const saidStem = [...saidByUser].some(
+        (w) => w.length >= 4 && (token.startsWith(w) || w.startsWith(token)),
+      )
+      if (token.length <= 4 || CHARGE_BOILERPLATE.has(token) || saidByUser.has(token) || saidStem)
+        continue
       const positions = draftTokens.flatMap((t, i) => (t === token ? [i] : []))
       if (positions.length === 0) continue
       const allQuoted = positions.every((i) => {

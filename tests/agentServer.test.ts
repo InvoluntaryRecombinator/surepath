@@ -227,6 +227,26 @@ describe('the draft guards — mechanical L3 on the signed document', () => {
     ).toEqual([])
   })
 
+  it('allows register-raising — a stem the person said licenses the full charge token', () => {
+    const saidMeth = {
+      ...deferredOnly,
+      context: {
+        ...deferredOnly.context,
+        charges: [
+          {
+            exactOffense: 'Possession of a Controlled Substance, Penalty Group 1 (Methamphetamine)',
+            sentence: '2 years deferred adjudication',
+            disposition: 'deferred_adjudication' as const,
+          },
+        ],
+      },
+      messages: [{ role: 'user' as const, content: 'i had meth on me, like a gram' }],
+    }
+    expect(
+      draftGuardViolations(saidMeth, 'I had methamphetamine on me, about a gram.'),
+    ).toEqual([])
+  })
+
   it('allows tokens the person actually said', () => {
     const said = {
       ...deferredOnly,

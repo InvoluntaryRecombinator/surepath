@@ -470,7 +470,7 @@ POST { facts, why, whatChanged, madeItRight, offenses[], style }
   key resembling an identifier is present. Fail closed.
 - **Provider + retention, recorded (D6, verified 2026-07-20 against OpenAI's docs):**
   the OpenAI API via the Vercel AI SDK (`@ai-sdk/openai`, `generateObject`,
-  Zod-validated, default `gpt-4.1-mini`). OpenAI's published policy: *"data sent to the
+  Zod-validated, default `gpt-4.1`). OpenAI's published policy: *"data sent to the
   OpenAI API is not used to train or improve OpenAI models"* (default since 2023-03-01);
   abuse-monitoring logs are *"retained for up to 30 days"*; **true Zero Data Retention
   exists but requires OpenAI approval.**

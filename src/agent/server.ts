@@ -41,10 +41,13 @@ async function defaultGenerate(
 ): Promise<AgentTurn> {
   const openai = createOpenAI({ apiKey: env.apiKey })
   const { object } = await generateObject({
-    // gpt-4.1-mini: mid-tier, low latency, native json_schema structured outputs, and it
-    // honors an explicit temperature (the gpt-5 reasoning family does not, and spends
-    // hidden reasoning tokens while a person waits on a draft).
-    model: openai(env.modelId ?? 'gpt-4.1-mini'),
+    // gpt-4.1 (full tier): the interview lives or dies on conversational judgment, and
+    // mini executed the rules woodenly — script-reading the prompt's example sentences
+    // back at people. A user sends ~10-15 messages total; the cost delta is cents per
+    // packet and the writing is the product. 4.1 honors explicit temperature (the gpt-5
+    // reasoning family does not, and spends hidden reasoning tokens while a person
+    // waits on a draft). Swap via NARRATIVE_MODEL.
+    model: openai(env.modelId ?? 'gpt-4.1'),
     schema: AgentTurnSchema,
     system,
     messages:
@@ -139,6 +142,7 @@ export async function handleNarrativeRequest(
       turn = { ...turn, reply: statements }
     }
     turn = stripNarration(turn)
+    turn = stripPromptExamples(turn)
     turn = dropJunkReason(turn, request.guidance.factorsQuote)
     return finish(200, { turn })
   }
@@ -169,6 +173,32 @@ export function stripNarration(turn: AgentTurn): AgentTurn {
  * read as nagging; they are nulled before they render. Narrow on purpose: reasons citing
  * the charge or their own words pass untouched.
  */
+/** The prompt's example sentences, verbatim. Rule 5 tells the model they are intent,
+ *  not script — models still tail-quote them onto otherwise-fresh reasons. Known
+ *  constants, so the ban is mechanical: any verbatim occurrence is stripped. */
+const PROMPT_EXAMPLE_SENTENCES = [
+  "The board reads this next to the charge on your form. If the account is vaguer than the charge, it reads like you're avoiding it — so it's better to just say it plainly.",
+  "Two years at one job is the kind of specific a board can actually weigh. 'I've been working' isn't — they see that on every one of these.",
+  "The date matters because they cross-check it against your record, and a mismatch they can't explain slows everything down.",
+  "What was the program, and did you finish it? Boards weigh a completed program very differently from an ongoing one, so it's worth naming.",
+]
+
+export function stripPromptExamples(turn: AgentTurn): AgentTurn {
+  const scrub = (text: string) => {
+    let out = text
+    for (const ex of PROMPT_EXAMPLE_SENTENCES) out = out.split(ex).join(' ')
+    return out.replace(/\s{2,}/g, ' ').trim()
+  }
+  const reply = scrub(turn.reply)
+  let followUp = turn.followUp
+  if (followUp?.reason) {
+    const reason = scrub(followUp.reason)
+    followUp = { ...followUp, reason: reason.length > 10 ? reason : null }
+  }
+  const nudge = turn.nudge ? { ...turn.nudge, text: scrub(turn.nudge.text) } : null
+  return { ...turn, reply, followUp, nudge }
+}
+
 const JUNK_REASON =
   /^(details about|this (helps|is to help)|understanding (your|the)|boards? (look|weigh|need)s? )/i
 

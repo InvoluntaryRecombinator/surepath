@@ -194,6 +194,25 @@ describe('the junk-reason gate — a reason names a consequence or it does not r
   })
 })
 
+describe('the example scrubber — prompt illustrations never reach the screen', () => {
+  it('strips a verbatim example tail-quoted onto a fresh reason', async () => {
+    const tailQuoted = {
+      ...cleanTurn,
+      followUp: {
+        question: 'Where do you work, and how long have you been there?',
+        reason:
+          "Naming your employer and how long you've held the job is the kind of detail the board weighs most. Two years at one job is the kind of specific a board can actually weigh. 'I've been working' isn't — they see that on every one of these.",
+        stage: 'changed' as const,
+      },
+    }
+    const res = await handleNarrativeRequest(request, env, async () => tailQuoted)
+    const turn = res.body.turn as AgentTurn
+    expect(turn.followUp?.reason).toBe(
+      "Naming your employer and how long you've held the job is the kind of detail the board weighs most.",
+    )
+  })
+})
+
 describe('the draft guards — mechanical L3 on the signed document', () => {
   const deferredOnly = {
     ...request,

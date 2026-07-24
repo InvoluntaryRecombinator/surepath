@@ -14,7 +14,7 @@ import { useState } from 'react'
 import { Button } from '../../ui/Button'
 import { FieldGroup } from '../../ui/FieldGroup'
 import { Notice } from '../../ui/Notice'
-import { generateAllPackets, type GeneratedPacket } from '../../documents/assemblePacket'
+import type { GeneratedPacket } from '../../state-config/types'
 import { draftToCase, IncompleteDraftError } from '../convertDraft'
 import { draftCounts } from '../draft'
 import { formatLongDate } from '../lib/format'
@@ -57,7 +57,7 @@ export function ReviewSection() {
         agency: config.agency,
         narrativeItemLabel: config.copy.narrativeItemLabel,
       })
-      const packets = await generateAllPackets(converted)
+      const packets = await config.generatePackets(converted)
       const violations = packets.flatMap((p) => p.violations)
       if (violations.length > 0) {
         // Fail closed: a packet that failed its own verification is never offered.

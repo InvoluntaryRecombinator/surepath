@@ -599,7 +599,7 @@ else.** The **non-business-owner** case is **both the default and the common one
 and **ships a packet declaring the applicant a General Partnership.* Caught in the Phase 0
 browser probe. Fixed.*
 
-Full map: `data/tdlr_field_map.json`. Labeled renders: `probe/*_labeled.png`.
+Full map: `data/states/texas/tdlr_field_map.json`. Labeled renders: `probe/*_labeled.png`.
 
 ### F9 — ENF006 splits county and state. ENF003 combines them. Same packet.
 
@@ -735,8 +735,8 @@ Ask the human. Do not proceed.
 | `docs/ARCHITECTURE.md` | Stack, data model, document service, LLM boundary, the two serverless functions, threat model. |
 | `docs/BUILD_SEQUENCE.md` | **Start here to build.** Day-1 smoke test, 7 phases, definitions of done, cut order. |
 | `docs/OPEN_QUESTIONS.md` | Unresolved. **Blocked on TDLR.** Do not invent answers. |
-| `data/tdlr_field_map.json` | **The verified AcroForm field map.** Source of truth for the document service. Every trap annotated. **Do not re-derive field names.** |
-| `data/tdlr_guidelines.json` | *(to build — Phase 3)* `license → [{ crimeCategory, tdlrStatedReason }]`. |
-| `assets/ENF006_blank.pdf` | Authoritative blank, form pages only, fresh from tdlr.texas.gov. |
-| `assets/ENF003_blank.pdf` | Same. |
+| `data/states/texas/tdlr_field_map.json` | **The verified AcroForm field map.** Source of truth for the Texas document service. Every trap annotated. **Do not re-derive field names.** |
+| `data/states/texas/tdlr_guidelines.json` | *(to build — Phase 3)* `license → [{ crimeCategory, tdlrStatedReason }]`. |
+| `public/forms/texas/ENF006_blank.pdf` | Authoritative blank, form pages only, fresh from tdlr.texas.gov. |
+| `public/forms/texas/ENF003_blank.pdf` | Same. |
 | `probe/*_labeled.png` | Field-map overlay renders. Evidence, and a good capstone artifact. |

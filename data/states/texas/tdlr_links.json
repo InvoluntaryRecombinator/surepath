@@ -17,7 +17,7 @@
       "url": "https://www.tdlr.texas.gov/crimconvict.htm",
       "verify": true,
       "use_on": ["Stage 5 (license selection — the guidelines lookup)"],
-      "note": "This is the source document for data/tdlr_guidelines.json. Cite it on every lookup."
+      "note": "This is the source document for data/states/texas/tdlr_guidelines.json. Cite it on every lookup."
     },
     "applicants_with_criminal_history": {
       "label": "TDLR — Information for Applicants with Criminal History",

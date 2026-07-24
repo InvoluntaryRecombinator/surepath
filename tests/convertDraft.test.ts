@@ -10,13 +10,13 @@ import { readFile } from 'node:fs/promises'
 import { describe, expect, it } from 'vitest'
 import { draftToCase, IncompleteDraftError } from '../src/app/convertDraft'
 import { emptyApplicant, emptyDraft, type DraftCase } from '../src/app/draft'
-import { generatePacket } from '../src/documents/assemblePacket'
-import { buildPacketPlan } from '../src/documents/packetPlan'
-import type { TemplateLoader } from '../src/documents/pdfPrimitives'
-import { marcusRivera } from '../src/fixtures/marcusRivera'
+import { generatePacket } from '../src/states/texas/documents/assemblePacket'
+import { buildPacketPlan } from '../src/states/texas/documents/packetPlan'
+import type { TemplateLoader } from '../src/states/texas/documents/pdfPrimitives'
+import { marcusRivera } from '../src/states/texas/fixtures/marcusRivera'
 
 const load: TemplateLoader = async (name) =>
-  new Uint8Array(await readFile(`public/forms/${name}_blank.pdf`))
+  new Uint8Array(await readFile(`public/forms/texas/${name}_blank.pdf`))
 
 /** Marcus Rivera, as the UI would have collected him — structured address, flat officer
  *  fields, narrativeDraft strings. Built from the fixture so the two can never drift. */

@@ -6,9 +6,10 @@
  * item is OURS and is marked as an open question (L8). Deferred adjudications are
  * reported like convictions (D2). There is no lookback window (D1).
  */
-import links from '../../data/tdlr_links.json'
-import programs from '../../data/tdlr_programs.json'
-import type { StateConfig } from './types'
+import links from '../../../data/states/texas/tdlr_links.json'
+import programs from '../../../data/states/texas/tdlr_programs.json'
+import type { StateConfig } from '../../state-config/types'
+import { generateAllPackets } from './documents/assemblePacket'
 
 const TDLR_CHEL_URL = links.tdlr.chel_page.url
 
@@ -160,4 +161,5 @@ export const txConfig: StateConfig = {
   forms: {
     templates: ['ENF006', 'ENF003'],
   },
+  generatePackets: generateAllPackets,
 }

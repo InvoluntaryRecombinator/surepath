@@ -271,7 +271,7 @@ For each selected license:
 7. **`flatten()` on output.** Text is burned into the page content → identical on every
    library printer. Smoke-tested with `/Sig` present; it works.
 
-The authoritative map is **`data/tdlr_field_map.json`**. It is generated, verified against
+The authoritative map is **`data/states/texas/tdlr_field_map.json`**. It is generated, verified against
 a render, and annotated with every trap. Read it. Do not re-derive it from field names.
 
 ### 6.3 Continuation sheets
@@ -316,7 +316,7 @@ TDLR's *Criminal Conviction Guidelines* are **structured data**, not prose:
 license type  →  [ { crimeCategory, tdlrStatedReason } ]
 ```
 
-~37 license types × 4–6 categories. **Parse once to `data/tdlr_guidelines.json`.**
+~37 license types × 4–6 categories. **Parse once to `data/states/texas/tdlr_guidelines.json`.**
 
 Lookup is a **deterministic table read**. No embeddings. No retrieval. No model in this
 path. It cannot hallucinate because there is nothing to hallucinate with. (S3)

@@ -7,8 +7,8 @@
  *
  * Same data. Two shapes. One packet.
  */
-import type { Applicant, Case, Charge, Incident, LicenseSelection } from '../types/case'
-import type { PacketDocument } from '../types/packet'
+import type { Applicant, Case, Charge, Incident, LicenseSelection } from '../../../types/case'
+import type { PacketDocument } from './types'
 import {
   ENF003,
   ENF003_BUTTONS,

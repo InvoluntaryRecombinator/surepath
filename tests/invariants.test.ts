@@ -12,15 +12,15 @@ import { readFile } from 'node:fs/promises'
 import { describe, expect, it } from 'vitest'
 import { PDFDocument, PDFSignature, PDFName, type PDFDict } from 'pdf-lib'
 
-import { generateAllPackets, generatePacket } from '../src/documents/assemblePacket'
-import { ENF003, ENF006 } from '../src/documents/fieldMap'
-import { buildAllPlans, buildPacketPlan } from '../src/documents/packetPlan'
-import { readFieldValue, type TemplateLoader } from '../src/documents/pdfPrimitives'
-import { marcusRivera, marcusRiveraThreeTrades } from '../src/fixtures/marcusRivera'
+import { generateAllPackets, generatePacket } from '../src/states/texas/documents/assemblePacket'
+import { ENF003, ENF006 } from '../src/states/texas/documents/fieldMap'
+import { buildAllPlans, buildPacketPlan } from '../src/states/texas/documents/packetPlan'
+import { readFieldValue, type TemplateLoader } from '../src/states/texas/documents/pdfPrimitives'
+import { marcusRivera, marcusRiveraThreeTrades } from '../src/states/texas/fixtures/marcusRivera'
 import { allCharges } from '../src/types/case'
 
 const load: TemplateLoader = async (name) =>
-  new Uint8Array(await readFile(`public/forms/${name}_blank.pdf`))
+  new Uint8Array(await readFile(`public/forms/texas/${name}_blank.pdf`))
 
 const plan = () => buildPacketPlan(marcusRivera, marcusRivera.licenses[0])
 
@@ -165,7 +165,7 @@ describe('A13 — zeroAllFields ran: no field holds a value the app did not inte
 describe('A9 / F11 — the non-business-owner never ships a pre-ticked General Partnership', () => {
   it('leaves Type of Ownership UNTICKED and writes N/A to the business text fields', async () => {
     // Rebuild an ENF006 without flattening, and read the ownership radio off the bytes.
-    const { fillENF006 } = await import('../src/documents/fillForms')
+    const { fillENF006 } = await import('../src/states/texas/documents/fillForms')
     const p = plan()
     const doc = p.documents.find((d) => d.kind === 'enf006')!
     const filled = await fillENF006(load, marcusRivera, p.license, doc)
@@ -202,7 +202,7 @@ describe('A10 — 3 trades ⟹ 3 packets ⟹ 3 separate $10 money orders', () =>
 
 describe('F9 — county/state: SPLIT on ENF006, COMBINED on ENF003. Same packet.', () => {
   it('ENF006 writes the county alone, and the state in its own field', async () => {
-    const { fillENF006 } = await import('../src/documents/fillForms')
+    const { fillENF006 } = await import('../src/states/texas/documents/fillForms')
     const p = plan()
     const doc = p.documents.find((d) => d.kind === 'enf006')!
     const filled = await fillENF006(load, marcusRivera, p.license, doc)
@@ -214,7 +214,7 @@ describe('F9 — county/state: SPLIT on ENF006, COMBINED on ENF003. Same packet.
   })
 
   it('ENF003 writes them combined, in one field', async () => {
-    const { fillENF003 } = await import('../src/documents/fillForms')
+    const { fillENF003 } = await import('../src/states/texas/documents/fillForms')
     const p = plan()
     const doc = p.documents.filter((d) => d.kind === 'enf003')[0]
     const filled = await fillENF003(load, marcusRivera, p.license, doc)
@@ -226,7 +226,7 @@ describe('F9 — county/state: SPLIT on ENF006, COMBINED on ENF003. Same packet.
 
 describe('F8 — ENF003 buttons use /ChoiceN, non-sequentially and semantically arbitrarily', () => {
   it('ticks the CORRECTED values: parole No = /Choice3, probation Yes = /Choice1', async () => {
-    const { fillENF003 } = await import('../src/documents/fillForms')
+    const { fillENF003 } = await import('../src/states/texas/documents/fillForms')
     const p = plan()
     const doc = p.documents.filter((d) => d.kind === 'enf003')[0]
     const filled = await fillENF003(load, marcusRivera, p.license, doc)
@@ -244,7 +244,7 @@ describe('F8 — ENF003 buttons use /ChoiceN, non-sequentially and semantically 
   })
 
   it('/Choice1 means YES on #17 and NO on #16 — the number carries no meaning', async () => {
-    const { fillENF003 } = await import('../src/documents/fillForms')
+    const { fillENF003 } = await import('../src/states/texas/documents/fillForms')
     const onParole = {
       ...marcusRivera,
       applicant: {
@@ -300,7 +300,7 @@ describe('ENF003 parole/probation ticks land in the box a HUMAN would read as co
   }
 
   const enf003Bytes = async (c = marcusRivera) => {
-    const { fillENF003 } = await import('../src/documents/fillForms')
+    const { fillENF003 } = await import('../src/states/texas/documents/fillForms')
     const p = buildPacketPlan(c, c.licenses[0])
     const doc = p.documents.filter((d) => d.kind === 'enf003')[0]
     const filled = await fillENF003(load, c, p.license, doc)
@@ -337,7 +337,7 @@ describe('ENF003 parole/probation ticks land in the box a HUMAN would read as co
   })
 
   it('ENF006 agrees with ENF003 — the same man, the same answers, on both forms', async () => {
-    const { fillENF006 } = await import('../src/documents/fillForms')
+    const { fillENF006 } = await import('../src/states/texas/documents/fillForms')
     const p = plan()
     const doc = p.documents.find((d) => d.kind === 'enf006')!
     const filled = await fillENF006(load, marcusRivera, p.license, doc)
@@ -351,7 +351,7 @@ describe('ENF003 parole/probation ticks land in the box a HUMAN would read as co
 
 describe('The NEVER_FILL guard fails closed', () => {
   it('refuses to write the SSN, loudly, even if asked directly', async () => {
-    const { loadTemplate, setText } = await import('../src/documents/pdfPrimitives')
+    const { loadTemplate, setText } = await import('../src/states/texas/documents/pdfPrimitives')
     const f = await loadTemplate(load, 'ENF006')
     expect(() => setText(f, ENF006.ssn, '123-45-6789')).toThrow(/REFUSED/)
     expect(() => setText(f, ENF006.dateSigned, '07/14/2026')).toThrow(/REFUSED/)

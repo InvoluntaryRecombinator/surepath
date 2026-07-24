@@ -84,20 +84,22 @@ surepath/
 │   └── tdlr_guidelines.json         ☐  ← Phase 3 builds this. Empty for now.
 ├── public/
 │   └── forms/
-│       ├── ENF006_blank.pdf         ☐  ⚠️ MUST be in public/ — the browser fetch()es these
-│       └── ENF003_blank.pdf         ☐
+│       └── texas/
+│           ├── ENF006_blank.pdf     ☐  ⚠️ MUST be in public/ — the browser fetch()es these
+│           └── ENF003_blank.pdf     ☐
 └── src/
 ```
 
 **Three things people get wrong here:**
 
 1. **`CLAUDE.md` goes in the ROOT, not `docs/`.** That's what the CLI auto-loads.
-2. **The blank PDFs go in `public/forms/`.** The document service runs *in the browser*:
+2. **Texas blank PDFs go in `public/forms/texas/`.** The document service runs *in the browser*:
    ```ts
-   const bytes = await fetch('/forms/ENF006_blank.pdf').then(r => r.arrayBuffer())
+   const bytes = await fetch('/forms/texas/ENF006_blank.pdf').then(r => r.arrayBuffer())
    ```
    Anywhere else and they don't ship. The agent will lose an hour to this.
-3. **Use the fresh blanks** (`assets/ENF006_blank.pdf`, `assets/ENF003_blank.pdf`) —
+3. **Use the fresh blanks** (`public/forms/texas/ENF006_blank.pdf`,
+   `public/forms/texas/ENF003_blank.pdf`) —
    form-pages-only, from tdlr.texas.gov, verified zero-residue. **Not the originals with
    instruction sheets attached** — you'd mail TDLR their own instructions.
 
@@ -151,7 +153,7 @@ If it does, **come back to me** — I have two fallbacks ready.
 > business owner. **Include a 1998 conviction** (regression guard for D1) **and one deferred
 > adjudication with no conviction** (D2).
 >
-> `data/tdlr_field_map.json` is the source of truth. **Do not re-derive field names.**
+> `data/states/texas/tdlr_field_map.json` is the source of truth. **Do not re-derive field names.**
 >
 > Green these tests before you stop: **A1, A2, A2b, A4, A5, A11, A13.**
 
@@ -245,7 +247,7 @@ on.
 
 - ☐ **Make the TDLR call / send the email.** Q1–Q8 in `OPEN_QUESTIONS.md`.
       **Q8 (expunged/sealed records) is the highest-stakes one — get that one in WRITING.**
-- ☐ **Verify the links** in `data/tdlr_links.json` marked `"verify": false`
+- ☐ **Verify the links** in `data/states/texas/tdlr_links.json` marked `"verify": false`
       (the FBI Identity History Summary URL and fee, and the county clerk directory).
 - ☐ **Rewrite the proposal** to match the build: Texas only (not TX+AZ), no RAG, and the
       moat reframed as *verified state adapters*, not a triage classifier.

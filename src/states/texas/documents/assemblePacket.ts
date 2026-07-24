@@ -6,8 +6,8 @@
  * browser. (D5)
  */
 import { PDFDocument } from 'pdf-lib'
-import type { Case } from '../types/case'
-import type { PacketPlan } from '../types/packet'
+import type { Case } from '../../../types/case'
+import type { PacketPlan } from './types'
 import { fillENF003, fillENF006 } from './fillForms'
 import { generateContinuationSheet, generateMailingChecklist } from './generatedPages'
 import { buildAllPlans } from './packetPlan'

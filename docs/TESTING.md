@@ -60,7 +60,7 @@ The second one is the stronger test, because it's the thing that actually gets m
 
 ### And: do NOT mock pdf-lib. Do NOT mock the forms.
 
-Load the real blanks from `public/forms/` off disk (`fs.readFileSync` — pdf-lib is isomorphic,
+Load the real blanks from `public/forms/texas/` off disk (`fs.readFileSync` — pdf-lib is isomorphic,
 it doesn't care). **The whole reason these tests exist is that the real forms are weird.** A
 mock of a form you invented tests nothing.
 
@@ -109,8 +109,8 @@ tests/
 
 ```ts
 import { describe, it, expect } from 'vitest'
-import { packetPlan } from '../src/documents/packetPlan'
-import { marcusRivera, singleConviction } from '../src/fixtures/marcusRivera'
+import { packetPlan } from '../src/states/texas/documents/packetPlan'
+import { marcusRivera, singleConviction } from '../src/states/texas/fixtures/marcusRivera'
 
 const hvac = { program: 'Air Conditioning and Refrigeration', specificLicenseType: 'Technician' }
 

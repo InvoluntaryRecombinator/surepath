@@ -127,9 +127,12 @@ Then "I'm done" returns to a marketing page. All still inside `<AppLayout>`.
 - `src/marketing/` — the content pages, `<MarketingLayout>`.
 - `src/app/` — the rail flow, `<AppLayout>`, the state machine.
 - `src/ui/` — shared primitives consumed by both.
-- `src/state-config/` — `tx.ts` today; each new state is a new file here.
-- `src/documents/` — the packet service (already built), driven by the config's forms.
+- `src/state-config/` — shared state configuration contracts.
+- `src/states/texas/` — Texas page, configuration, data adapters, ENF document service,
+  fixtures, and Texas-only development harnesses.
+- `public/forms/texas/` — browser-served Texas/TDLR PDF templates.
+- `data/states/texas/` — verified Texas/TDLR catalogs and field maps.
 
-The separation of `marketing/` and `app/`, and the isolation of everything
-state-specific into `state-config/`, is the architecture. It is what makes "onboard
-Arizona" a matter of adding one config file, not editing the whole app.
+The separation of `marketing/` and `app/`, and the isolation of state-owned material
+under `states/<state>/`, is the architecture. Shared UI remains reusable; onboarding
+another state does not mix its forms, rules, or source data with Texas.

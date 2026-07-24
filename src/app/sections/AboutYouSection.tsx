@@ -2,7 +2,8 @@
  * About you — the applicant, collected once, stamped onto every page of the packet.
  *
  * FORM_SPEC note: docs/FORM_SPEC.md is referenced by the brief but absent from the repo;
- * the fields here are built from the verified sources instead — data/tdlr_field_map.json
+ * the fields here are built from verified state sources instead —
+ * data/states/texas/tdlr_field_map.json
  * (ENF006 items 1–14, 22–23), ARCHITECTURE §4's Applicant, and PRD Stage 3.
  *
  * THERE IS NO SSN FIELD. There will never be an SSN field (D3). The copy explaining why

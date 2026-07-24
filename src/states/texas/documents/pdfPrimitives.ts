@@ -25,8 +25,8 @@ import { NEVER_FILL } from './fieldMap'
 export type TemplateLoader = (name: 'ENF006' | 'ENF003') => Promise<Uint8Array>
 
 export const browserTemplateLoader: TemplateLoader = async (name) => {
-  const res = await fetch(`/forms/${name}_blank.pdf`)
-  if (!res.ok) throw new Error(`/forms/${name}_blank.pdf → HTTP ${res.status}`)
+  const res = await fetch(`/forms/texas/${name}_blank.pdf`)
+  if (!res.ok) throw new Error(`/forms/texas/${name}_blank.pdf → HTTP ${res.status}`)
   return new Uint8Array(await res.arrayBuffer())
 }
 
@@ -135,7 +135,7 @@ export function tickButton(f: FilledDocument, name: string, exportValue: string)
   if (!options.includes(wanted)) {
     throw new Error(
       `"${exportValue}" is not an option on "${name}". Actual options: ` +
-        `[${options.map((o) => `/${o}`).join(', ')}]. Read data/tdlr_field_map.json. Do not guess.`,
+        `[${options.map((o) => `/${o}`).join(', ')}]. Read data/states/texas/tdlr_field_map.json. Do not guess.`,
     )
   }
 

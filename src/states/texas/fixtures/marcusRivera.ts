@@ -17,7 +17,7 @@
  * The narratives are in the user's own voice, plainly. Nothing in them asserts anything
  * about what TDLR will decide, and nothing claims a rehabilitation the user did not describe.
  */
-import type { Case } from '../types/case'
+import type { Case } from '../../../types/case'
 
 const story = (draft: string) => ({
   rawAnswers: { facts: '', why: '', whatChanged: '', madeItRight: '' },

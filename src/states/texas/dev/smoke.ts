@@ -5,7 +5,7 @@
  * until every check below is green. This file is framework-free on purpose: it is
  * the regression suite, not a screen.
  *
- * It runs IN THE BROWSER, against the real blanks in public/forms/, because that is
+ * It runs IN THE BROWSER, against the real blanks in public/forms/texas/, because that is
  * where the document service will run. Passing in Node would prove nothing. (D5)
  */
 import {
@@ -41,13 +41,13 @@ export type SmokeReport = {
   evidence: string[]
 }
 
-const ENF006_URL = '/forms/ENF006_blank.pdf'
-const ENF003_URL = '/forms/ENF003_blank.pdf'
+const ENF006_URL = '/forms/texas/ENF006_blank.pdf'
+const ENF003_URL = '/forms/texas/ENF003_blank.pdf'
 
 /** Expected field counts, from CLAUDE.md F10 (32 fillable + 1 /Sig, 23 fillable + 1 /Sig). */
 const EXPECTED_FIELDS = { ENF006: 33, ENF003: 24 }
 
-/** Names copied from data/tdlr_field_map.json. Phase 1 will import them from a typed map;
+/** Names copied from data/states/texas/tdlr_field_map.json. Phase 1 will import them from a typed map;
  *  Phase 0 states them literally so a mismatch shows up here, not in the packet. */
 const SSN_FIELD = {
   ENF006: 'Social Security Number',
@@ -60,7 +60,7 @@ const SIG_FIELD = {
 
 async function loadBlank(url: string): Promise<PDFDocument> {
   const res = await fetch(url)
-  if (!res.ok) throw new Error(`${url} → HTTP ${res.status}. The blanks must live in public/forms/.`)
+  if (!res.ok) throw new Error(`${url} → HTTP ${res.status}. The blanks must live in public/forms/texas/.`)
   return PDFDocument.load(await res.arrayBuffer())
 }
 
@@ -150,7 +150,7 @@ export async function runSmoke(): Promise<SmokeReport> {
       id: '2',
       label: 'pdf-lib loads the blanks IN THE BROWSER (not Node)',
       status: 'pass',
-      detail: `ENF006: ${enf006.getPageCount()} page(s) · ENF003: ${enf003.getPageCount()} page(s), fetched from public/forms/`,
+      detail: `ENF006: ${enf006.getPageCount()} page(s) · ENF003: ${enf003.getPageCount()} page(s), fetched from public/forms/texas/`,
     })
   } catch (err) {
     checks.push({

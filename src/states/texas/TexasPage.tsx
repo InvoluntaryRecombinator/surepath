@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import catalog from '../../data/tx_licenses.json'
-import links from '../../data/tdlr_links.json'
+import catalog from '../../../data/states/texas/tx_licenses.json'
+import links from '../../../data/states/texas/tdlr_links.json'
 
 const fee = links.tdlr.fee_usd
 const days = links.tdlr.turnaround_days

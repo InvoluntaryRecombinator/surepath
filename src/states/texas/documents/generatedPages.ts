@@ -5,8 +5,8 @@
  * These pages exist to make the packet impossible to misfile and impossible to under-fill.
  */
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
-import type { Case } from '../types/case'
-import type { PacketDocument, PacketPlan } from '../types/packet'
+import type { Case } from '../../../types/case'
+import type { PacketDocument, PacketPlan } from './types'
 
 const PAGE: [number, number] = [612, 792] // US Letter
 const MARGIN = 54

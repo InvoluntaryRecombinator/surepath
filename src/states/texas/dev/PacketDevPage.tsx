@@ -4,9 +4,9 @@
  * The real UI starts with the shell. Nothing here is a precedent.
  */
 import { useEffect, useState } from 'react'
-import { generateAllPackets, type GeneratedPacket } from './documents/assemblePacket'
-import { marcusRivera } from './fixtures/marcusRivera'
-import { allCharges } from './types/case'
+import { generateAllPackets, type GeneratedPacket } from '../documents/assemblePacket'
+import { marcusRivera } from '../fixtures/marcusRivera'
+import { allCharges } from '../../../types/case'
 import './devHarness.css'
 
 export default function PacketDevPage() {

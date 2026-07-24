@@ -10,9 +10,9 @@
  * Conviction #1 rides on ENF006 and is NOT questionnaire 1. With 9 charges there are 8
  * questionnaires. Getting this wrong is an off-by-one that produces an incomplete packet.
  */
-import { FEE_USD, CONTINUATION_SHEETS } from '../config/flags'
-import { allCharges, type Case, type LicenseSelection } from '../types/case'
-import type { HandwriteLocation, PacketDocument, PacketPlan } from '../types/packet'
+import { FEE_USD, CONTINUATION_SHEETS } from './config'
+import { allCharges, type Case, type LicenseSelection } from '../../../types/case'
+import type { HandwriteLocation, PacketDocument, PacketPlan } from './types'
 import { FORM_PAGES, HANDWRITE_ITEMS } from './fieldMap'
 
 /** The reference string written into the narrative box. Two forms, two strings. */

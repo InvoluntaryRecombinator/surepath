@@ -4,7 +4,7 @@
     "verify": false,
     "verify_note": "REVIEW BEFORE DEMO: confirm each program name against https://www.tdlr.texas.gov/ and prune anything TDLR has sunset. A wrong program name here walks someone into a packet for a license that does not exist.",
     "demo_depth": "PRD: curate the demo around Barbering & Cosmetology, Air Conditioning & Refrigeration, and Electricians. Breadth is real; depth is curated.",
-    "no_guidelines_here": "This file is the CATALOG only. Per-license crime categories (data/tdlr_guidelines.json) are deliberately ABSENT — quoting TDLR's guidelines requires parsing their published document, a separate reviewed task. Until then the UI links to TDLR's guidelines page, attributed. Never invent a category."
+    "no_guidelines_here": "This file is the CATALOG only. Per-license crime categories (data/states/texas/tdlr_guidelines.json) are deliberately ABSENT — quoting TDLR's guidelines requires parsing their published document, a separate reviewed task. Until then the UI links to TDLR's guidelines page, attributed. Never invent a category."
   },
   "programs": [
     { "program": "Barbering and Cosmetology", "examples": ["Class A Barber", "Cosmetology Operator", "Esthetician", "Manicurist"], "demo": true },

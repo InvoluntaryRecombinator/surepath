@@ -34,7 +34,7 @@ entire architecture rests on. Two hours to validate. Do not skip.
 
 ```
 [ ] Vite + React + TS scaffold runs.
-[ ] pdf-lib loads assets/ENF006_blank.pdf IN THE BROWSER (not Node).
+[ ] pdf-lib loads public/forms/texas/ENF006_blank.pdf IN THE BROWSER (not Node).
 [ ] form.getFields() returns 33 fields on ENF006, 24 on ENF003.
 [ ] getTextField('Last Name').setText('RIVERA')          → renders.
 [ ] getRadioGroup('Are you currently on parole?').select('No')     → ticks.     (ENF006: Yes/No)
@@ -68,7 +68,7 @@ Not a business owner. Include a **1998 conviction** (regression guard for D1) an
 **deferred adjudication with no conviction** (D2).
 
 Tasks:
-1. Load `data/tdlr_field_map.json`. **It is the source of truth. Do not re-derive field names.**
+1. Load `data/states/texas/tdlr_field_map.json`. **It is the source of truth. Do not re-derive field names.**
 2. `zeroAllFields(pdf)` — clear `/V` and `/AS` on every field and every kid widget. **(D7)**
 3. `fillENF006(case, license)` — applicant + license + **conviction #1**. **(F1)**
 4. `fillENF003(case, charge, incident)` — one per conviction 2..N.
@@ -133,7 +133,7 @@ produces the same packet as the Phase 1 fixture.
 
 The same parsed table feeds **two** screens. Build the data once.
 
-1. Parse the *Criminal Conviction Guidelines* → `data/tdlr_guidelines.json`
+1. Parse the *Criminal Conviction Guidelines* → `data/states/texas/tdlr_guidelines.json`
    (`license → [{ crimeCategory, tdlrStatedReason }]`). **Deterministic table. No RAG.** (S3)
 
 2. **Stage 1 — trade catalog + coverage gate.** *(Not decoration. A trust gate.)*

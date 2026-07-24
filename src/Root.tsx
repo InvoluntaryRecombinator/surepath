@@ -2,10 +2,10 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { ApplyPage } from './app/ApplyPage'
 import { MarketingLayout } from './marketing/MarketingLayout'
 import { About, Faq, Landing } from './marketing/pages'
-import { TexasPage } from './marketing/TexasPage'
-import { txConfig } from './state-config/tx'
-import PacketDevPage from './PacketDevPage'
-import SmokePage from './SmokePage'
+import { TexasPage } from './states/texas/TexasPage'
+import { txConfig } from './states/texas/config'
+import PacketDevPage from './states/texas/dev/PacketDevPage'
+import SmokePage from './states/texas/dev/SmokePage'
 
 /**
  * Routes per SITE_STRUCTURE §2. Two shells: <MarketingLayout> for content pages,

@@ -3,9 +3,26 @@
  *
  * Everything state-specific lives in a StateConfig: the rail's section list, the copy,
  * the defaults, the links, the forms. The components are the reusable skeleton — they
- * read the config and NEVER hardcode a state. Onboarding a new state = a new file in
- * this directory, not an app edit.
+ * read the config and NEVER hardcode a state. Onboarding a new state = a state module
+ * under src/states/, not an app edit.
  */
+import type { Case } from '../types/case'
+
+export type PacketGenerationViolation = {
+  assertion: string
+  detail: string
+}
+
+export type GeneratedPacket = {
+  bytes: Uint8Array
+  filename: string
+  violations: PacketGenerationViolation[]
+  plan: {
+    license: { specificLicenseType: string }
+    mailedPages: number
+    feeUsd: number
+  }
+}
 
 export type IconKey = 'briefcase' | 'person' | 'folder' | 'pen' | 'certificate' | 'seal'
 
@@ -105,8 +122,12 @@ export type StateConfig = {
   }
 
   /** The packet service inputs for this state — template names as served from
-   *  public/forms/, consumed by the document service (already built for TX). */
+   *  public/forms/<state>/, consumed by that state's document service. */
   forms: {
     templates: string[]
   }
+
+  /** State-owned document adapter. Shared form UI calls this without importing a
+   *  particular state's forms or packet implementation. */
+  generatePackets: (caseData: Case) => Promise<GeneratedPacket[]>
 }

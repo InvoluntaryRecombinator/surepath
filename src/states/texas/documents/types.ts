@@ -6,7 +6,7 @@
  * checklist CANNOT drift from the packet. They are not two descriptions of the packet.
  * They are one description, used twice.
  */
-import type { Charge, Incident, LicenseSelection } from './case'
+import type { Charge, Incident, LicenseSelection } from '../../../types/case'
 
 export type DocumentKind = 'checklist' | 'enf006' | 'enf003' | 'continuation'
 

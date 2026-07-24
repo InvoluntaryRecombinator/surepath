@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { emptyDraft } from '../src/app/draft'
 import { parseProgressFile, serializeProgressFile } from '../src/app/progressFile'
 import type { AppState } from '../src/app/store'
-import { txConfig } from '../src/state-config/tx'
+import { txConfig } from '../src/states/texas/config'
 
 describe('SurePath progress files', () => {
   it('preserves the draft, current section, and reached steps', () => {

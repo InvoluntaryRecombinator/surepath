@@ -1,7 +1,7 @@
 /**
  * THE ONLY MODULE IN THE CODEBASE ALLOWED A FIELD-NAME STRING LITERAL.
  *
- * This is the typed adapter over `data/tdlr_field_map.json`. The JSON is the source of
+ * This is the typed adapter over `data/states/texas/tdlr_field_map.json`. The JSON is the source of
  * truth (verified against a field-probe render); this file makes it a compile-time
  * constraint, so that typing `/Yes` on an ENF003 button is a TYPE ERROR rather than a
  * rejected packet.

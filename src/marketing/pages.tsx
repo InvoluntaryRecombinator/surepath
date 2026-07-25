@@ -18,8 +18,8 @@ function Page({ title, line, children }: { title: string; line: string; children
 }
 
 
-const aboutEyebrow =
-  'font-mono text-[12px] font-bold uppercase tracking-[0.14em] text-brass'
+const aboutSectionHeading =
+  'font-display text-[32px] font-extrabold uppercase leading-[1.1] tracking-[-0.025em] text-brass sm:text-[34px] lg:text-[36px]'
 
 const aboutBody = 'max-w-[68ch] text-[17px] leading-[1.75] text-ink/80'
 
@@ -27,10 +27,9 @@ export const About = () => (
   <div className="bg-silica">
     <section className="bg-wet text-silica">
       <div className="mx-auto max-w-[1100px] px-6 py-16 sm:px-8 lg:px-14 lg:py-20">
-        <p className={aboutEyebrow}>About</p>
         <h1
-          className="mt-4 max-w-[19ch] font-display text-[44px] font-extrabold leading-[1.04] tracking-[-0.04em] text-brass lg:text-[56px]"
-          style={{ textShadow: '2px 2px 0 rgb(22 25 29 / 55%)' }}
+          className="max-w-[19ch] font-display text-[44px] font-extrabold leading-[1.04] tracking-[-0.04em] text-brass lg:text-[56px]"
+          style={{ textShadow: '4px 4px 0 #16191d' }}
         >
           Why SurePath exists
         </h1>
@@ -58,7 +57,7 @@ export const About = () => (
       </section>
 
       <section className="border-t border-wet/25 py-12 lg:py-14">
-        <p className={aboutEyebrow}>What's in the way</p>
+        <h2 className={aboutSectionHeading}>What's in the way</h2>
         <div className={`${aboutBody} mt-5 space-y-5`}>
           <p>
             Texas will review your record and answer you in writing, before you enroll in
@@ -76,7 +75,7 @@ export const About = () => (
       </section>
 
       <section className="border-t border-wet/25 py-12 lg:py-14">
-        <p className={aboutEyebrow}>What SurePath does</p>
+        <h2 className={aboutSectionHeading}>What SurePath does</h2>
         <p className={`${aboutBody} mt-5`}>
           It fills out the forms, assembles your packet, and tells you exactly where to sign and
           where to mail it. One packet per license you want reviewed, ready to print and send.
@@ -84,7 +83,7 @@ export const About = () => (
       </section>
 
       <section className="border-t border-wet/25 py-12 lg:py-14">
-        <p className={aboutEyebrow}>What it won't do</p>
+        <h2 className={aboutSectionHeading}>What it won't do</h2>
         <div className={`${aboutBody} mt-5 space-y-5`}>
           <p>
             SurePath can't tell you whether you'll be approved — but it will help you get an
@@ -105,7 +104,7 @@ export const About = () => (
       </section>
 
       <section className="border-t border-wet/25 py-12 lg:py-14">
-        <p className={aboutEyebrow}>Your information</p>
+        <h2 className={aboutSectionHeading}>Your information</h2>
         <p className={`${aboutBody} mt-5`}>
           There's no account and nothing to sign up for. Your name, your address, and your record
           stay in your browser. We never ask for your Social Security number at all — you write
@@ -115,7 +114,7 @@ export const About = () => (
       </section>
 
       <section className="border-t border-wet/25 py-12 lg:py-14">
-        <p className={aboutEyebrow}>Where it works</p>
+        <h2 className={aboutSectionHeading}>Where it works</h2>
         <p className={`${aboutBody} mt-5`}>
           Texas today. Several other states run similar programs, each with its own board and its
           own forms, and each one is real work to get right.

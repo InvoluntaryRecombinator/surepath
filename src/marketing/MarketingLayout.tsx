@@ -13,7 +13,11 @@ export function MarketingLayout() {
     <div className="flex min-h-screen flex-col bg-silica">
       <header className="relative z-20 border-b border-wet/20 bg-silica">
         <div className="flex min-h-[78px] items-center justify-between px-6">
-          <Link to="/" aria-label="SurePath home" className="inline-flex">
+          <Link
+            to="/"
+            aria-label="SurePath home"
+            className="inline-flex origin-left transition-transform duration-150 hover:-translate-y-px hover:scale-[1.015] focus-visible:-translate-y-px focus-visible:scale-[1.015]"
+          >
             <img
               src="/assets/surepath_arrow_s_logo-2.svg"
               alt="SurePath"
@@ -24,7 +28,7 @@ export function MarketingLayout() {
             <button
               type="button"
               onClick={() => setResumeProgressOpen(true)}
-              className="inline-flex h-11 cursor-pointer items-center rounded-[2px] border-[1.5px] border-ink bg-transparent px-[22px] text-[15px] font-bold tracking-[0.01em] text-ink transition-colors duration-150 hover:bg-ink hover:text-paper"
+              className="inline-flex h-11 cursor-pointer items-center rounded-[2px] border-[1.5px] border-ink bg-transparent px-[22px] text-[15px] font-bold tracking-[0.01em] text-ink shadow-action transition-[transform,box-shadow,background-color] duration-150 hover:-translate-x-px hover:-translate-y-px hover:bg-paper hover:shadow-action-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
             >
               Continue where you left off
             </button>

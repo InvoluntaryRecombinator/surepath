@@ -217,7 +217,7 @@ function ProcessStep({ step, alternate }: { step: (typeof steps)[number]; altern
         </div>
         <div aria-hidden="true" className="relative flex basis-[380px] justify-center">
           <span
-            className={`pointer-events-none absolute top-1/2 z-0 -translate-y-1/2 font-display text-[clamp(160px,15vw,220px)] font-black leading-none text-brass/[0.12] ${step.number === '01' ? '-right-[47px]' : step.number === '03' ? '-right-8' : alternate ? '-left-[clamp(92px,10vw,140px)] translate-x-[8px]' : '-right-[clamp(92px,10vw,140px)]'}`}
+            className={`pointer-events-none absolute top-1/2 z-0 -translate-y-1/2 font-display text-[clamp(160px,15vw,220px)] font-black leading-none text-brass/[0.12] ${step.number === '01' ? '-right-[50px]' : step.number === '03' ? '-right-8' : alternate ? '-left-[clamp(92px,10vw,140px)] translate-x-[8px]' : '-right-[clamp(92px,10vw,140px)]'}`}
           >
             {Number(step.number)}
           </span>

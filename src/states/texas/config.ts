@@ -7,6 +7,7 @@
  * reported like convictions (D2). There is no lookback window (D1).
  */
 import links from '../../../data/states/texas/tdlr_links.json'
+import counties from '../../../data/states/texas/counties.json'
 import programs from '../../../data/states/texas/tdlr_programs.json'
 import type { StateConfig } from '../../state-config/types'
 import { generateAllPackets } from './documents/assemblePacket'
@@ -95,6 +96,13 @@ export const txConfig: StateConfig = {
   turnaroundDays: links.tdlr.turnaround_days,
 
   programs: programs.programs,
+
+  counties: counties.counties,
+
+  // Budgets sized to the single-line AcroForm boxes on ENF006/ENF003 at their default
+  // font before pdf-lib begins shrinking. Estimated from the printed forms — re-probe
+  // against the real box rects if TDLR revises the PDFs.
+  fieldBudgets: { offense: 110, sentence: 110, street: 60, court: 60, names: 90 },
 
   links: {
     agencySite: { label: links.tdlr.chel_page.label, url: links.tdlr.chel_page.url },

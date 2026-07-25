@@ -16,6 +16,7 @@ import { Notice } from '../ui/Notice'
 import { SectionBriefing } from '../ui/SectionIntro'
 import { useFocusMode } from './focusModeContext'
 import { useAppStore } from './storeContext'
+import { AttemptedContext } from './validationUI'
 import { DeleteDataDialog } from './DeleteDataDialog'
 import { MobileRail } from './MobileRail'
 import { Rail } from './Rail'
@@ -52,7 +53,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
     event.preventDefault()
     if (!validation.complete) {
       setAttemptedSectionId(stage.id)
-      requestAnimationFrame(() => errorSummaryRef.current?.focus())
+      requestAnimationFrame(() => {
+        // land the user ON the first offending field, not just the summary
+        const firstInvalid = document.querySelector('[aria-invalid="true"]')
+        if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        else errorSummaryRef.current?.focus()
+      })
       return
     }
     go(idx + 1)
@@ -86,6 +92,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <div
               className={`mx-auto max-w-[920px] px-6 pb-14 sm:px-10 lg:px-12 ${focused && !stage.focusIntro ? 'pt-9 lg:pt-11' : 'pt-10 lg:pt-12'}`}
             >
+              <AttemptedContext.Provider value={attemptedSectionId === stage.id}>
               <form
                 id="apply-section-form"
                 data-validation-attempted={showValidation || undefined}
@@ -139,6 +146,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 </div>
                 )}
               </form>
+              </AttemptedContext.Provider>
             </div>
           </div>
         </main>

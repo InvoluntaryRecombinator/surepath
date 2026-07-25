@@ -22,9 +22,10 @@ import {
 } from '../../ui/FieldGroup'
 import { InfoBubble } from '../../ui/InfoBubble'
 import { SelectField } from '../../ui/Select'
-import { formatDate, formatPhone, formatZip, US_STATES } from '../lib/format'
+import { dateProblem, formatDate, formatPhone, formatZip, US_STATES } from '../lib/format'
 import type { DraftApplicant } from '../draft'
 import { useAppStore } from '../storeContext'
+import { useAttempted } from '../validationUI'
 
 const OWNERSHIP_OPTIONS = [
   'Sole proprietor',
@@ -45,10 +46,77 @@ const OWNERSHIP_LABEL: Record<string, string> = Object.fromEntries(
   Object.entries(OWNERSHIP_VALUE).map(([label, value]) => [value, label]),
 )
 
+/** "Other names" as an add-another list: a maiden name and a prior alias are separate
+ *  entries, not one crammed field. Joined with "; " into the same stored string the form
+ *  fill already uses — no migration, no PDF change. Budgeted: the joined result prints
+ *  into one fixed-size box. */
+function OtherNamesList({
+  value,
+  budget,
+  onChange,
+}: {
+  value: string
+  budget: number
+  onChange: (joined: string) => void
+}) {
+  const names = value.length > 0 ? value.split(';').map((n) => n.trimStart()) : []
+  const joinedLength = names.map((n) => n.trim()).filter(Boolean).join('; ').length
+  const commit = (next: string[]) =>
+    onChange(next.map((n) => n.trim()).filter(Boolean).join('; '))
+  const edit = (index: number, text: string) => {
+    const next = [...names]
+    next[index] = text
+    // live edits keep raw text (so typing spaces works); trim happens on commit
+    onChange(next.join('; '))
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {names.map((name, i) => (
+        <div key={i} className="flex items-end gap-2">
+          <div className="flex-1">
+            <TextField
+              label={`Name ${i + 1}`}
+              value={name}
+              maxLength={40}
+              onChange={(e) => edit(i, e.target.value)}
+              placeholder="e.g. Marcus D. Rivera"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => commit(names.filter((_, j) => j !== i))}
+            className="h-11 shrink-0 text-[12.5px] font-medium text-muted underline underline-offset-2 hover:text-ink"
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+      <div className="flex items-baseline justify-between">
+        <button
+          type="button"
+          onClick={() => onChange(names.concat('').join('; '))}
+          disabled={joinedLength >= budget}
+          className="text-[13.5px] font-medium text-accent hover:underline disabled:opacity-40"
+        >
+          + Add {names.length === 0 ? 'a name' : 'another name'}
+        </button>
+        {joinedLength >= budget * 0.7 && (
+          <span className={`text-[11.5px] tabular-nums ${joinedLength >= budget ? 'font-semibold text-state' : 'text-muted'}`}>
+            {joinedLength}/{budget}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function AboutYouSection() {
-  const { state, dispatch } = useAppStore()
+  const { state, dispatch, config } = useAppStore()
   const a = state.draft.applicant
   const patch = (p: Partial<DraftApplicant>) => dispatch({ type: 'update-applicant', patch: p })
+  const attempted = useAttempted()
+  const req = (v: string) => (attempted && v.trim().length === 0 ? 'Required.' : null)
 
   return (
     <div className="flex flex-col gap-10 xl:gap-12">
@@ -62,6 +130,7 @@ export function AboutYouSection() {
             label="Last name"
             required
             autoComplete="family-name"
+            error={req(a.lastName)}
             value={a.lastName}
             onChange={(e) => patch({ lastName: e.target.value })}
           />
@@ -69,6 +138,7 @@ export function AboutYouSection() {
             label="First name"
             required
             autoComplete="given-name"
+            error={req(a.firstName)}
             value={a.firstName}
             onChange={(e) => patch({ firstName: e.target.value })}
           />
@@ -81,11 +151,12 @@ export function AboutYouSection() {
             onChange={(e) => patch({ middleName: e.target.value })}
             hint="Leave blank if you don't have one."
           />
-          <TextField
+          <SelectField
             label="Suffix"
             value={a.suffix}
             onChange={(e) => patch({ suffix: e.target.value })}
-            placeholder="Jr, Sr, III"
+            placeholder="None"
+            options={['Jr', 'Sr', 'II', 'III', 'IV', 'V']}
           />
         </FieldRow>
       </FieldGroup>
@@ -94,11 +165,10 @@ export function AboutYouSection() {
         heading="Other names you've been known by"
         description="Include any name you've used before — a maiden name, a married name, or any other name you've gone by. These are needed so your history can be searched accurately."
       >
-        <TextField
-          label="Names to include"
+        <OtherNamesList
           value={a.allKnownNames}
-          onChange={(e) => patch({ allKnownNames: e.target.value })}
-          placeholder="e.g. Marcus D. Rivera; Marc Rivera"
+          budget={config.fieldBudgets.names}
+          onChange={(joined) => patch({ allKnownNames: joined })}
         />
       </FieldGroup>
 
@@ -117,6 +187,7 @@ export function AboutYouSection() {
             placeholder="MM/DD/YYYY"
             pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}"
             title="Use MM/DD/YYYY."
+            error={req(a.dob) ?? dateProblem(a.dob)}
           />
           <ChoiceField
             label="Gender"
@@ -140,6 +211,8 @@ export function AboutYouSection() {
           label="Street address"
           required
           autoComplete="street-address"
+          maxLength={config.fieldBudgets.street}
+          error={req(a.addressStreet)}
           value={a.addressStreet}
           onChange={(e) => patch({ addressStreet: e.target.value })}
           placeholder="e.g. 4412 Larkspur Lane, Apt 3B"
@@ -150,6 +223,7 @@ export function AboutYouSection() {
             label="City"
             required
             autoComplete="address-level2"
+            error={req(a.addressCity)}
             value={a.addressCity}
             onChange={(e) => patch({ addressCity: e.target.value })}
           />

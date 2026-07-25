@@ -14,9 +14,10 @@
 import { Button } from '../../ui/Button'
 import { ChoiceField, TextField } from '../../ui/Field'
 import { FaqPanel } from '../../ui/FaqPanel'
-import { formatLongDate } from '../lib/format'
+import { dateOnOrAfter, dateProblem, formatDate, formatLongDate } from '../lib/format'
 import type { DraftCharge, DraftIncident } from '../draft'
 import { useAppStore } from '../storeContext'
+import { useAttempted } from '../validationUI'
 
 function ChargeRow({
   incident,
@@ -30,6 +31,9 @@ function ChargeRow({
   removable: boolean
 }) {
   const { dispatch, config } = useAppStore()
+  const budgets = config.fieldBudgets
+  const attempted = useAttempted()
+  const req = (v: string) => (attempted && v.trim().length === 0 ? 'Required.' : null)
   const patch = (p: Partial<DraftCharge>) =>
     dispatch({ type: 'update-charge', incidentId: incident.id, chargeId: charge.id, patch: p })
 
@@ -61,6 +65,8 @@ function ChargeRow({
       <TextField
         label="Exact offense, as your court records name it"
         required
+        maxLength={budgets.offense}
+        error={req(charge.exactOffense)}
         value={charge.exactOffense}
         onChange={(e) => patch({ exactOffense: e.target.value })}
         placeholder="e.g. Possession of a Controlled Substance, Penalty Group 1, less than 1 gram"
@@ -70,6 +76,8 @@ function ChargeRow({
       <TextField
         label="Sentence or action imposed by the court"
         required
+        maxLength={budgets.sentence}
+        error={req(charge.sentence)}
         value={charge.sentence}
         onChange={(e) => patch({ sentence: e.target.value })}
         placeholder="e.g. 6 months county jail; $1,500 fine (paid)"
@@ -96,6 +104,10 @@ function ChargeRow({
 
 function IncidentCard({ incident, ordinal }: { incident: DraftIncident; ordinal: number }) {
   const { dispatch, config } = useAppStore()
+  const budgets = config.fieldBudgets
+  const countyListId = `county-list-${incident.id}`
+  const attempted = useAttempted()
+  const req = (v: string) => (attempted && v.trim().length === 0 ? 'Required.' : null)
   const patch = (p: Partial<DraftIncident>) =>
     dispatch({ type: 'update-incident', id: incident.id, patch: p })
 
@@ -130,7 +142,17 @@ function IncidentCard({ incident, ordinal }: { incident: DraftIncident; ordinal:
           value={incident.county}
           onChange={(e) => patch({ county: e.target.value })}
           placeholder="e.g. Harris"
+          error={req(incident.county)}
+          maxLength={30}
+          list={incident.state === config.stateName ? countyListId : undefined}
         />
+        {incident.state === config.stateName && (
+          <datalist id={countyListId}>
+            {config.counties.map((county) => (
+              <option key={county} value={county} />
+            ))}
+          </datalist>
+        )}
         <TextField
           label="State"
           required
@@ -141,6 +163,8 @@ function IncidentCard({ incident, ordinal }: { incident: DraftIncident; ordinal:
           <TextField
             label="Court"
             required
+            error={req(incident.court)}
+            maxLength={budgets.court}
             value={incident.court}
             onChange={(e) => patch({ court: e.target.value })}
             placeholder="e.g. 178th District Court"
@@ -150,16 +174,33 @@ function IncidentCard({ incident, ordinal }: { incident: DraftIncident; ordinal:
         <TextField
           label="Date the crime was committed"
           required
+          inputMode="numeric"
           value={incident.dateCrimeCommitted}
-          onChange={(e) => patch({ dateCrimeCommitted: e.target.value })}
+          onChange={(e) => patch({ dateCrimeCommitted: formatDate(e.target.value) })}
           placeholder="MM/DD/YYYY"
+          pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}"
+          title="Use MM/DD/YYYY."
+          error={req(incident.dateCrimeCommitted) ?? dateProblem(incident.dateCrimeCommitted)}
         />
         <TextField
           label="Date of conviction or deferred adjudication"
           required
+          inputMode="numeric"
           value={incident.dateOfConviction}
-          onChange={(e) => patch({ dateOfConviction: e.target.value })}
+          onChange={(e) => patch({ dateOfConviction: formatDate(e.target.value) })}
           placeholder="MM/DD/YYYY"
+          pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}"
+          title="Use MM/DD/YYYY."
+          error={
+            req(incident.dateOfConviction) ??
+            dateProblem(incident.dateOfConviction) ??
+            (incident.dateCrimeCommitted &&
+            incident.dateOfConviction &&
+            !dateProblem(incident.dateCrimeCommitted) &&
+            !dateOnOrAfter(incident.dateOfConviction, incident.dateCrimeCommitted)
+              ? 'This is before the date the crime was committed.'
+              : null)
+          }
         />
       </div>
 

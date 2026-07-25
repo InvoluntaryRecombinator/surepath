@@ -113,3 +113,51 @@ describe('story migration — legacy narrativeDraft normalizes, unaffirmed (§7)
     expect('narrativeDraft' in migrated).toBe(false)
   })
 })
+
+
+describe('real date validation — impossible dates are caught at the step, not at Review', () => {
+  const withIncidentDates = (crime: string, conviction: string) => {
+    const d = emptyDraft()
+    const incident = {
+      ...newIncident('Texas'),
+      county: 'Harris',
+      state: 'Texas',
+      court: '178th District Court',
+      dateCrimeCommitted: crime,
+      dateOfConviction: conviction,
+    }
+    d.incidents = [incident]
+    return d
+  }
+
+  it('rejects a well-formed but impossible date (99/99/9999)', () => {
+    const v = validateSection('record', withIncidentDates('99/99/9999', '01/12/1999'))
+    expect(v.issues.some((i) => i.field.endsWith('dateCrimeCommitted'))).toBe(true)
+  })
+
+  it('rejects a date in the future', () => {
+    const v = validateSection('record', withIncidentDates('08/21/1998', '01/12/2199'))
+    expect(v.issues.some((i) => i.field.endsWith('dateOfConviction'))).toBe(true)
+  })
+
+  it('rejects a disposition date before the crime date', () => {
+    const v = validateSection('record', withIncidentDates('08/21/1998', '01/12/1997'))
+    expect(
+      v.issues.some(
+        (i) => i.field.endsWith('dateOfConviction') && i.message.includes('before'),
+      ),
+    ).toBe(true)
+  })
+
+  it('accepts a real pair, and leap-day is a real date', () => {
+    const good = validateSection('record', withIncidentDates('02/29/2016', '01/12/2017'))
+    expect(good.issues.filter((i) => i.field.includes('date'))).toHaveLength(0)
+  })
+
+  it('DOB: mask-passing garbage is rejected', () => {
+    const d = emptyDraft()
+    d.applicant.dob = '13/45/2020'
+    const v = validateSection('info', d)
+    expect(v.issues.some((i) => i.field === 'applicant.dob' && !i.message.includes('MM/DD'))).toBe(true)
+  })
+})

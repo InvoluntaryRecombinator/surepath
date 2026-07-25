@@ -98,6 +98,21 @@ export type StateConfig = {
    *  never written anywhere. */
   programs: { name: string; aliases: string[] }[]
 
+  /** The state's counties, for the incident-county type-ahead (suggestions only —
+   *  free text stays legal, because out-of-state incidents name other states' counties). */
+  counties: string[]
+
+  /** Character budgets for inputs that print into fixed-size AcroForm boxes — pdf-lib
+   *  shrinks overflow to fit, which prints ant-sized on the official form. Values are
+   *  per-state, derived from the form's box geometry; re-probe if the forms revise. */
+  fieldBudgets: {
+    offense: number
+    sentence: number
+    street: number
+    court: number
+    names: number
+  }
+
   /** External links the chassis renders. Attributed, never hardcoded in a component. */
   links: {
     agencySite: { label: string; url: string }

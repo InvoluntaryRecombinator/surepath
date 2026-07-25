@@ -1,4 +1,5 @@
 import type { DraftCase } from './draft'
+import { dateOnOrAfter, dateProblem } from './lib/format'
 
 /** State-specific message context. Optional: without it, messages stay generic — no agency
  *  name or form-item label is ever hardcoded here. */
@@ -33,6 +34,9 @@ function applicantValidation(draft: DraftCase): SectionValidation {
 
   if (!DATE.test(a.dob)) {
     issues.push({ field: 'applicant.dob', message: 'Enter your date of birth as MM/DD/YYYY.' })
+  } else {
+    const problem = dateProblem(a.dob)
+    if (problem) issues.push({ field: 'applicant.dob', message: problem })
   }
   if (!a.gender) issues.push({ field: 'applicant.gender', message: 'Choose a gender.' })
 
@@ -104,6 +108,24 @@ function recordValidation(draft: DraftCase): SectionValidation {
     required.forEach(([field, value, message]) => {
       if (!hasText(value)) issues.push({ field: `${prefix}.${field}`, message })
     })
+
+    // Real date validation at the step — not just "not empty" caught at Review.
+    for (const field of ['dateCrimeCommitted', 'dateOfConviction'] as const) {
+      const problem = hasText(incident[field]) ? dateProblem(incident[field]) : null
+      if (problem) issues.push({ field: `${prefix}.${field}`, message: `${label}: ${problem}` })
+    }
+    if (
+      !dateProblem(incident.dateCrimeCommitted) &&
+      !dateProblem(incident.dateOfConviction) &&
+      hasText(incident.dateCrimeCommitted) &&
+      hasText(incident.dateOfConviction) &&
+      !dateOnOrAfter(incident.dateOfConviction, incident.dateCrimeCommitted)
+    ) {
+      issues.push({
+        field: `${prefix}.dateOfConviction`,
+        message: `${label}: the disposition date is before the date the crime was committed.`,
+      })
+    }
 
     if (incident.charges.length === 0) {
       issues.push({ field: `${prefix}.charges`, message: `${label}: add at least one record.` })

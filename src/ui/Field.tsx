@@ -20,11 +20,17 @@ type FieldShellProps = {
   required?: boolean
   hint?: string
   info?: ReactNode
+  /** Field-level validation message. Renders AT the field, in state red, and the input
+   *  carries aria-invalid — a summary count at the bottom is not error display. */
+  error?: string | null
+  /** "142/160" style budget readout — shown once usage passes ~70% of maxLength. */
+  counter?: { length: number; max: number }
   htmlFor: string
   children: ReactNode
 }
 
-export function FieldShell({ label, required, hint, info, htmlFor, children }: FieldShellProps) {
+export function FieldShell({ label, required, hint, info, error, counter, htmlFor, children }: FieldShellProps) {
+  const showCounter = counter && counter.length >= counter.max * 0.7
   return (
     <div className="flex flex-col gap-[7px]">
       <div className="flex min-h-[18px] items-center gap-1.5">
@@ -40,9 +46,22 @@ export function FieldShell({ label, required, hint, info, htmlFor, children }: F
           )}
         </label>
         {info && <InfoBubble label={label}>{info}</InfoBubble>}
+        {showCounter && (
+          <span
+            className={`ml-auto text-[11.5px] tabular-nums ${counter.length >= counter.max ? 'font-semibold text-state' : 'text-muted'}`}
+          >
+            {counter.length}/{counter.max}
+          </span>
+        )}
       </div>
       {children}
-      {hint && <p className="text-[12.5px] leading-[18px] text-muted">{hint}</p>}
+      {error ? (
+        <p role="alert" className="text-[12.5px] font-medium leading-[18px] text-state">
+          {error}
+        </p>
+      ) : (
+        hint && <p className="text-[12.5px] leading-[18px] text-muted">{hint}</p>
+      )}
     </div>
   )
 }
@@ -52,15 +71,35 @@ type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id' | 'classN
   required?: boolean
   hint?: string
   info?: ReactNode
+  error?: string | null
 }
 
-export function TextField({ label, required, hint, info, ...input }: TextFieldProps) {
+export function TextField({ label, required, hint, info, error, ...input }: TextFieldProps) {
   const id = useId()
   const pattern =
     input.pattern ?? (required && (input.type === undefined || input.type === 'text') ? '.*\\S.*' : undefined)
+  const counter =
+    typeof input.maxLength === 'number' && typeof input.value === 'string'
+      ? { length: input.value.length, max: input.maxLength }
+      : undefined
   return (
-    <FieldShell label={label} required={required} hint={hint} info={info} htmlFor={id}>
-      <input id={id} className={inputClass} {...input} required={required} pattern={pattern} />
+    <FieldShell
+      label={label}
+      required={required}
+      hint={hint}
+      info={info}
+      error={error}
+      counter={counter}
+      htmlFor={id}
+    >
+      <input
+        id={id}
+        className={`${inputClass} ${error ? 'border-state hover:border-state' : ''}`}
+        aria-invalid={error ? true : undefined}
+        {...input}
+        required={required}
+        pattern={pattern}
+      />
     </FieldShell>
   )
 }

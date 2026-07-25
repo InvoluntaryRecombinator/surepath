@@ -15,14 +15,14 @@
  */
 import { createOpenAI } from '@ai-sdk/openai'
 import { generateObject } from 'ai'
-import { buildSystemPrompt, findIdentifierKeys } from './prompt'
+import { buildSystemPrompt, findIdentifierKeys } from './prompt.js'
 import {
   AgentRequestSchema,
   AgentTurnSchema,
   outcomeLanguageViolations,
   type AgentRequest,
   type AgentTurn,
-} from './turns'
+} from './turns.js'
 
 export type NarrativeEnv = {
   apiKey: string | undefined

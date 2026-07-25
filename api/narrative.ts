@@ -4,7 +4,8 @@
  *
  * Stateless. No database. Status + latency logged inside the handler; never the body. (D6)
  */
-import { handleNarrativeRequest } from '../src/agent/server'
+import process from 'node:process'
+import { handleNarrativeRequest } from '../src/agent/server.js'
 
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') {

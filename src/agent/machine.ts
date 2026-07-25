@@ -14,7 +14,7 @@
  *   - A factor is nudged at most once, ever. The MANUAL PATH is first-class. Hints never
  *     gate. Save requires the §7 affirmation. Failures don't consume turns.
  */
-import type { AgentTurn, NudgeFactor, Ownership, StageKey, Stages } from './turns'
+import type { AgentTurn, NudgeFactor, Ownership, StageKey, Stages } from './turns.js'
 
 export const MAX_FOLLOWUP_TURNS = 15
 

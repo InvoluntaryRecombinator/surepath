@@ -13,7 +13,7 @@
  * the model must see everything from that night to write one true account instead of
  * amputated fragments.
  */
-import { emptyRawAnswers, type DraftCharge, type DraftIncident, type RawAnswers } from '../app/draft'
+import { emptyRawAnswers, type DraftCharge, type DraftIncident, type RawAnswers } from '../app/draft.js'
 
 export { emptyRawAnswers, type RawAnswers }
 

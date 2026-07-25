@@ -12,7 +12,7 @@
  * the client owns stateConfig; this file and the server are state-agnostic. The chassis
  * rule applies to prompts too: a new state is a config file, not a prompt edit.
  */
-import type { AgentRequest } from './turns'
+import type { AgentRequest } from './turns.js'
 
 /** The absolute rules — both prompts start here. */
 export const PROMPT_PREAMBLE = `You help a person write one honest account of an arrest, for a criminal history evaluation
@@ -416,7 +416,7 @@ theirs and you may use it.`)
     )
   }
 
-  const answers = Object.entries(context.rawAnswers)
+  const answers = Object.entries<string>(context.rawAnswers)
     .filter(([, v]) => v.trim().length > 0)
     .map(([k, v]) => `${k}: ${v}`)
     .join('\n')
